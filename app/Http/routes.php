@@ -11,6 +11,14 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', function(){
+    return view('pages.home');
+});
+
+Route::get('/howto', function(){
+  return view('pages.howto');
+});
+
+Route::get('/traitDB', function(){
+  return view('pages.traitDB');
 });
