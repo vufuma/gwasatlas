@@ -17,7 +17,7 @@ class CreateGwasDBTable extends Migration
             $table->string('PMID');
             $table->integer('Year');
             $table->string('File');
-            $table->string('website');
+            $table->string('Website');
             $table->string('Domain');
             $table->string('ChapterLevel');
             $table->string('SubchapterLevel');
@@ -26,9 +26,15 @@ class CreateGwasDBTable extends Migration
             $table->string('Ncase');
             $table->string('Ncontrol');
             $table->integer('N');
-            $table->string('Note');
-            $table->string('SNPh2');
             $table->string('Genome');
+            $table->integer('Nsnps');
+            $table->integer('Nhits');
+            $table->float('SNPh2');
+            $table->float('SNPh2_se');
+            $table->float('LambdaGC');
+            $table->float('Chi2');
+            $table->float('Intercept');
+            $table->string('Note');
             $table->date('DateAdded');
             $table->date('DateLastModified');
         });
