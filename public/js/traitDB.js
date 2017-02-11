@@ -5,6 +5,11 @@ $(document).ready(function(){
   // selectTable = $('#dbTable').DataTable();
   Selection("Domain");
 
+  $('#dbTable').on('click', 'tr', function(){
+    var rowData = selectTable.row(this).data();
+    console.log(rowData["ID"]);
+    window.open(subdir+"/traitDB/"+rowData["ID"]);
+  });
   // $('#selectTable tbody').on('click', 'tr', function(){
   //   var rowData = selectTable.row(this).data();
   //   // console.log(rowData);
@@ -196,6 +201,8 @@ function TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin,
       {"data": "Ncontrol", name: "Control"},
       {"data": "N", name: "N"},
       {"data": "Genome", name: "Genome"},
+      {"data": "Nsnps", name: "Nsnps"},
+      {"data": "Nhits", name: "Nhits"},
       {"data": "SNPh2", name: "SNP h2"},
       {"data": "File", name: "File"},
       {"data": "Website", name: "Web site"}

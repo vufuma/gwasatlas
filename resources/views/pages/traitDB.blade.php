@@ -24,7 +24,7 @@
 @stop
 
 @section('content')
-<div class="container" style="padding-top: 50px;">
+<div style="padding: 50px;">
   <div class="panel panel-default">
     <div class="panel-heading">
       <div class="panel-title">Brows studies in GWAS ATLAS</div>

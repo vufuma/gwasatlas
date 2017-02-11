@@ -298,38 +298,55 @@ class DBController extends Controller
     return $check;
   }
 
-  public function gwasDBtable(Request $request){
-    $dbName = $request -> input('dbName');
-    $head = DB::getSchemaBuilder()->getColumnListing('gwasDB');
-    $head[8] = "ChapterLevel";
-    $head[9] = "SubchapterLevel";
-    $head[11] = "Nsample";
-    $head[15] = "SNPh2";
-    $results = DB::select('SELECT * FROM gwasDB WHERE dbName=?', [$dbName]);
-    $rows = json_decode(json_encode($results), true);
-    $all_row = array();
-    $all_row[] = array_combine($head, $rows[0]);
-    $json = array('data'=>$all_row);
-    echo json_encode($json);
+  public function getData(Request $request){
+    $id = $request->input("id");
+    $result = DB::table('gwasDB')->where('id', $id)->get();
+    return json_encode($result);
   }
 
-  public function d3js_GWAS_textfile($dbName, $file){
-    $filedir = config('app.gwasDBdir').'/gwasDB/'.$dbName.'/';
+  public function manhattan($id, $file){
+    $filedir = config('app.datadir');
+    $filedir .= '/'.$id.'/';
     $f = $filedir.$file;
-    if(file_exists($f)){
-      $file = fopen($f, 'r');
-      $header = fgetcsv($file, 0, "\t");
-      $all_rows = array();
-      while($row = fgetcsv($file, 0, "\t")){
-        $all_rows[] = array_combine($header, $row);
+    if($file == "manhattan.txt"){
+      if(file_exists($f)){
+        $file = fopen($f, 'r');
+        $header = fgetcsv($file, 0, "\t");
+        $all_rows = [];
+        while($row = fgetcsv($file, 0, "\t")){
+          $row[0] = (int)$row[0];
+          $row[1] = (int)$row[1];
+          $row[2] = (float)$row[2];
+          // $all_rows[] = array_combine($header, $row);
+          $all_rows[] = $row;
+        }
+        echo json_encode($all_rows);
       }
-      echo json_encode($all_rows);
+    }else if($file == "magma.genes.out"){
+      if(file_exists($f)){
+        $file = fopen($f, 'r');
+        $header = fgetcsv($file, 0, "\t");
+        $all_rows = array();
+        while($row = fgetcsv($file, 0, "\t")){
+          if($row[1]=="X"){$row[1] = "23";}
+          $row[1] = (int)$row[1];
+          $row[2] = (int)$row[2];
+          $row[3] = (int)$row[3];
+          $row[8] = (float)$row[8];
+          // $all_rows[] = array_combine($header, $row);
+          $all_rows[] = array($row[1], $row[2], $row[3], $row[8], $row[9]);
+        }
+        echo json_encode($all_rows);
+      }
     }
+
   }
 
-  public function d3js_GWAS_QQ($dbName, $type){
-    $filedir = config('app.gwasDBdir').'/gwasDB/'.$dbName.'/';
-    if(strcmp($type,"SNP")==0){
+  public function QQplot($id, $plot){
+    $filedir = config('app.datadir');
+    $filedir .= '/'.$id.'/';
+
+    if(strcmp($plot,"SNP")==0){
       $file=$filedir."QQSNPs.txt";
       $f = fopen($file, 'r');
       $all_row = array();
@@ -339,7 +356,7 @@ class DBController extends Controller
       }
       echo json_encode($all_row);
 
-    }else if(strcmp($type,"Gene")==0){
+    }else if(strcmp($plot,"Gene")==0){
       $file=$filedir."magma.genes.out";
       $f = fopen($file, 'r');
       $obs = array();
@@ -359,5 +376,64 @@ class DBController extends Controller
       }
       echo json_encode($all_row);
     }
+  }
+
+  public function GCplot($id){
+    $results = DB::select('SELECT gc.*, db.Trait FROM ( SELECT IF (id1= ?, id2, id1) AS id, rg, se, z, p FROM GenCor WHERE id1= ? OR id2= ? ORDER BY ABS(rg) DESC LIMIT 10) AS gc JOIN gwasDB AS db ON gc.id=db.id', [$id, $id, $id]);
+    return json_encode($results);
+  }
+
+  public function DTfile(Request $request){
+    $id = $request -> input('id');
+    $fin = $request -> input('infile');
+    $cols = $request -> input('header');
+    $cols = explode(":", $cols);
+    $filedir = config('app.datadir')."/".$id."/";
+    $f = $filedir.$fin;
+    if(file_exists($f)){
+      $file = fopen($f, 'r');
+      $all_rows = array();
+      $head = fgetcsv($file, 0, "\t");
+      $index = array();
+
+      foreach($cols as $c){
+        if(in_array($c, $head)){
+          $index[] = array_search($c, $head);
+        }else{
+          $index[] = -1;
+        }
+      }
+      while($row = fgetcsv($file, 0, "\t")){
+        $temp = [];
+        foreach($index as $i){
+          if($i==-1){
+            $temp[] = "NA";
+          }else{
+            $temp[] = $row[$i];
+          }
+        }
+        $all_rows[] = $temp;
+      }
+      $json = (array('data'=> $all_rows));
+
+      echo json_encode($json);
+    }else{
+      echo '{"data":[]}';
+    }
+  }
+
+  public function DomainPie(){
+    $results = DB::select("SELECT Domain, COUNT(*) AS count FROM gwasDB GROUP BY Domain");
+    return json_encode($results);
+  }
+
+  public function ChapterPie($domain){
+    $results = DB::select('SELECT ChapterLevel, COUNT(*) AS count FROM gwasDB WHERE Domain=? GROUP BY ChapterLevel', [$domain]);
+    return json_encode($results);
+  }
+
+  public function SubchapterPie($domain, $chapter){
+    $results = DB::select('SELECT SubchapterLevel, COUNT(*) AS count FROM gwasDB WHERE Domain=? AND ChapterLevel=? GROUP BY SubchapterLevel', [$domain, $chapter]);
+    return json_encode($results);
   }
 }
