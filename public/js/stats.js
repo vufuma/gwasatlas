@@ -1,6 +1,7 @@
 $(document).ready(function(){
   DomainPiePlot();
   NsampleYearPlot();
+  NsampleDomainPlot();
 });
 
 function DomainPiePlot(){
@@ -268,6 +269,48 @@ function NsampleYearPlot(){
     svg.append("text").attr("text-anchor", "middle")
       .attr("transform", "translate("+width/2+","+(height+35)+")")
       .text("Published Year");
+    svg.append("text").attr("text-anchor", "middle")
+      .attr("transform", "translate("+(-55)+","+(height/2)+")rotate(-90)")
+      .text("Total Sample Size of GWAS");
+  });
+}
+
+function NsampleDomainPlot(){
+  var margin = {top:50, right: 50, bottom:90, left:100},
+      width = 800,
+      height = 300;
+  d3.select('#NsampleDomainPlot').select('svg').remove();
+  var svg = d3.select("#NsampleDomainPlot").append("svg")
+            .attr("width", width+margin.left+margin.right)
+            .attr("height", height+margin.top+margin.bottom)
+            .append("g")
+            .attr("transform", "translate("+margin.left+","+margin.top+")");
+  d3.json(subdir+"/stats/NsampleDomain", function(data){
+    data.forEach(function(d){
+      d.N = +d.N;
+    });
+    var x = d3.scale.ordinal().rangeBands([0, width]);
+    var y = d3.scale.linear().range([height, 0]);
+    x.domain(data.map(function(d){return d.Domain;}));
+    y.domain([d3.min(data, function(d){return d.N})-100, d3.max(data, function(d){return d.N})+100]);
+    var xAxis = d3.svg.axis().scale(x).orient("bottom");
+    var yAxis = d3.svg.axis().scale(y).orient("left");
+
+    svg.selectAll("dot").data(data).enter()
+      .append("circle")
+      .attr("r", 3.5)
+      .attr("cx", function(d){return x(d.Domain)+x.rangeBand()/2})
+      .attr("cy", function(d){return y(d.N)})
+      .attr("fill", "blue");
+    svg.append("g").attr("class", "x axis")
+      .attr("transform", "translate(0,"+height+")").call(xAxis)
+      .selectAll("text").style("text-anchor", "end")
+      .attr("transform", "rotate(-60)");
+    svg.append("g").attr("class", "y axis").call(yAxis)
+      .selectAll('text').style('font-size', '11px');
+    svg.append("text").attr("text-anchor", "middle")
+      .attr("transform", "translate("+width/2+","+(height+75)+")")
+      .text("Domain");
     svg.append("text").attr("text-anchor", "middle")
       .attr("transform", "translate("+(-55)+","+(height/2)+")rotate(-90)")
       .text("Total Sample Size of GWAS");

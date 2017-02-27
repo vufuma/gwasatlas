@@ -441,4 +441,9 @@ class DBController extends Controller
     $results = DB::select('SELECT Year, N from gwasDB');
     return json_encode($results);
   }
+
+  public function NsampleDomain(){
+    $results = DB::select('SELECT Domain, N from gwasDB ORDER BY Domain');
+    return json_encode($results);
+  }
 }
