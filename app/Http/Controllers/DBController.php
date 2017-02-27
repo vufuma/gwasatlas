@@ -423,17 +423,22 @@ class DBController extends Controller
   }
 
   public function DomainPie(){
-    $results = DB::select("SELECT Domain, COUNT(*) AS count FROM gwasDB GROUP BY Domain");
+    $results = DB::select("SELECT Domain, COUNT(*) AS count FROM gwasDB GROUP BY Domain ORDER BY count DESC");
     return json_encode($results);
   }
 
   public function ChapterPie($domain){
-    $results = DB::select('SELECT ChapterLevel, COUNT(*) AS count FROM gwasDB WHERE Domain=? GROUP BY ChapterLevel', [$domain]);
+    $results = DB::select('SELECT ChapterLevel, COUNT(*) AS count FROM gwasDB WHERE Domain=? GROUP BY ChapterLevel ORDER BY count DESC', [$domain]);
     return json_encode($results);
   }
 
   public function SubchapterPie($domain, $chapter){
-    $results = DB::select('SELECT SubchapterLevel, COUNT(*) AS count FROM gwasDB WHERE Domain=? AND ChapterLevel=? GROUP BY SubchapterLevel', [$domain, $chapter]);
+    $results = DB::select('SELECT SubchapterLevel, COUNT(*) AS count FROM gwasDB WHERE Domain=? AND ChapterLevel=? GROUP BY SubchapterLevel ORDER BY count DESC', [$domain, $chapter]);
+    return json_encode($results);
+  }
+
+  public function NsampleYear(){
+    $results = DB::select('SELECT Year, N from gwasDB');
     return json_encode($results);
   }
 }

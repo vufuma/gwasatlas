@@ -1,9 +1,10 @@
 $(document).ready(function(){
   DomainPiePlot();
+  NsampleYearPlot();
 });
 
 function DomainPiePlot(){
-  var margin = {top:20, right: 20, bottom:20, left:20},
+  var margin = {top:50, right: 50, bottom:50, left:50},
       width = 300,
       height = 300,
       radius = Math.min(width, height)/2;
@@ -20,6 +21,9 @@ function DomainPiePlot(){
   var arcOver = d3.svg.arc()
     .outerRadius(radius - 5)
     .innerRadius(radius - 85);
+  var outerArc = d3.svg.arc()
+    .outerRadius(radius - 5)
+    .innerRadius(radius - 5);
 
   var pie = d3.layout.pie()
     .sort(null)
@@ -51,10 +55,22 @@ function DomainPiePlot(){
         ChapterPiePlot(data[i]["Domain"]);
       });
     g.append("text")
-      .attr("text-anchor", "middle")
-      .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+      .attr("transform", function(d) { return "translate(" + outerArc.centroid(d) + ")"; })
       .attr("dy", ".35em")
-      .text(function(d) { return d.data.Domain; });
+      .text(function(d) { return d.data.Domain; })
+      .style("font-size", "10")
+      .attr("text-anchor", function(d){
+        if(outerArc.centroid(d)[0]>0){
+          return "start";
+        }else{
+          return "end";
+        }
+      });
+    g.append("text")
+      .attr("transform", function(d){ return "translate(" + arc.centroid(d) + ")"})
+      .text(function(d){ return d.data.count; })
+      .style("font-size", "12")
+      .attr("text-anchor", "middle");
     svg.append("text").attr("text-anchor", "middle")
       .attr("x", 0).attr("y", -5)
       .text("Total GWAS");
@@ -65,7 +81,7 @@ function DomainPiePlot(){
 }
 
 function ChapterPiePlot(domain){
-  var margin = {top:20, right: 20, bottom:20, left:20},
+  var margin = {top:50, right: 50, bottom:50, left:50},
       width = 300,
       height = 300,
       radius = Math.min(width, height)/2;
@@ -84,6 +100,9 @@ function ChapterPiePlot(domain){
   var arcOver = d3.svg.arc()
     .outerRadius(radius - 5)
     .innerRadius(radius - 85);
+  var outerArc = d3.svg.arc()
+    .outerRadius(radius - 5)
+    .innerRadius(radius - 5);
 
   var pie = d3.layout.pie()
     .sort(null)
@@ -114,10 +133,22 @@ function ChapterPiePlot(domain){
         SubchapterPiePlot(domain, data[i]["ChapterLevel"]);
       });
     g.append("text")
-      .attr("text-anchor", "middle")
-      .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+      .attr("transform", function(d) { return "translate(" + outerArc.centroid(d) + ")"; })
       .attr("dy", ".35em")
-      .text(function(d) { return d.data.ChapterLevel; });
+      .text(function(d) { return d.data.ChapterLevel; })
+      .style("font-size", "10")
+      .attr("text-anchor", function(d){
+        if(outerArc.centroid(d)[0]>0){
+          return "start";
+        }else{
+          return "end";
+        }
+      });
+    g.append("text")
+      .attr("transform", function(d){ return "translate(" + arc.centroid(d) + ")"})
+      .text(function(d){ return d.data.count; })
+      .style("font-size", "12")
+      .attr("text-anchor", "middle");
     svg.append("text").attr("text-anchor", "middle")
       .attr("x", 0).attr("y", -5)
       .text("Total GWAS");
@@ -128,7 +159,7 @@ function ChapterPiePlot(domain){
 }
 
 function SubchapterPiePlot(domain, chapter){
-  var margin = {top:20, right: 20, bottom:20, left:20},
+  var margin = {top:50, right: 50, bottom:50, left:50},
       width = 300,
       height = 300,
       radius = Math.min(width, height)/2;
@@ -147,6 +178,9 @@ function SubchapterPiePlot(domain, chapter){
   var arcOver = d3.svg.arc()
     .outerRadius(radius - 5)
     .innerRadius(radius - 85);
+  var outerArc = d3.svg.arc()
+    .outerRadius(radius - 5)
+    .innerRadius(radius - 5);
 
   var pie = d3.layout.pie()
     .sort(null)
@@ -174,15 +208,68 @@ function SubchapterPiePlot(domain, chapter){
           .attr("d", arc)
       });
     g.append("text")
-      .attr("text-anchor", "middle")
-      .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+      .attr("transform", function(d) { return "translate(" + outerArc.centroid(d) + ")"; })
       .attr("dy", ".35em")
-      .text(function(d) { return d.data.SubchapterLevel; });
+      .text(function(d) { return d.data.SubchapterLevel; })
+      .style("font-size", "10")
+      .attr("text-anchor", function(d){
+        if(outerArc.centroid(d)[0]>0){
+          return "start";
+        }else{
+          return "end";
+        }
+      });
+    g.append("text")
+      .attr("transform", function(d){ return "translate(" + arc.centroid(d) + ")"})
+      .text(function(d){ return d.data.count; })
+      .style("font-size", "12")
+      .attr("text-anchor", "middle");
     svg.append("text").attr("text-anchor", "middle")
       .attr("x", 0).attr("y", -5)
       .text("Total GWAS");
     svg.append("text").attr("text-anchor", "middle")
       .attr("x", 0).attr("y", 15)
       .text(total);
+  });
+}
+
+function NsampleYearPlot(){
+  var margin = {top:50, right: 50, bottom:80, left:100},
+      width = 800,
+      height = 300;
+  d3.select('#NsampleYearPlot').select('svg').remove();
+  var svg = d3.select("#NsampleYearPlot").append("svg")
+            .attr("width", width+margin.left+margin.right)
+            .attr("height", height+margin.top+margin.bottom)
+            .append("g")
+            .attr("transform", "translate("+margin.left+","+margin.top+")");
+  d3.json(subdir+"/stats/NsampleYear", function(data){
+    data.forEach(function(d){
+      d.Year = +d.Year;
+      d.N = +d.N;
+    });
+    var x = d3.scale.linear().range([0, width]);
+    var y = d3.scale.linear().range([height, 0]);
+    x.domain([d3.min(data, function(d){return d.Year})-1, d3.max(data, function(d){return d.Year})+1]);
+    y.domain([d3.min(data, function(d){return d.N})-100, d3.max(data, function(d){return d.N})+100]);
+    var xAxis = d3.svg.axis().scale(x).orient("bottom").tickFormat(d3.format("d"));
+    var yAxis = d3.svg.axis().scale(y).orient("left");
+
+    svg.selectAll("dot").data(data).enter()
+      .append("circle")
+      .attr("r", 3.5)
+      .attr("cx", function(d){return x(d.Year)})
+      .attr("cy", function(d){return y(d.N)})
+      .attr("fill", "blue");
+    svg.append("g").attr("class", "x axis")
+      .attr("transform", "translate(0,"+height+")").call(xAxis);
+    svg.append("g").attr("class", "y axis").call(yAxis)
+      .selectAll('text').style('font-size', '11px');
+    svg.append("text").attr("text-anchor", "middle")
+      .attr("transform", "translate("+width/2+","+(height+35)+")")
+      .text("Published Year");
+    svg.append("text").attr("text-anchor", "middle")
+      .attr("transform", "translate("+(-55)+","+(height/2)+")rotate(-90)")
+      .text("Total Sample Size of GWAS");
   });
 }

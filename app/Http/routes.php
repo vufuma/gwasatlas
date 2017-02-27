@@ -45,6 +45,7 @@ Route::get('/stats', function(){
 Route::get('/stats/DomainPie', 'DBController@DomainPie');
 Route::get('/stats/ChapterPie/{domain}', 'DBController@ChapterPie');
 Route::get('/stats/SubchapterPie/{domain}/{chapter}', 'DBController@SubchapterPie');
+Route::get('/stats/NsampleYear', 'DBController@NsampleYear');
 
 Route::get('/documentation', function(){
   return view('pages.documentation');

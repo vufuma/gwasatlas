@@ -25,7 +25,7 @@
 
 @section('content')
 <div style="padding:50px;">
-  <div id="info" class="panel panel-default">
+  <div class="panel panel-default">
     <div class="panel-heading">
       <h4 class="panel-title"><a data-toggle="collapse" href="#PhePanel">Phenotypes in GWAS ATLAS</a></h4>
     </div>
@@ -46,6 +46,16 @@
         </div>
       </div>
       <br/>
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title"><a data-toggle="collapse" href="#NsamplePanel">Smple size per year</a></h4>
+    </div>
+    <div id="NsamplePanel" class="panel-collapse collapse in">
+      <div id="NsampleYearPlot" style="text-align: center;">
+      </div>
     </div>
   </div>
 </div>
