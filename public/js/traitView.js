@@ -452,7 +452,7 @@ function GCplot(id, n){
                 .attr("height", height+margin.top+margin.bottom)
                 .append("g")
                 .attr("transform", "translate("+margin.left+","+margin.top+")");
-      var y_element = data.map(function(d){return d.Trait;});
+      var y_element = data.map(function(d){return d.id+":"+d.Trait;});
       var y = d3.scale.ordinal().domain(y_element).rangeRoundBands([0,height], 0.1);
       var x = d3.scale.linear().range([0, width]);
       x.domain([-d3.max(data, function(d){return Math.abs(d.rg);})-d3.max(data, function(d){return d.se;}),
@@ -469,7 +469,7 @@ function GCplot(id, n){
           if(d.rg>0){return x(0)}
           else{return x(d.rg)}
         })
-        .attr('y', function(d){return y(d.Trait)})
+        .attr('y', function(d){return y(d.id+":"+d.Trait)})
         .attr('width', function(d){
           if(d.rg>0){return x(d.rg)-x(0)}
           else{return x(0)-x(d.rg)}
@@ -486,7 +486,7 @@ function GCplot(id, n){
       svg.selectAll("rect.error").data(data).enter()
         .append('rect')
         .attr('x', function(d){return x(d.rg-d.se)})
-        .attr('y', function(d){return y(d.Trait)+13})
+        .attr('y', function(d){return y(d.id+":"+d.Trait)+13})
         .attr('height', 1)
         .attr('width', function(d){return x(d.rg+d.se)-x(d.rg-d.se)})
         .attr('fill', 'black');
