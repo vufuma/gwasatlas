@@ -30,7 +30,7 @@ Route::get('/traitDB/manhattan/{id}/{file}', 'DBController@manhattan');
 
 Route::get('/traitDB/QQplot/{id}/{type}', 'DBController@QQplot');
 
-Route::get('/traitDB/GCplot/{id}', 'DBController@GCplot');
+Route::get('/traitDB/GCplot/{id}/{n}', 'DBController@GCplot');
 
 // ************** Multi GWAS Comparison page ***************
 Route::get('/multiGWAS', function(){

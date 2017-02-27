@@ -93,19 +93,18 @@
     </div>
     <div id="GCPanel" class="panel-collapse collapse container">
       <br/>
-      <!-- <div class="row">
-        <div class="col-md-6 col-xs-6 col-sm-6"> -->
-          <div id="GCplot" style="text-align: center;"></div>
-        <!-- </div>
-        <div class="col-md-6 col-xs-6 col-sm-6"> -->
-          <table class="table table-sm table-bordered" id="GCtable" style="width:80%;  margin:auto;">
-            <thead>
-              <th>ID</th><th>Trait</th><th>rg</th><th>se</th><th>z</th><th>p</th>
-            </thead>
-            <tbody id="GCtableBody"></tbody>
-          </table>
-        <!-- </div>
-      </div> -->
+      <div>
+        <span class="form-inline">Display top <input class="form-control" type="number" id="GCtop" name="GCtop" value="10" style="width:150px;" onkeyup="GCupdate();"> correlated phenotypes.</span><br/>
+        <span class="info"><i class="fa fa-info"></i> Please press enter to update.</span>
+      </div>
+      <div id="GCplot" style="text-align: center;"></div>
+      <br/>
+      <table class="table table-sm table-bordered" id="GCtable" style="width:80%;  margin:auto;">
+        <thead>
+          <th>ID</th><th>Trait</th><th>rg</th><th>se</th><th>z</th><th>p</th>
+        </thead>
+        <tbody id="GCtableBody"></tbody>
+      </table>
       <br/>
     </div>
   </div>

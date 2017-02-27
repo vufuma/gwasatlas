@@ -378,8 +378,8 @@ class DBController extends Controller
     }
   }
 
-  public function GCplot($id){
-    $results = DB::select('SELECT gc.*, db.Trait FROM ( SELECT IF (id1= ?, id2, id1) AS id, rg, se, z, p FROM GenCor WHERE id1= ? OR id2= ? ORDER BY ABS(rg) DESC LIMIT 10) AS gc JOIN gwasDB AS db ON gc.id=db.id', [$id, $id, $id]);
+  public function GCplot($id, $n){
+    $results = DB::select('SELECT gc.*, db.Trait FROM ( SELECT IF (id1= ?, id2, id1) AS id, rg, se, z, p FROM GenCor WHERE (id1 = ? OR id2 = ?) AND p<0.05 ORDER BY ABS(rg) DESC LIMIT ?) AS gc JOIN gwasDB AS db ON gc.id=db.id', [$id, $id, $id, $n]);
     return json_encode($results);
   }
 

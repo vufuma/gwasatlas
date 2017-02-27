@@ -66,8 +66,9 @@ $(document).ready(function(){
 
   GWplot(id);
   QQplot(id);
-  GCplot(id);
 
+  var nGC = $('#GCtop').val();
+  GCplot(id, nGC);
 });
 
 function GWplot(id){
@@ -410,78 +411,90 @@ function QQplot(id){
   });
 }
 
-function GCplot(id){
+function GCupdate(){
+  if(event.keyCode==13){
+    var nGC = $('#GCtop').val();
+    GCplot(id, nGC);
+  }
+}
 
-  d3.json(subdir+'/traitDB/GCplot/'+id, function(data){
-    var table="";
-    var maxLabel = 0;
-    data.forEach(function(d){
-      d.id = +d.id;
-      d.rg = +d.rg;
-      d.se = +d.se;
-      d.z = +d.z;
-      d.p = +d.p;
-      if(d.Trait.length>maxLabel){maxLabel = d.Trait.length}
-      table += "<tr>";
-      table += "<td>"+d.id+"</td>";
-      table += "<td>"+d.Trait+"</td>";
-      table += "<td>"+d.rg+"</td>";
-      table += "<td>"+d.se+"</td>";
-      table += "<td>"+d.z+"</td>";
-      table += "<td>"+d.p+"</td>";
-      table += "</tr>";
-    })
-    $('#GCtableBody').html(table);
-    var margin = {top:30, right: 30, bottom:50, left:6*maxLabel},
-        width = 300,
-        height = 30*data.length;
-    var svg = d3.select("#GCplot").append("svg")
-              .attr("width", width+margin.left+margin.right)
-              .attr("height", height+margin.top+margin.bottom)
-              .append("g")
-              .attr("transform", "translate("+margin.left+","+margin.top+")");
-    var y_element = data.map(function(d){return d.Trait;});
-    var y = d3.scale.ordinal().domain(y_element).rangeRoundBands([0,height], 0.1);
-    var x = d3.scale.linear().range([0, width]);
-    x.domain([-d3.max(data, function(d){return Math.abs(d.rg);})-d3.max(data, function(d){return d.se;}),
-      d3.max(data, function(d){return Math.abs(d.rg);})+d3.max(data, function(d){return d.se;})]);
-    var xAxis = d3.svg.axis().scale(x).orient("bottom");
-    var yAxis = d3.svg.axis().scale(y).orient("left");
+function GCplot(id, n){
+  d3.select("#GCplot").select("svg").remove();
+  d3.json(subdir+'/traitDB/GCplot/'+id+'/'+n, function(data){
+    if(data==null || data==undefined || data.length==0){
+      table = '<tr><td colspan="6" style="text-align:center;"> No data available.</td></tr>';
+      $('#GCtableBody').html(table);
+    }else{
+      var table="";
+      var maxLabel = 0;
+      data.forEach(function(d){
+        d.id = +d.id;
+        d.rg = +d.rg;
+        d.se = +d.se;
+        d.z = +d.z;
+        d.p = +d.p;
+        if(d.Trait.length>maxLabel){maxLabel = d.Trait.length}
+        table += "<tr>";
+        table += "<td>"+d.id+"</td>";
+        table += "<td>"+d.Trait+"</td>";
+        table += "<td>"+d.rg+"</td>";
+        table += "<td>"+d.se+"</td>";
+        table += "<td>"+d.z+"</td>";
+        table += "<td>"+d.p+"</td>";
+        table += "</tr>";
+      })
+      $('#GCtableBody').html(table);
+      var margin = {top:30, right: 30, bottom:50, left:6*maxLabel},
+          width = 300,
+          height = 30*data.length;
+      var svg = d3.select("#GCplot").append("svg")
+                .attr("width", width+margin.left+margin.right)
+                .attr("height", height+margin.top+margin.bottom)
+                .append("g")
+                .attr("transform", "translate("+margin.left+","+margin.top+")");
+      var y_element = data.map(function(d){return d.Trait;});
+      var y = d3.scale.ordinal().domain(y_element).rangeRoundBands([0,height], 0.1);
+      var x = d3.scale.linear().range([0, width]);
+      x.domain([-d3.max(data, function(d){return Math.abs(d.rg);})-d3.max(data, function(d){return d.se;}),
+        d3.max(data, function(d){return Math.abs(d.rg);})+d3.max(data, function(d){return d.se;})]);
+      var xAxis = d3.svg.axis().scale(x).orient("bottom");
+      var yAxis = d3.svg.axis().scale(y).orient("left");
 
-    svg.append("rect").attr("x", x(0)).attr("y", 0)
-      .attr("width", 0.05).attr("height", height)
-      .style("stroke", "grey");
-    svg.selectAll("rect.bar").data(data).enter()
-      .append('rect')
-      .attr('x', function(d){
-        if(d.rg>0){return x(0)}
-        else{return x(d.rg)}
-      })
-      .attr('y', function(d){return y(d.Trait)})
-      .attr('width', function(d){
-        if(d.rg>0){return x(d.rg)-x(0)}
-        else{return x(0)-x(d.rg)}
-      })
-      .attr('height', y.rangeBand())
-      .attr("fill", function(d){
-        if(d.rg>0){return "red"}
-        else{return "blue"}
-      })
-      .attr("opacity", function(d){
-        if(d.p<0.05){return 0.8}
-        else{return 0.5}
-      });
-    svg.selectAll("rect.error").data(data).enter()
-      .append('rect')
-      .attr('x', function(d){return x(d.rg-d.se)})
-      .attr('y', function(d){return y(d.Trait)+13})
-      .attr('height', 1)
-      .attr('width', function(d){return x(d.rg+d.se)-x(d.rg-d.se)})
-      .attr('fill', 'black');
-    svg.append('g').attr("class", "x axis")
-      .attr("transform", "translate(0,"+height+")")
-      .call(xAxis);
-    svg.append('g').attr("class", "y axis")
-      .call(yAxis);
+      svg.append("rect").attr("x", x(0)).attr("y", 0)
+        .attr("width", 0.05).attr("height", height)
+        .style("stroke", "grey");
+      svg.selectAll("rect.bar").data(data).enter()
+        .append('rect')
+        .attr('x', function(d){
+          if(d.rg>0){return x(0)}
+          else{return x(d.rg)}
+        })
+        .attr('y', function(d){return y(d.Trait)})
+        .attr('width', function(d){
+          if(d.rg>0){return x(d.rg)-x(0)}
+          else{return x(0)-x(d.rg)}
+        })
+        .attr('height', y.rangeBand())
+        .attr("fill", function(d){
+          if(d.rg>0){return "red"}
+          else{return "blue"}
+        })
+        .attr("opacity", function(d){
+          if(d.p<0.05){return 0.8}
+          else{return 0.5}
+        });
+      svg.selectAll("rect.error").data(data).enter()
+        .append('rect')
+        .attr('x', function(d){return x(d.rg-d.se)})
+        .attr('y', function(d){return y(d.Trait)+13})
+        .attr('height', 1)
+        .attr('width', function(d){return x(d.rg+d.se)-x(d.rg-d.se)})
+        .attr('fill', 'black');
+      svg.append('g').attr("class", "x axis")
+        .attr("transform", "translate(0,"+height+")")
+        .call(xAxis);
+      svg.append('g').attr("class", "y axis")
+        .call(yAxis);
+    }
   });
 }
