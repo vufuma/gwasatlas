@@ -3,17 +3,17 @@ $(document).ready(function(){
     function showPanel(hash) {
 
         // Hide all panels
-        $('.sidePanel').each(function(){
-            $('#'+this.id).hide();
-            $('#'+this.id+'sub').hide();
-        });
+        // $('.sidePanel').each(function(){
+        //     $('#'+this.id).hide();
+        //     $('#'+this.id+'sub').hide();
+        // });
 
         // Remove active class from menu
         $("#sidebar.sidebar-nav").find(".active").removeClass("active");
 
         // Show the current tab
-        $(hash).show();
-        $(hash+'sub').show();
+        // $(hash).show();
+        // $(hash+'sub').show();
 
         // Add active class to parent
         $("#sidebar.sidebar-nav a[href='"+hash+"']").parent().addClass("active");

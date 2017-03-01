@@ -446,4 +446,16 @@ class DBController extends Controller
     $results = DB::select('SELECT Domain, N from gwasDB ORDER BY Domain');
     return json_encode($results);
   }
+
+  public function CGhead($ids){
+    $script = storage_path().'/scripts/getCGheat.py';
+    // $out = shell_exec("python $script $id");
+    // echo $out;
+    $out = '{"data":[{"features":[
+        {"Trait":[{1:"Trait 1", 3:"Trait 3"}]},
+        {"Domain":[{1:1, 3:2}]},
+        {"Order":[{1:2, 3:1}]}
+      ]},"rg":[["id1":1, "id2":1, "rg":1], ["id1":1, "id2":3, "rg":0.5], ["id1":3, "id2":3, "rg":1], ["id1":3, "id2":1, "rg":0.5]]';
+    echo $out;
+  }
 }

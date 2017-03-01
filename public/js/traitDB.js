@@ -136,35 +136,6 @@ function SelectEnter(ele){
 }
 
 function TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin, nMax){
-  // $.ajax({
-  //   url: subdir+"/traitDB/dbTable",
-  //   type: "POST",
-  //   data: {
-  //     type: type,
-  //     domain: domain,
-  //     chapter: chapter,
-  //     subchapter: subchapter,
-  //     trait: trait
-  //   },
-  //   error: function(){
-  //     alert("dbTable error");
-  //   },
-  //   success: function(data){
-  //     var temp = JSON.parse(data);
-  //     var out = "";
-  //     for(var i=0; i<temp.length; i++){
-  //       out += "<tr>"
-  //       $.each(temp[i], function(key, d){
-  //         out += "<td>"+d+"</td>";
-  //       });
-  //       out += "</tr>";
-  //     }
-  //     $('#dbTableBody').html(out);
-  //   },
-  //   complete: function(){
-  //     $('#dbTable').DataTable();
-  //   }
-  // });
   $('#dbTable').DataTable().destroy();
   selectTable = $('#dbTable').DataTable({
     processing: false,

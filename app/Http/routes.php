@@ -36,6 +36,13 @@ Route::get('/traitDB/GCplot/{id}/{n}', 'DBController@GCplot');
 Route::get('/multiGWAS', function(){
   return view('pages.multiGWAS');
 });
+Route::get('/multiGWAS/manhattan', function(){
+  return view('page.multiGWAS.manhattan');
+});
+
+Route::get('/multiGWAS/manhattan/{id}/{file}', 'DBController@manhattan');
+
+Route::get('/multiGWAS/GC/{ids}', 'DBController@GCheat');
 
 // ************** Stats Page ***************
 Route::get('/stats', function(){

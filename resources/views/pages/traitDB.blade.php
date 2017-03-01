@@ -82,7 +82,7 @@
   </div>
 
   <div>
-    <table id="dbTable" class="display compact dt-body-right dt-head-center" width="100%" cellspacing="0" style="display: block; overflow-x: auto;">
+    <table id="dbTable" class="display compact dt-body-right dt-head-center" width="100%" cellspacing="0" style="display: block; overflow-x: auto; font-size: 14px;">
       <thead>
         <th>ID</th>
         <th>PMID</th>
