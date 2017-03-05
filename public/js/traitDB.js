@@ -7,7 +7,6 @@ $(document).ready(function(){
 
   $('#dbTable').on('click', 'tr', function(){
     var rowData = selectTable.row(this).data();
-    console.log(rowData["ID"]);
     window.open(subdir+"/traitDB/"+rowData["ID"]);
   });
   // $('#selectTable tbody').on('click', 'tr', function(){

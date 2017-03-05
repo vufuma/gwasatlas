@@ -42,7 +42,11 @@ Route::get('/multiGWAS/manhattan', function(){
 
 Route::get('/multiGWAS/manhattan/{id}/{file}', 'DBController@manhattan');
 
-Route::get('/multiGWAS/GC/{ids}', 'DBController@GCheat');
+Route::get('/multiGWAS/GCheat/{ids}', 'DBController@GCheat');
+
+Route::get('/multiGWAS/MagmaGeneheat/{ids}', 'DBController@MagmaGeneheat');
+
+Route::get('/multiGWAS/MagmaGSheat/{ids}', 'DBController@MagmaGSheat');
 
 // ************** Stats Page ***************
 Route::get('/stats', function(){

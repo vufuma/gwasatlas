@@ -422,7 +422,7 @@ function GCplot(id, n){
   d3.select("#GCplot").select("svg").remove();
   d3.json(subdir+'/traitDB/GCplot/'+id+'/'+n, function(data){
     if(data==null || data==undefined || data.length==0){
-      table = '<tr><td colspan="6" style="text-align:center;"> No data available.</td></tr>';
+      table = '<tr><td colspan="7" style="text-align:center;"> No data available.</td></tr>';
       $('#GCtableBody').html(table);
     }else{
       var table="";
@@ -433,6 +433,7 @@ function GCplot(id, n){
         d.se = +d.se;
         d.z = +d.z;
         d.p = +d.p;
+        d.pbon = +d.pbon;
         if(d.Trait.length>maxLabel){maxLabel = d.Trait.length}
         table += "<tr>";
         table += "<td>"+d.id+"</td>";
@@ -441,6 +442,7 @@ function GCplot(id, n){
         table += "<td>"+d.se+"</td>";
         table += "<td>"+d.z+"</td>";
         table += "<td>"+d.p+"</td>";
+        table += "<td>"+d.pbon+"</td>";
         table += "</tr>";
       })
       $('#GCtableBody').html(table);
@@ -476,11 +478,12 @@ function GCplot(id, n){
         })
         .attr('height', y.rangeBand())
         .attr("fill", function(d){
-          if(d.rg>0){return "red"}
+          if(d.p>=0.05){return "grey"}
+          else if(d.rg>0){return "red"}
           else{return "blue"}
         })
         .attr("opacity", function(d){
-          if(d.p<0.05){return 0.8}
+          if(d.pbon<0.05){return 0.8}
           else{return 0.5}
         });
       svg.selectAll("rect.error").data(data).enter()

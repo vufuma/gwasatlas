@@ -101,7 +101,7 @@
       <br/>
       <table class="table table-sm table-bordered" id="GCtable" style="width:80%;  margin:auto;">
         <thead>
-          <th>ID</th><th>Trait</th><th>rg</th><th>se</th><th>z</th><th>p</th>
+          <th>ID</th><th>Trait</th><th>rg</th><th>se</th><th>z</th><th>P</th><th>P-bon</th>
         </thead>
         <tbody id="GCtableBody"></tbody>
       </table>

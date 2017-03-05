@@ -39,10 +39,9 @@
       <li class="sidebar-brand"><a id="menu-toggle"><tab><i id="main_icon" class="fa fa-chevron-left"></i></a></li>
     </ul>
     <ul class="sidebar-nav" id="sidebar">
-      <li class="active"><a href="#manhattan">Manhattan (GWAS)<i class="sub_icon fa fa-area-chart"></i></a></li>
-      <li><a href="#geneManhattan">Manhattan (gene)<i class="sub_icon fa fa-area-chart"></i></a></li>
-      <li><a href="#magma">MAGMA genes<i class="sub_icon fa fa-bar-chart"></i></a></li>
       <li><a href="#GC">Generic Correlation<i class="sub_icon fa fa-bar-chart"></i></a></li>
+      <li><a href="#magmagenes">MAGMA genes<i class="sub_icon fa fa-bar-chart"></i></a></li>
+      <li><a href="#magmaGS">MAGMA gene-set<i class="sub_icon fa fa-area-chart"></i></a></li>
     </ul>
   </div>
 
@@ -87,14 +86,14 @@
             <br/>
             <span class="form-inline">
               <strong>Year</strong><br/>
-              From <input type="number" class="form-control" id="yearFrom" name="yearFrom">
-              to <input type="number" class="form-control" id="yearTo" name="yearTo">
+              From <input type="number" class="form-control" id="yearFrom" name="yearFrom" onkeydown="SelectEnter(this)">
+              to <input type="number" class="form-control" id="yearTo" name="yearTo" onkeydown="SelectEnter(this)">
             </span>
             <br/><br/>
             <span class="form-inline">
               <strong>Total sample size</strong><br/>
-              Minimum: <input type="number" class="form-control" id="nMin" name="nMin">
-              Maximum: <input type="number" class="form-control" id="nMax" name="nMax">
+              Minimum: <input type="number" class="form-control" id="nMin" name="nMin" onkeydown="SelectEnter(this)">
+              Maximum: <input type="number" class="form-control" id="nMax" name="nMax" onkeydown="SelectEnter(this)">
             </span>
             <br/><br/>
             <table id="selectTable" class="display compact dt-body-right dt-head-center" width="100%" cellspacing="0" style="display: block; overflow-x: auto; font-size:12px;">
@@ -112,10 +111,12 @@
                 <th>N</th>
               </thead>
             </table>
+            <br/>
+
           </div>
         </div>
 
-        <div class="panel panel-default">
+        <!-- <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title"><a data-toggle="collapse" href="#selected">Selected GWAS</a></h4>
           </div>
@@ -128,8 +129,8 @@
             <button class="btn btn-xs" id="delGWAS">Delete checked GWAS</button>
             <br/><br/>
           </div>
-        </div>
-
+        </div> -->
+        <button class="btn btn-xs" id="updatePlot">Update Plots</button><br/><br/>
         <div id="panel">
         </div>
       </div>

@@ -379,8 +379,22 @@ class DBController extends Controller
   }
 
   public function GCplot($id, $n){
-    $results = DB::select('SELECT gc.*, db.Trait FROM ( SELECT IF (id1= ?, id2, id1) AS id, rg, se, z, p FROM GenCor WHERE (id1 = ? OR id2 = ?) AND p<0.05 ORDER BY ABS(rg) DESC LIMIT ?) AS gc JOIN gwasDB AS db ON gc.id=db.id', [$id, $id, $id, $n]);
-    return json_encode($results);
+    $results = DB::select('SELECT gc.*, db.Trait FROM ( SELECT IF (id1= ?, id2, id1) AS id, rg, se, z, p FROM GenCor WHERE (id1 = ? OR id2 = ?) AND ABS(rg)<=1.25 ORDER BY ABS(rg) DESC LIMIT ?) AS gc JOIN gwasDB AS db ON gc.id=db.id', [$id, $id, $id, $n]);
+    $n = (int) DB::table('gwasDB')->count();
+    $gc = [];
+    $head = ["id", "rg", "se", "z", "p", "Trait", "pbon"];
+    // $results = json_encode($results);
+    // file_put_contents("/media/sf_Documents/VU/Data/WebApp/test.txt", $results);
+    $results = json_decode(json_encode($results), true);
+    // $results = (array) $results;
+    foreach ($results as $r){
+      // $r = json_decode(json_encode($r), true);
+      // file_put_contents("/media/sf_Documents/VU/Data/WebApp/test.txt", $r['id']."\t".$r['p']."\n");
+      $pbon = (float) $r['p']*$n;
+      $r['pbon'] = $pbon;
+      $gc[] = $r;
+    }
+    return json_encode($gc);
   }
 
   public function DTfile(Request $request){
@@ -447,15 +461,37 @@ class DBController extends Controller
     return json_encode($results);
   }
 
-  public function CGhead($ids){
-    $script = storage_path().'/scripts/getCGheat.py';
-    // $out = shell_exec("python $script $id");
-    // echo $out;
-    $out = '{"data":[{"features":[
-        {"Trait":[{1:"Trait 1", 3:"Trait 3"}]},
-        {"Domain":[{1:1, 3:2}]},
-        {"Order":[{1:2, 3:1}]}
-      ]},"rg":[["id1":1, "id2":1, "rg":1], ["id1":1, "id2":3, "rg":0.5], ["id1":3, "id2":3, "rg":1], ["id1":3, "id2":1, "rg":0.5]]';
-    echo $out;
+  public function GCheat($ids){
+    $script = storage_path().'/scripts/getGCheat.py';
+    $host = config('database.connections.mysql.host');
+    $user = config('database.connections.mysql.username');
+    $pass = config('database.connections.mysql.password');
+    $db = config('database.connections.mysql.database');
+
+    $out = shell_exec("python $script $host $user $pass $db $ids");
+
+    return $out;
+  }
+
+  public function MagmaGeneheat($ids){
+    $script = storage_path().'/scripts/getGeneheat.py';
+    $host = config('database.connections.mysql.host');
+    $user = config('database.connections.mysql.username');
+    $pass = config('database.connections.mysql.password');
+    $db = config('database.connections.mysql.database');
+
+    $out = shell_exec("python $script $host $user $pass $db $ids");
+    return $out;
+  }
+
+  public function MagmaGSheat($ids){
+    $script = storage_path().'/scripts/getGSheat.py';
+    $host = config('database.connections.mysql.host');
+    $user = config('database.connections.mysql.username');
+    $pass = config('database.connections.mysql.password');
+    $db = config('database.connections.mysql.database');
+
+    $out = shell_exec("python $script $host $user $pass $db $ids");
+    return $out;
   }
 }

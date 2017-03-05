@@ -1,51 +1,49 @@
 var selectTable;
-var selectedTable;
-var maxSelect = 5;
+var panel = "";
 $(document).ready(function(){
-  // selectTable = $('#selectTable').DataTable();
-  Selection("Domain");
 
   var hash = window.location.hash;
-  var panel = "";
   if(hash){
     panel = hash;
   }else{
-    panel = "manhattan";
+    panel = "#GC";
   }
+
+  // selectTable = $('#selectTable').DataTable();
+  Selection("Domain");
+
   $("#sidebar.sidebar-nav").find(".active").removeClass("active");
   $("#sidebar.sidebar-nav a[href='"+panel+"']").parent().addClass("active");
-
-  loadPanel(panel);
 
   $('#sidebar.sidebar-nav li a').click(function(){
     panel = $(this).attr("href");
     loadPanel(panel);
   });
 
-  $('#selectTable tbody').on('click', 'tr', function(){
-    var rowData = selectTable.row(this).data();
-    var add = true;
-    $('#selectedGWAS input').each(function(i, d){
-      if($(d).val() == rowData['ID']){
-        add = false;
-        return false;
-      }
-    });
-    if(add){
-      selected = '<div class="selectedGWAS"><input type="checkbox" class="form-contorl" value="'+rowData['ID']+'"/>'
-        +" "+rowData['ID']+": "+rowData['Domain']+'; '+rowData['ChapterLevel']+'; '+rowData['SubchapterLevel']+'; '+rowData['Trait']+'</div>'
-      $('#selectedGWAS').append(selected)
-    }
-  });
+  // $('#selectTable tbody').on('click', 'tr', function(){
+  //   var rowData = selectTable.row(this).data();
+  //   var add = true;
+  //   $('#selectedGWAS input').each(function(i, d){
+  //     if($(d).val() == rowData['ID']){
+  //       add = false;
+  //       return false;
+  //     }
+  //   });
+  //   if(add){
+  //     selected = '<div class="selectedGWAS"><input type="checkbox" class="form-contorl" value="'+rowData['ID']+'"/>'
+  //       +" "+rowData['ID']+": "+rowData['Domain']+'; '+rowData['ChapterLevel']+'; '+rowData['SubchapterLevel']+'; '+rowData['Trait']+'</div>'
+  //     $('#selectedGWAS').append(selected)
+  //   }
+  // });
 
-  $('#delGWAS').on('click', function(){
-    $(".selectedGWAS").each(function(){
-      if($(this).children("input").is(":checked")){
-        $(this).remove();
-      }
-    });
-    loadPanel(panel);
-  });
+  // $('#delGWAS').on('click', function(){
+  //   $(".selectedGWAS").each(function(){
+  //     if($(this).children("input").is(":checked")){
+  //       $(this).remove();
+  //     }
+  //   });
+  //   loadPanel(panel);
+  // });
 
   $('#updatePlot').on('click', function(){
     loadPanel(panel);
@@ -149,7 +147,7 @@ function TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin,
   selectTable = $('#selectTable').DataTable({
     processing: false,
     serverSide: false,
-    select: true,
+    select: false,
     autoWidth: false,
     "ajax" : {
       url: subdir+"/traitDB/dbTable",
@@ -163,7 +161,10 @@ function TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin,
         yearTo: yearTo,
         nMin: nMin,
         nMax: nMax
-      }
+      },
+      complete: function(){
+        loadPanel(panel);
+      },
     },
     error: function(){
 
@@ -191,365 +192,591 @@ function TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin,
 
 function loadPanel(panel){
   switch (panel) {
-    case "#manhattan":
-      manhattan();
-      break;
-    case "#geneManhattan":
-      geneManhattan();
-      break;
-    case "#magma":
-      magma();
-      break;
     case "#GC":
       GC();
       break;
+    case "#magmagenes":
+      magmagenes();
+      break;
+    case "#magmaGS":
+      magmaGS();
+      break;
     default:
-      manhattan();
+      magmagenes();
   }
 }
 
-function manhattan(){
-  ids = []
-  $(".selectedGWAS").each(function(){
-    ids.push($(this).children("input").val())
-  })
-  if(ids.length==0){
-    $('#panel').html('<div style="text-align: center;">Please select GWAS from the top panel.</div>');
+// function manhattan(){
+//   ids = []
+//   $(".selectedGWAS").each(function(){
+//     ids.push($(this).children("input").val())
+//   })
+//   if(ids.length==0){
+//     $('#panel').html('<div style="text-align: center;">Please select GWAS from the top panel.</div>');
+//   }else{
+//     $('#panel').html('<div style="text-align: center;" id="plot"></div>');
+//     ids.forEach(function(id){
+//       // $('#plot').append("manhattan plot of ID "+id+"<br/>");
+//       PlotManhattan(id, "snps");
+//     })
+//   }
+// }
+//
+// function geneManhattan(){
+//   ids = []
+//   $(".selectedGWAS").each(function(){
+//     ids.push($(this).children("input").val())
+//   })
+//   if(ids.length==0){
+//     $('#panel').html('<div style="text-align: center;">Please select GWAS from the top panel.</div>');
+//   }else{
+//     $('#panel').html('<div style="text-align: center;" id="plot"></div>');
+//     ids.forEach(function(id){
+//       // $('#plot').append("gene manhattan plot of ID "+id+"<br/>");
+//       PlotManhattan(id, "genes");
+//     })
+//   }
+// }
+function magmagenes(){
+  ids = selectTable.column(0).data();
+  if(ids.length<=1){
+    $('#panel').html('<div style="text-align: center;">Please select at lease 2 GWAS from the top panel.</div>');
   }else{
-    $('#panel').html('<div style="text-align: center;" id="plot"></div>');
-    ids.forEach(function(id){
-      // $('#plot').append("manhattan plot of ID "+id+"<br/>");
-      PlotManhattan(id, "snps");
-    })
+    $("#panel").html('Order by : <select id="orderHeat"><option value="alph">Alphabetical</option><option value="domain">Domain</option><option value="clst">Cluster</option></select>')
+    $('#panel').append('<div style="width:auto;overflow-x:auto;" id="plot"></div>');
+    ids = ids.join(":");
+    PlotMagmaGenes(ids);
   }
 }
 
-function geneManhattan(){
-  ids = []
-  $(".selectedGWAS").each(function(){
-    ids.push($(this).children("input").val())
-  })
-  if(ids.length==0){
-    $('#panel').html('<div style="text-align: center;">Please select GWAS from the top panel.</div>');
+function magmaGS(){
+  ids = selectTable.column(0).data();
+  if(ids.length<=1){
+    $('#panel').html('<div style="text-align: center;">Please select at lease 2 GWAS from the top panel.</div>');
   }else{
-    $('#panel').html('<div style="text-align: center;" id="plot"></div>');
-    ids.forEach(function(id){
-      // $('#plot').append("gene manhattan plot of ID "+id+"<br/>");
-      PlotManhattan(id, "genes");
-    })
-  }
-}
-
-function magma(){
-  ids = []
-  $(".selectedGWAS").each(function(){
-    ids.push($(this).children("input").val())
-  })
-  if(ids.length==0){
-    $('#panel').html('<div style="text-align: center;">Please select GWAS from the top panel.</div>');
-  }else{
-    $('#panel').html('<div style="text-align: center;" id="plot"></div>');
-    ids.forEach(function(id){
-      $('#plot').append("magma genes plot of ID "+id+"<br/>");
-    })
+    $("#panel").html('Order by : <select id="orderHeat"><option value="alph">Alphabetical</option><option value="domain">Domain</option><option value="clst">Cluster</option></select>')
+    $('#panel').append('<div style="width:auto;overflow-x:auto;" id="plot"></div>');
+    ids = ids.join(":");
+    PlotMagmaGS(ids);
   }
 }
 
 function GC(){
-  ids = []
-  $(".selectedGWAS").each(function(){
-    ids.push($(this).children("input").val())
-  })
-  if(ids.length==0){
-    $('#panel').html('<div style="text-align: center;">Please select GWAS from the top panel.</div>');
+  ids = selectTable.column(0).data();
+  if(ids.length<=1){
+    $('#panel').html('<div style="text-align: center;">Please select at lease 2 GWAS from the top panel.</div>');
   }else{
-    $('#panel').html('<div style="text-align: center;" id="plot"></div>');
+    $("#panel").html('Order by : <select id="orderHeat"><option value="alph">Alphabetical</option><option value="domain">Domain</option><option value="clst">Cluster</option></select>')
+    $('#panel').append('<div style="width:auto;overflow-x:auto;" id="plot"></div>');
     ids = ids.join(":");
-    PlotCG(ids);
-  }
-}
-
-function showPlots(ID){
-  var curHeight = $('#ManhattanPanel').height();
-  var chromSize = [249250621, 243199373, 198022430, 191154276, 180915260, 171115067,
-    159138663, 146364022, 141213431, 135534747, 135006516, 133851895, 115169878, 107349540,
-    102531392, 90354753, 81195210, 78077248, 63025520, 59128983, 48129895, 51304566, 155270560];
-  var chromStart = [];
-  chromStart.push(0);
-  for(var i=1; i<chromSize.length; i++){
-    chromStart.push(chromStart[i-1]+chromSize[i-1]);
-  }
-
-  var margin = {top:30, right: 30, bottom:50, left:50},
-      width = 800,
-      height = 300;
-
-  d3.select('#ManhattanPanel').style("height", curHeight+height+margin.top+margin.bottom);
-  $('#ManhattanPanel').append('<div id="manhattan'+ID+'Panel" style="position: relative; height:'+(height+margin.top+margin.bottom)+';"></div>');
-  $('#manhattan'+ID+"Panel").append('<div id="manhattan'+ID+'" class="canvasarea"></div>')
-  var svg = d3.select("#manhattan"+ID).append("svg")
-            .attr("width", width+margin.left+margin.right)
-            .attr("height", height+margin.top+margin.bottom)
-            .append("g")
-            .attr("transform", "translate("+margin.left+","+margin.top+")");
-  var canvas1 = d3.select('#manhattan'+ID).append("div").attr("class", "canvasarea")
-               .style("left", margin.left)
-              .style("top", margin.top)
-              .append("canvas")
-              .attr("class", "canvasarea")
-              .attr("width", width)
-              .attr("height", height)
-              .node().getContext('2d');
-
-  d3.json("GWASresult/manhattan/gwasDB/"+ID+"/manhattan.txt", function(data){
-    data.forEach(function(d){
-  		// d.chr = +d.chr;
-  		// d.bp = +d.bp;
-  		// d.p = +d.p;
-      // d.y = 0;
-      d[0] = +d[0]; //chr
-      d[1] = +d[1]; // bp
-      d[2] = +d[2]; // p
-  	});
-    // var chr = d3.set(data.map(function(d){return d.chr;})).values();
-    var chr = d3.set(data.map(function(d){return d[0];})).values();
-
-    var max_chr = chr.length;
-    var x = d3.scale.linear().range([0, width]);
-    x.domain([0, (chromStart[max_chr-1]+chromSize[max_chr-1])]);
-    var xAxis = d3.svg.axis().scale(x).orient("bottom");
-    var y = d3.scale.linear().range([height, 0]);
-    // y.domain([0, d3.max(data, function(d){return -Math.log10(d.p);})+1]);
-    y.domain([0, d3.max(data, function(d){return -Math.log10(d[2]);})+1]);
-
-    var yAxis = d3.svg.axis().scale(y).orient("left");
-
-    data.forEach(function(d){
-    		// if(d.p<=0.005 || d.bp%200==0){
-    			canvas1.beginPath();
-    			// canvas1.arc( x(d.bp+chromStart[d.chr-1]), y(-Math.log10(d.p)), 2, 0, 2*Math.PI);
-          canvas1.arc( x(d[1]+chromStart[d[0]-1]), y(-Math.log10(d[2])), 2, 0, 2*Math.PI);
-    			// if(d.chr%2==0){canvas1.fillStyle="steelblue";}
-          if(d[0]%2==0){canvas1.fillStyle="steelblue";}
-    			else{canvas1.fillStyle="blue";}
-    			canvas1.fill();
-    		// }
-    	});
-
-    svg.append("line")
-  	 .attr("x1", 0).attr("x2", width)
-    	.attr("y1", y(-Math.log10(5e-8))).attr("y2", y(-Math.log10(5e-8)))
-    	.style("stroke", "red")
-    	.style("stroke-dasharray", ("3,3"));
-  	svg.append("g").attr("class", "x axis")
-      .attr("transform", "translate(0,"+height+")").call(xAxis).selectAll("text").remove();
-    svg.append("g").attr("class", "y axis").call(yAxis);
-
-    //Chr label
-  	for(var i=0; i<chr.length; i++){
-  		svg.append("text").attr("text-anchor", "middle")
-  		.attr("transform", "translate("+x((chromStart[i]*2+chromSize[i])/2)+","+(height+20)+")")
-  		.text(chr[i])
-      .style("font-size", "10px");
-  	}
-  	svg.append("text").attr("text-anchor", "middle")
-  	 .attr("transform", "translate("+width/2+","+(height+35)+")")
-  	  .text("Chromosome");
-    svg.append("text").attr("text-anchor", "middle")
-      .attr("transform", "translate("+(-35)+","+(height/2)+")rotate(-90)")
-      .text("-log10 P-value");
-  });
-}
-
-function PlotManhattan(id, type){
-  var chromSize = [249250621, 243199373, 198022430, 191154276, 180915260, 171115067,
-    159138663, 146364022, 141213431, 135534747, 135006516, 133851895, 115169878, 107349540,
-    102531392, 90354753, 81195210, 78077248, 63025520, 59128983, 48129895, 51304566, 155270560];
-  var chromStart = [];
-  chromStart.push(0);
-  for(var i=1; i<chromSize.length; i++){
-    chromStart.push(chromStart[i-1]+chromSize[i-1]);
-  }
-  var margin = {top:30, right: 200, bottom:50, left:50},
-      width = 800,
-      height = 100;
-
-  // create svg and canvas object
-  var svg = d3.select("#plot").append("svg")
-            .attr("width", width+margin.left+margin.right)
-            .attr("height", height+margin.top+margin.bottom)
-            .append("g")
-            .attr("transform", "translate("+margin.left+","+margin.top+")");
-  // var canvas1 = d3.select('#SNPsManhattan').append("div").attr("class", "canvasarea")
-  // 	           .style("left", margin.left)
-  //           	.style("top", margin.top)
-  //           	.append("canvas")
-  //           	.attr("class", "canvasarea")
-  //           	.attr("width", width)
-  //           	.attr("height", height)
-  //           	.node().getContext('2d');
-
-  var x = d3.scale.linear().range([0, width]);
-
-  if(type=="snps"){
-    // plot SNPs manhattan
-    d3.json(subdir+"/multiGWAS/manhattan/"+id+"/manhattan.txt", function(data){
-      data.forEach(function(d){
-        d[0] = +d[0]; //chr
-        d[1] = +d[1]; // bp
-        d[2] = +d[2]; // p
-    	});
-      // var chr = d3.set(data.map(function(d){return d.chr;})).values();
-      var chr = d3.set(data.map(function(d){return d[0];})).values();
-
-      var max_chr = chr.length;
-      var x = d3.scale.linear().range([0, width]);
-      x.domain([0, (chromStart[max_chr-1]+chromSize[max_chr-1])]);
-      var xAxis = d3.svg.axis().scale(x).orient("bottom");
-      var y = d3.scale.linear().range([height, 0]);
-      // y.domain([0, d3.max(data, function(d){return -Math.log10(d.p);})+1]);
-      y.domain([0, d3.max(data, function(d){return -Math.log10(d[2]);})+1]);
-
-      var yAxis = d3.svg.axis().scale(y).orient("left").ticks(4);
-
-      svg.selectAll("dot.manhattan").data(data).enter()
-        .append("circle")
-        .attr("r", 2)
-        .attr("cx", function(d){return x(d[1]+chromStart[d[0]-1])})
-        .attr("cy", function(d){return y(-Math.log10(d[2]))})
-        .attr("fill", function(d){if(d[0]%2==0){return "steelblue"}else{return "blue"}});
-
-      svg.append("line")
-    	 .attr("x1", 0).attr("x2", width)
-      	.attr("y1", y(-Math.log10(5e-8))).attr("y2", y(-Math.log10(5e-8)))
-      	.style("stroke", "red")
-      	.style("stroke-dasharray", ("3,3"));
-    	svg.append("g").attr("class", "x axis")
-        .attr("transform", "translate(0,"+height+")").call(xAxis).selectAll("text").remove();
-      svg.append("g").attr("class", "y axis").call(yAxis)
-        .selectAll('text').style('font-size', '11px');
-
-      // d3.timer(moveCircles);
-      // var duration = 2000;
-      // var timeScale = d3.scale.linear()
-      // 	.domain([0, duration])
-      // 	.range([0,1]);
-      // var renderTime = 0;
-      // function moveCircles(t) {
-    	// 	data.forEach(function(d){
-    	// 		d.y = (t/duration)*-Math.log10(d.p);
-    	// 	});
-    	// 	drawCircles();
-    	// 	if(t >= duration){
-    	// 		console.log('Render time:', renderTime);
-    	// 		return true;
-    	// 	}
-    	// }
-      //
-      // function drawCircles(point) {
-    	// 	var start = new Date();
-    	// 	canvas1.clearRect(0, 0, width, height);
-    	// 	//fill = point ? "#e4e5e5" : "steelblue";
-    	// 	data.forEach(function(d) {
-      //     if(d.chr%2==0){canvas1.fillStyle="steelblue";}
-      //     else{canvas1.fillStyle="blue";}
-    	// 		canvas1.beginPath();
-    	// 		canvas1.moveTo(x(d.bp+chromStart[d.chr-1]), y(d.y));
-    	// 		canvas1.arc(x(d.bp+chromStart[d.chr-1]), y(d.y), 2, 0, 2 * Math.PI);
-    	// 		canvas1.fill();
-    	// 	});
-    	// 	var end = new Date();
-    	// 	renderTime += (end-start);
-    	// }
-
-      //Chr label
-      for(var i=0; i<chr.length; i++){
-        svg.append("text").attr("text-anchor", "middle")
-        .attr("transform", "translate("+x((chromStart[i]*2+chromSize[i])/2)+","+(height+20)+")")
-        .text(chr[i])
-        .style("font-size", "10px");
-      }
-
-      svg.append("text").attr("text-anchor", "middle")
-    	 .attr("transform", "translate("+width/2+","+(height+35)+")")
-    	  .text("Chromosome");
-      svg.append("text").attr("text-anchor", "middle")
-        .attr("transform", "translate("+(-35)+","+(height/2)+")rotate(-90)")
-        .text("-log10 P-value");
-      svg.selectAll('path').style('fill', 'none').style('stroke', 'grey');
-      svg.selectAll('.axis').selectAll('line').style('fill', 'none').style('stroke', 'grey');
-      svg.selectAll('text').style("font-family", "sans-serif");
-    });
-  }else if(type=="genes"){
-    // plot gene manhattan
-    d3.json(subdir+"/multiGWAS/manhattan/"+id+"/magma.genes.out", function(data){
-      data.forEach(function(d){
-        d[0] = +d[0]; //chr
-        d[1] = +d[1]; //start
-        d[2] = +d[2]; //stop
-        d[3] = +d[3]; //p
-    	});
-
-      $('#geneManhattanDesc').html("Input SNPs were mapped to "+data.length+" protein coding genes (distance 0). "
-        +"Genome wide significance (red dashed line in the plot) was defined at P = 0.05/"+data.length+" = "+((0.05/data.length).toExponential())+".");
-
-      // sortedP = sortedP.sort(function(a,b){return a-b;});
-      // var chr = d3.set(data.map(function(d){return d.CHR;})).values();
-      var chr = d3.set(data.map(function(d){return d[0];})).values();
-      var max_chr = chr.length;
-      var x = d3.scale.linear().range([0, width]);
-      x.domain([0, (chromStart[max_chr-1]+chromSize[max_chr-1])]);
-      var xAxis = d3.svg.axis().scale(x).orient("bottom");
-      var y = d3.scale.linear().range([height, 0]);
-      // y.domain([0, d3.max(data, function(d){return -Math.log10(d.P);})+1]);
-      y.domain([0, d3.max(data, function(d){return -Math.log10(d[3]);})+1]);
-      var yAxis = d3.svg.axis().scale(y).orient("left").ticks(4);
-
-      svg.selectAll("dot.geneManhattan").data(data).enter()
-        .append("circle")
-        .attr("r", 2)
-        .attr("cx", function(d){return x((d[1]+d[2])/2+chromStart[d[0]-1])})
-        .attr("cy", function(d){return y(-Math.log10(d[3]))})
-        .attr("fill", function(d){if(d[0]%2==0){return "steelblue"}else{return "blue"}});
-
-      svg.append("line")
-    	 .attr("x1", 0).attr("x2", width)
-      	.attr("y1", y(-Math.log10(0.05/data.length))).attr("y2", y(-Math.log10(0.05/data.length)))
-      	.style("stroke", "red")
-      	.style("stroke-dasharray", ("3,3"));
-    	svg.append("g").attr("class", "x axis")
-        .attr("transform", "translate(0,"+height+")").call(xAxis).selectAll("text").remove();
-      svg.append("g").attr("class", "y axis").call(yAxis)
-        .selectAll('text').style('font-size', '11px');
-
-    	//Chr label
-    	for(var i=0; i<chr.length; i++){
-    		svg.append("text").attr("text-anchor", "middle")
-    		.attr("transform", "translate("+x((chromStart[i]*2+chromSize[i])/2)+","+(height+20)+")")
-    		.text(chr[i])
-        .style("font-size", "10px");
-    	}
-    	svg.append("text").attr("text-anchor", "middle")
-    	 .attr("transform", "translate("+width/2+","+(height+35)+")")
-    	  .text("Chromosome");
-      svg.append("text").attr("text-anchor", "middle")
-        .attr("transform", "translate("+(-35)+","+(height/2)+")rotate(-90)")
-        .text("-log10 P-value");
-      svg.selectAll('path').style('fill', 'none').style('stroke', 'grey');
-      svg.selectAll('.axis').selectAll('line').style('fill', 'none').style('stroke', 'grey');
-      svg.selectAll('text').style("font-family", "sans-serif");
-
-    });
+    PlotGC(ids);
   }
 }
 
 function PlotGC(ids){
-  console.log(ids);
-  d3.json(subdir+"/multiGWAS/GCplot/"+ids, function(data){
-    if(data.length == 0 || data == undefined || data == null){
+  d3.select('#plot').select('svg').remove();
+  d3.json(subdir+"/multiGWAS/GCheat/"+ids, function(data){
+    if(data == undefined || data == null || data.length==0){
       $('#plot').html("No genetic correlatioin is available for selected GWAS.");
     }else{
-      $('#plot').html("heatmap here");
+      var ids = data.data["id"];
+      var n = ids.length;
+      var cellsize = 10;
+      if(n < 50){
+        cellsize = 20;
+      }
+      data.data.rg.forEach(function(d){
+        d[0] = +d[0]; //id1
+        d[1] = +d[1]; //id2
+        d[2] = +d[2]; //rg
+        d[3] = +d[3]; //p
+        d[4] = +d[4]; //pbon
+      });
+
+      var maxTrait = 0;
+      ids.forEach(function(d){
+        if(data.data.Trait[d].length > maxTrait){
+          maxTrait = data.data.Trait[d].length;
+        }
+      });
+
+      var margin = {top: maxTrait*5.5, right: 100, bottom: 50, left: maxTrait*5.5},
+        width = cellsize*n,
+        height = cellsize*n;
+      var svg = d3.select('#plot').append('svg')
+                .attr("width", width+margin.left+margin.right)
+                .attr("height", height+margin.top+margin.bottom)
+                .append("g").attr("transform", "translate("+margin.left+","+margin.top+")");
+      var colorScale = d3.scale.linear().domain([-1.25, 0, 1.25]).range(["#000099", "#fff", "#b30000"]);
+      var sizeScale = d3.scale.linear().domain([0.05, 1]).range([1, 0]);
+
+      // legened
+      var t = [];
+      for(var i =0; i<26; i++){t.push(i);}
+      var legendRect = svg.selectAll(".legend").data(t).enter().append("g")
+        .append("rect")
+        .attr("class", 'legendRect')
+        .attr("x", width+10)
+        .attr("y", function(d){return (25-d)*5+20})
+        .attr("width", 20)
+        .attr("height", 10)
+        .attr("fill", function(d){return colorScale(d*0.1-1.25)});
+      var legendText = svg.selectAll("text.legend").data([0,12.5,25]).enter().append("g")
+        .append("text")
+        .attr("text-anchor", "start")
+        .attr("class", "legenedText")
+        .attr("x", width+32)
+        .attr("y", function(d){return (25-d)*5+11+20})
+        .text(function(d){return d*0.1-1.25})
+        .style("font-size", "12px");
+
+      // y axis label
+      var rowLabels = svg.append("g").selectAll(".rowLabel")
+                      .data(ids).enter().append("text")
+                      .text(function(d){return data.data.Trait[d];})
+                      .attr("x", -3)
+                      .attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;})
+                      .style("font-size", "10px")
+                      .style("text-anchor", "end");
+      // x axis label
+      var colLabels = svg.append("g").selectAll(".colLabel")
+                      .data(ids).enter().append("text")
+                      .text(function(d){return data.data.Trait[d];})
+                      .style("text-anchor", "start")
+                      .style("font-size", "10px")
+                      .attr("transform", function(d){
+                        return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
+                      });
+
+      // heatmap for significant rg
+      var heatMapSig = svg.append("g").attr("class", "cell heatmapcell")
+                    .selectAll("rect.cell").data(data.data.rg.filter(function(d){if(d[3]<0.05){return d}})).enter()
+                    .append("rect")
+                    .attr("width", cellsize-1).attr("height", cellsize-1)
+                    .attr('x', function(d){return data.data.order.alph[d[0]]*cellsize})
+                    .attr('y', function(d){return data.data.order.alph[d[1]]*cellsize})
+                    .attr('fill', function(d){return colorScale(d[2])});
+      // stars for significant rg after bon correction
+      var stars = svg.append("g").attr("class", "cell star")
+                    .selectAll("star").data(data.data.rg.filter(function(d){if(d[4]<0.05 && d[0] != d[1]){return d}})).enter()
+                    .append("text")
+                    .attr('x', function(d){return data.data.order.alph[d[0]]*cellsize+(cellsize-1)/2})
+                    .attr('y', function(d){return data.data.order.alph[d[1]]*cellsize+(cellsize-4)})
+                    .text("*")
+                    .style("text-anchor", "middle");
+      // heatmap for non-significant rg
+      var heatMapNonsig = svg.append("g").attr("class", "cell heatmapcell")
+                    .selectAll("rect.cell.nonsig").data(data.data.rg.filter(function(d){if(d[3]>=0.05){return d}})).enter()
+                    .append("rect")
+                    .attr("width", function(d){return (cellsize-1)*sizeScale(d[3])})
+                    .attr("height", function(d){return (cellsize-1)*sizeScale(d[3])})
+                    .attr("x", function(d){return data.data.order.alph[d[0]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)})
+                    .attr("y", function(d){return data.data.order.alph[d[1]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)})
+                    .attr('fill', function(d){return colorScale(d[2])});
+
+      // reordering labels
+      function sortOptions(type){
+        if(type == "alph"){
+          heatMapSig.transition().duration(1000)
+            .attr("x", function(d){return data.data.order.alph[d[0]]*cellsize})
+            .attr("y", function(d){return data.data.order.alph[d[1]]*cellsize});
+          stars.transition().duration(1000)
+            .attr("x", function(d){return data.data.order.alph[d[0]]*cellsize+(cellsize-1)/2})
+            .attr("y", function(d){return data.data.order.alph[d[1]]*cellsize+(cellsize-4)});
+          heatMapNonsig.transition().duration(1000)
+            .attr("x", function(d){return data.data.order.alph[d[0]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)})
+            .attr("y", function(d){return data.data.order.alph[d[1]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)});
+          rowLabels.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;});
+          colLabels.transition().duration(1000)
+          .attr("transform", function(d){
+            return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
+          });
+        }else if(type == "domain"){
+          heatMapSig.transition().duration(1000)
+            .attr("x", function(d){return data.data.order.domain[d[0]]*cellsize})
+            .attr("y", function(d){return data.data.order.domain[d[1]]*cellsize});
+          stars.transition().duration(1000)
+            .attr("x", function(d){return data.data.order.domain[d[0]]*cellsize+(cellsize-1)/2})
+            .attr("y", function(d){return data.data.order.domain[d[1]]*cellsize+(cellsize-4)});
+          heatMapNonsig.transition().duration(1000)
+            .attr("x", function(d){return data.data.order.domain[d[0]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)})
+            .attr("y", function(d){return data.data.order.domain[d[1]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)});
+          rowLabels.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.domain[d]*cellsize+(cellsize-1)/2;});
+          colLabels.transition().duration(1000)
+          .attr("transform", function(d){
+            return "translate("+(data.data.order.domain[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
+          });
+        }else if(type == "clst"){
+          heatMapSig.transition().duration(1000)
+            .attr("x", function(d){return data.data.order.clst[d[0]]*cellsize})
+            .attr("y", function(d){return data.data.order.clst[d[1]]*cellsize});
+          stars.transition().duration(1000)
+            .attr("x", function(d){return data.data.order.clst[d[0]]*cellsize+(cellsize-1)/2})
+            .attr("y", function(d){return data.data.order.clst[d[1]]*cellsize+(cellsize-4)});
+          heatMapNonsig.transition().duration(1000)
+            .attr("x", function(d){return data.data.order.clst[d[0]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)})
+            .attr("y", function(d){return data.data.order.clst[d[1]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)});
+          rowLabels.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.clst[d]*cellsize+(cellsize-1)/2;});
+          colLabels.transition().duration(1000)
+          .attr("transform", function(d){
+            return "translate("+(data.data.order.clst[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
+          });
+        }
+      }
+
+      d3.select('#orderHeat').on("change", function(){
+        var type = $('#orderHeat').val();
+        sortOptions(type);
+      })
+    }
+  });
+}
+
+function PlotMagmaGenes(ids){
+  d3.select('#plot').select('svg').remove();
+  d3.json(subdir+"/multiGWAS/MagmaGeneheat/"+ids, function(data){
+    if(data == undefined || data == null || data.length==0){
+      $('#plot').html("No MAGMA gene analysis is available for selcted GWAS.");
+    }else{
+      var ids = data.data["id"];
+      var n = ids.length;
+      var cellsize = 10;
+      if(n < 50){
+        cellsize = 20;
+      }
+
+      data.data.go.forEach(function(d){
+        d[0] = +d[0]; //id1
+        d[1] = +d[1]; //id2
+        d[2] = +d[2]; //overlap
+      });
+
+      data.data.ng.forEach(function(d){
+        d[0] = +d[0] //id
+        d[1] = +d[1] //n genes
+      });
+
+      var maxTrait = 0;
+      ids.forEach(function(d){
+        if(data.data.Trait[d].length > maxTrait){
+          maxTrait = data.data.Trait[d].length;
+        }
+      });
+
+      var barWidth = 80;
+      var space = 5;
+      var margin = {top: maxTrait*5.5, right: 100, bottom: 50, left: maxTrait*5.5},
+        width = cellsize*n+space+barWidth,
+        height = cellsize*n;
+      var svg = d3.select('#plot').append('svg')
+                .attr("width", width+margin.left+margin.right)
+                .attr("height", height+margin.top+margin.bottom)
+                .append("g").attr("transform", "translate("+margin.left+","+margin.top+")");
+      var colorScale = d3.scale.linear().domain([0, 1]).range(["#fff", "#b30000"]);
+      // var sizeScale = d3.scale.linear().domain([0.05, 1]).range([1, 0]);
+
+      // legened
+      var t = [];
+      for(var i =0; i<11; i++){t.push(i);}
+      var legendRect = svg.selectAll(".legend").data(t).enter().append("g")
+        .append("rect")
+        .attr("class", 'legendRect')
+        .attr("x", width+20)
+        .attr("y", function(d){return (d)*10+20})
+        .attr("width", 20)
+        .attr("height", 10)
+        .attr("fill", function(d){return colorScale(1-d*0.1)});
+      var legendText = svg.selectAll("text.legend").data([0,5,10]).enter().append("g")
+        .append("text")
+        .attr("text-anchor", "start")
+        .attr("class", "legenedText")
+        .attr("x", width+42)
+        .attr("y", function(d){return (d)*10+11+20})
+        .text(function(d){return 1-d*0.1})
+        .style("font-size", "12px");
+
+      // y axis label
+      var rowLabels = svg.append("g").selectAll(".rowLabel")
+                      .data(ids).enter().append("text")
+                      .text(function(d){return data.data.Trait[d];})
+                      .attr("x", -3)
+                      .attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;})
+                      .style("font-size", "10px")
+                      .style("text-anchor", "end");
+      // x axis label
+      var colLabels = svg.append("g").selectAll(".colLabel")
+                      .data(ids).enter().append("text")
+                      .text(function(d){return data.data.Trait[d];})
+                      .style("text-anchor", "start")
+                      .style("font-size", "10px")
+                      .attr("transform", function(d){
+                        return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
+                      });
+
+      // heatmap for non zero overlap
+      var heatMap = svg.append("g").attr("class", "cell heatmapcell")
+                    .selectAll("rect.cell").data(data.data.go).enter()
+                    .append("rect")
+                    .attr("width", cellsize-1).attr("height", cellsize-1)
+                    .attr('x', function(d){return data.data.order.alph[d[0]]*cellsize})
+                    .attr('y', function(d){return data.data.order.alph[d[1]]*cellsize})
+                    .attr('fill', function(d){if(d[2]==-1){return "grey";}else{return colorScale(d[2])}});
+
+      // n genes bar plot
+      var x = d3.scale.linear().range([(cellsize+1)*n+space, width]);
+      var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(3);
+      x.domain([0, d3.max(data.data.ng, function(d){return d[1]})]);
+
+      var barPlot = svg.append("g").attr("class", "bar")
+                    .selectAll("bar").data(data.data.ng).enter()
+                    .append("rect")
+                    .attr("width", function(d){return x(d[1])-x(0)})
+                    .attr("height", cellsize-1)
+                    .attr("x", (cellsize+1)*n+space)
+                    .attr("y", function(d){return data.data.order.alph[d[0]]*cellsize})
+                    .attr("fill", "skyblue");
+      var barText = svg.append("g")
+                    .selectAll("bar.text").data(data.data.ng).enter()
+                    .append("text")
+                    .attr("x", function(d){return x(d[1])})
+                    .attr("y", function(d){return data.data.order.alph[d[0]]*cellsize+cellsize/2})
+                    .text(function(d){return d[1];})
+                    .style("text-anchor", "start")
+                    .style("font-size", "10px");
+      svg.append('g').attr("class", "x axis")
+          .attr("transform", "translate(0,"+height+")")
+          .call(xAxis).selectAll("text")
+          .attr("transform", "translate(-12, 3)rotate(-60)")
+          .style("text-anchor", "end");
+
+
+      // reordering labels
+      function sortOptions(type){
+        if(type == "alph"){
+          heatMap.transition().duration(1000)
+            .attr("x", function(d){return data.data.order.alph[d[0]]*cellsize})
+            .attr("y", function(d){return data.data.order.alph[d[1]]*cellsize});
+          barPlot.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.alph[d[0]]*cellsize});
+          barText.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.alph[d[0]]*cellsize+cellsize/2});
+          rowLabels.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;});
+          colLabels.transition().duration(1000)
+          .attr("transform", function(d){
+            return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
+          });
+        }else if(type == "domain"){
+          heatMap.transition().duration(1000)
+            .attr("x", function(d){return data.data.order.domain[d[0]]*cellsize})
+            .attr("y", function(d){return data.data.order.domain[d[1]]*cellsize});
+          barPlot.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.domain[d[0]]*cellsize});
+          barText.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.domain[d[0]]*cellsize+cellsize/2});
+          rowLabels.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.domain[d]*cellsize+(cellsize-1)/2;});
+          colLabels.transition().duration(1000)
+          .attr("transform", function(d){
+            return "translate("+(data.data.order.domain[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
+          });
+        }else if(type == "clst"){
+          heatMap.transition().duration(1000)
+            .attr("x", function(d){return data.data.order.clst[d[0]]*cellsize})
+            .attr("y", function(d){return data.data.order.clst[d[1]]*cellsize});
+          barPlot.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.clst[d[0]]*cellsize});
+          barText.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.clst[d[0]]*cellsize+cellsize/2});
+          rowLabels.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.clst[d]*cellsize+(cellsize-1)/2;});
+          colLabels.transition().duration(1000)
+          .attr("transform", function(d){
+            return "translate("+(data.data.order.clst[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
+          });
+        }
+      }
+
+      d3.select('#orderHeat').on("change", function(){
+        var type = $('#orderHeat').val();
+        sortOptions(type);
+      })
+    }
+  });
+}
+
+function PlotMagmaGS(ids){
+  d3.select('#plot').select('svg').remove();
+  d3.json(subdir+"/multiGWAS/MagmaGSheat/"+ids, function(data){
+    if(data == undefined || data == null || data.length==0){
+      $('#plot').html("No MAGMA gene-set analysis is available for selected GWAS.");
+    }else{
+      var ids = data.data["id"];
+      var n = ids.length;
+      var cellsize = 10;
+      if(n < 50){
+        cellsize = 20;
+      }
+
+      data.data.gso.forEach(function(d){
+        d[0] = +d[0]; //id1
+        d[1] = +d[1]; //id2
+        d[2] = +d[2]; //overlap
+      });
+
+      data.data.ngs.forEach(function(d){
+        d[0] = +d[0] //id
+        d[1] = +d[1] //n gene-sets
+      });
+
+      var maxTrait = 0;
+      ids.forEach(function(d){
+        if(data.data.Trait[d].length > maxTrait){
+          maxTrait = data.data.Trait[d].length;
+        }
+      });
+
+      var barWidth = 80;
+      var space = 5;
+      var margin = {top: maxTrait*5.5, right: 100, bottom: 50, left: maxTrait*5.5},
+        width = cellsize*n+space+barWidth,
+        height = cellsize*n;
+      var svg = d3.select('#plot').append('svg')
+                .attr("width", width+margin.left+margin.right)
+                .attr("height", height+margin.top+margin.bottom)
+                .append("g").attr("transform", "translate("+margin.left+","+margin.top+")");
+      var colorScale = d3.scale.linear().domain([0, 1]).range(["#fff", "#b30000"]);
+      // var sizeScale = d3.scale.linear().domain([0.05, 1]).range([1, 0]);
+
+      // legened
+      var t = [];
+      for(var i =0; i<11; i++){t.push(i);}
+      var legendRect = svg.selectAll(".legend").data(t).enter().append("g")
+        .append("rect")
+        .attr("class", 'legendRect')
+        .attr("x", width+20)
+        .attr("y", function(d){return (d)*10+20})
+        .attr("width", 20)
+        .attr("height", 10)
+        .attr("fill", function(d){return colorScale(1-d*0.1)});
+      var legendText = svg.selectAll("text.legend").data([0,5,10]).enter().append("g")
+        .append("text")
+        .attr("text-anchor", "start")
+        .attr("class", "legenedText")
+        .attr("x", width+42)
+        .attr("y", function(d){return (d)*10+11+20})
+        .text(function(d){return 1-d*0.1})
+        .style("font-size", "12px");
+
+      // y axis label
+      var rowLabels = svg.append("g").selectAll(".rowLabel")
+                      .data(ids).enter().append("text")
+                      .text(function(d){return data.data.Trait[d];})
+                      .attr("x", -3)
+                      .attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;})
+                      .style("font-size", "10px")
+                      .style("text-anchor", "end");
+      // x axis label
+      var colLabels = svg.append("g").selectAll(".colLabel")
+                      .data(ids).enter().append("text")
+                      .text(function(d){return data.data.Trait[d];})
+                      .style("text-anchor", "start")
+                      .style("font-size", "10px")
+                      .attr("transform", function(d){
+                        return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
+                      });
+
+      // heatmap for non zero overlap
+      var heatMap = svg.append("g").attr("class", "cell heatmapcell")
+                    .selectAll("rect.cell").data(data.data.gso).enter()
+                    .append("rect")
+                    .attr("width", cellsize-1).attr("height", cellsize-1)
+                    .attr('x', function(d){return data.data.order.alph[d[0]]*cellsize})
+                    .attr('y', function(d){return data.data.order.alph[d[1]]*cellsize})
+                    .attr('fill', function(d){if(d[2]==-1){return "grey";}else{return colorScale(d[2])}});
+
+      // n genes bar plot
+      var x = d3.scale.linear().range([(cellsize+1)*n+space, width]);
+      var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(3);
+      x.domain([0, d3.max(data.data.ngs, function(d){return d[1]})]);
+
+      var barPlot = svg.append("g").attr("class", "bar")
+                    .selectAll("bar").data(data.data.ngs).enter()
+                    .append("rect")
+                    .attr("width", function(d){return x(d[1])-x(0)})
+                    .attr("height", cellsize-1)
+                    .attr("x", (cellsize+1)*n+space)
+                    .attr("y", function(d){return data.data.order.alph[d[0]]*cellsize})
+                    .attr("fill", "skyblue");
+      var barText = svg.append("g")
+                    .selectAll("bar.text").data(data.data.ngs).enter()
+                    .append("text")
+                    .attr("x", function(d){return x(d[1])})
+                    .attr("y", function(d){return data.data.order.alph[d[0]]*cellsize+cellsize/2})
+                    .text(function(d){return d[1];})
+                    .style("text-anchor", "start")
+                    .style("font-size", "10px");
+      svg.append('g').attr("class", "x axis")
+          .attr("transform", "translate(0,"+height+")")
+          .call(xAxis).selectAll("text")
+          .attr("transform", "translate(-12, 3)rotate(-60)")
+          .style("text-anchor", "end");
+
+
+      // reordering labels
+      function sortOptions(type){
+        if(type == "alph"){
+          heatMap.transition().duration(1000)
+            .attr("x", function(d){return data.data.order.alph[d[0]]*cellsize})
+            .attr("y", function(d){return data.data.order.alph[d[1]]*cellsize});
+          barPlot.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.alph[d[0]]*cellsize});
+          barText.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.alph[d[0]]*cellsize+cellsize/2});
+          rowLabels.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;});
+          colLabels.transition().duration(1000)
+          .attr("transform", function(d){
+            return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
+          });
+        }else if(type == "domain"){
+          heatMap.transition().duration(1000)
+            .attr("x", function(d){return data.data.order.domain[d[0]]*cellsize})
+            .attr("y", function(d){return data.data.order.domain[d[1]]*cellsize});
+          barPlot.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.domain[d[0]]*cellsize});
+          barText.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.domain[d[0]]*cellsize+cellsize/2});
+          rowLabels.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.domain[d]*cellsize+(cellsize-1)/2;});
+          colLabels.transition().duration(1000)
+          .attr("transform", function(d){
+            return "translate("+(data.data.order.domain[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
+          });
+        }else if(type == "clst"){
+          heatMap.transition().duration(1000)
+            .attr("x", function(d){return data.data.order.clst[d[0]]*cellsize})
+            .attr("y", function(d){return data.data.order.clst[d[1]]*cellsize});
+          barPlot.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.clst[d[0]]*cellsize});
+          barText.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.clst[d[0]]*cellsize+cellsize/2});
+          rowLabels.transition().duration(1000)
+            .attr("y", function(d){return data.data.order.clst[d]*cellsize+(cellsize-1)/2;});
+          colLabels.transition().duration(1000)
+          .attr("transform", function(d){
+            return "translate("+(data.data.order.clst[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
+          });
+        }
+      }
+
+      d3.select('#orderHeat').on("change", function(){
+        var type = $('#orderHeat').val();
+        sortOptions(type);
+      })
     }
   });
 }
