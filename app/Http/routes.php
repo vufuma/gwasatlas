@@ -4,6 +4,8 @@ Route::get('/', function(){
     return view('pages.home');
 });
 
+Route::post('/home/dbSum', 'StatsController@dbSum');
+
 Route::get('/howto', function(){
   return view('pages.howto');
 });
@@ -32,32 +34,45 @@ Route::get('/traitDB/QQplot/{id}/{type}', 'DBController@QQplot');
 
 Route::get('/traitDB/GCplot/{id}/{n}', 'DBController@GCplot');
 
+Route::post('/traitDB/getGCdata', 'DBController@getGCdata');
+
+Route::post('/traitDB/getGClist', 'DBController@getGClist');
+
 // ************** Multi GWAS Comparison page ***************
 Route::get('/multiGWAS', function(){
   return view('pages.multiGWAS');
 });
-Route::get('/multiGWAS/manhattan', function(){
-  return view('page.multiGWAS.manhattan');
-});
 
-Route::get('/multiGWAS/manhattan/{id}/{file}', 'DBController@manhattan');
+Route::post('/multiGWAS/getData', 'MultiController@getData');
 
-Route::get('/multiGWAS/GCheat/{ids}', 'DBController@GCheat');
-
-Route::get('/multiGWAS/MagmaGeneheat/{ids}', 'DBController@MagmaGeneheat');
-
-Route::get('/multiGWAS/MagmaGSheat/{ids}', 'DBController@MagmaGSheat');
+// Route::post('/multiGWAS/getIDs', 'DBController@getIDs');
+//
+// Route::get('/multiGWAS/GCheat/{ids}', 'DBController@GCheat');
+//
+// Route::get('/multiGWAS/MagmaGeneheat/{ids}', 'DBController@MagmaGeneheat');
+//
+// Route::get('/multiGWAS/MagmaGSheat/{ids}', 'DBController@MagmaGSheat');
 
 // ************** Stats Page ***************
 Route::get('/stats', function(){
   return view('pages.stats');
 });
 
-Route::get('/stats/DomainPie', 'DBController@DomainPie');
-Route::get('/stats/ChapterPie/{domain}', 'DBController@ChapterPie');
-Route::get('/stats/SubchapterPie/{domain}/{chapter}', 'DBController@SubchapterPie');
-Route::get('/stats/NsampleYear', 'DBController@NsampleYear');
-Route::get('/stats/NsampleDomain', 'DBController@NsampleDomain');
+Route::post('/stats/dbSum', 'StatsController@dbSum');
+
+Route::get('/stats/yearSumPlot', 'StatsController@yearSumPlot');
+
+Route::get('/stats/domainSumPlot', 'StatsController@domainSumPlot');
+
+Route::get('/stats/DomainPie', 'StatsController@DomainPie');
+
+Route::get('/stats/ChapterPie/{domain}', 'StatsController@ChapterPie');
+
+Route::get('/stats/SubchapterPie/{domain}/{chapter}', 'StatsController@SubchapterPie');
+
+Route::get('/stats/NsampleYear', 'StatsController@NsampleYear');
+
+Route::get('/stats/NsampleDomain', 'StatsController@NsampleDomain');
 
 Route::get('/documentation', function(){
   return view('pages.documentation');

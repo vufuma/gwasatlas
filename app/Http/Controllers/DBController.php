@@ -15,483 +15,619 @@ use JavaScript;
 
 class DBController extends Controller
 {
-  public function SelectOption(Request $request){
-    $type = $request -> input('type');
-    $domain = $request -> input('domain');
-    $chapter = $request -> input('chapter');
-    $subchapter = $request -> input('subchapter');
+	public function SelectOption(Request $request){
+		$type = $request -> input('type');
+		$domain = $request -> input('domain');
+		$chapter = $request -> input('chapter');
+		$subchapter = $request -> input('subchapter');
 
-    if(strcmp($type, 'Domain')==0){
-      if(strcmp($domain, "null")==0){
-        $Domain = [];
-        $results = DB::select('SELECT * FROM gwasDB');
-        foreach($results as $row){
-          $d = $row->Domain;
-          if(array_key_exists($d, $Domain)){
-            $Domain[$d] += 1;
-          }else{
-            $Domain[$d] = 1;
-          }
-        }
-        // $keys = array_keys($Domain);
-        // $json = "";
-        // foreach($keys as $k){
-        //   if(strcmp($json, "")==0){
-        //     $json = '{0:"'.$k.'", 1:'.$Domain[$k].'}';
-        //   }else{
-        //     $json .= ',{0:"'.$k.'", 1:'.$Domain[$k].'}';
-        //   }
-        // }
-        // $json = '{Domain:['.$json.']}';
-        $json = array("Domain" => $Domain, "Chapter"=>[], "Subchapter"=>[], "Trait"=>[]);
-        // $json = json_encode($json);
-        echo json_encode($json);
-      }else{
-        $results = DB::select('SELECT * FROM gwasDB WHERE Domain=?', [$domain]);
-        $Chapter = [];
-        $Subchapter = [];
-        $Trait = [];
-        foreach($results as $row){
-          $c = $row->ChapterLevel;
-          $s = $row->SubchapterLevel;
-          $t = $row->Trait;
-          if(array_key_exists($c, $Chapter)){
-            $Chapter[$c] += 1;
-          }else{
-            $Chapter[$c] = 1;
-          }
-          if(array_key_exists($s, $Subchapter)){
-            $Subchapter[$s] += 1;
-          }else{
-            $Subchapter[$s] = 1;
-          }
-          if(array_key_exists($t, $Trait)){
-            $Trait[$t] += 1;
-          }else{
-            $Trait[$t] = 1;
-          }
-        }
-        $json = array("Chapter"=>$Chapter, "Subchapter"=>$Subchapter, "Trait"=>$Trait);
-        echo json_encode($json);
-      }
+		if(strcmp($type, 'Domain')==0){
+			if(strcmp($domain, "null")==0){
+				$Domain = [];
+				$Trait = [];
+				$results = DB::select('SELECT * FROM gwasDB');
+				foreach($results as $row){
+					$d = $row->Domain;
+					$t = $row->Trait;
+					$t = preg_replace("/(.+) \(.+\)/", "$1", $t);
+					$t = preg_replace("/(.+) - .+/", "$1", $t);
+					if(array_key_exists($d, $Domain)){
+						$Domain[$d] += 1;
+					}else{
+						$Domain[$d] = 1;
+					}
+					if(array_key_exists($t, $Trait)){
+						$Trait[$t] += 1;
+					}else{
+						$Trait[$t] = 1;
+					}
+				}
+				ksort($Domain);
+				ksort($Trait);
+				$json = array("Domain" => $Domain, "Chapter"=>[], "Subchapter"=>[], "Trait"=>$Trait);
+				echo json_encode($json);
+			}else{
+				$results = DB::select('SELECT * FROM gwasDB WHERE Domain=?', [$domain]);
+				$Chapter = [];
+				$Subchapter = [];
+				$Trait = [];
+				foreach($results as $row){
+					$c = $row->ChapterLevel;
+					$s = $row->SubchapterLevel;
+					$t = $row->Trait;
+					$t = preg_replace("/(.+) \(.+\)/", "$1", $t);
+					$t = preg_replace("/(.+) - .+/", "$1", $t);
+					if(array_key_exists($c, $Chapter)){
+						$Chapter[$c] += 1;
+					}else{
+						$Chapter[$c] = 1;
+					}
+					if(array_key_exists($s, $Subchapter)){
+						$Subchapter[$s] += 1;
+					}else{
+						$Subchapter[$s] = 1;
+					}
+					if(array_key_exists($t, $Trait)){
+						$Trait[$t] += 1;
+					}else{
+						$Trait[$t] = 1;
+					}
+				}
+				ksort($Chapter);
+				ksort($Subchapter);
+				ksort($Trait);
+				$json = array("Chapter"=>$Chapter, "Subchapter"=>$Subchapter, "Trait"=>$Trait);
+				echo json_encode($json);
+			}
+		}else if(strcmp($type, 'Chapter')==0){
+			if(strcmp($chapter, "null")==0){
+				$results = DB::select('SELECT * FROM gwasDB WHERE Domain=?', [$domain]);
+				$Chapter = [];
+				$Subchapter = [];
+				$Trait = [];
+				foreach($results as $row){
+					$c = $row->ChapterLevel;
+					$s = $row->SubchapterLevel;
+					$t = $row->Trait;
+					$t = preg_replace("/(.+) \(.+\)/", "$1", $t);
+					$t = preg_replace("/(.+) - .+/", "$1", $t);
+					if(array_key_exists($c, $Chapter)){
+						$Chapter[$c] += 1;
+					}else{
+						$Chapter[$c] = 1;
+					}
+					if(array_key_exists($s, $Subchapter)){
+						$Subchapter[$s] += 1;
+					}else{
+						$Subchapter[$s] = 1;
+					}
+					if(array_key_exists($t, $Trait)){
+						$Trait[$t] += 1;
+					}else{
+						$Trait[$t] = 1;
+					}
+				}
+				ksort($Chapter);
+				ksort($Subchapter);
+				ksort($Trait);
+				$json = array("Chapter"=>$Chapter, "Subchapter"=>$Subchapter, "Trait"=>$Trait);
+				echo json_encode($json);
+			}else{
+				$results = DB::select('SELECT * FROM gwasDB WHERE Domain=? AND ChapterLevel=?', [$domain, $chapter]);
+				$Subchapter = [];
+				$Trait = [];
+				foreach($results as $row){
+					$s = $row->SubchapterLevel;
+					$t = $row->Trait;
+					$t = preg_replace("/(.+) \(.+\)/", "$1", $t);
+					$t = preg_replace("/(.+) - .+/", "$1", $t);
+					if(array_key_exists($s, $Subchapter)){
+						$Subchapter[$s] += 1;
+					}else{
+						$Subchapter[$s] = 1;
+					}
+					if(array_key_exists($t, $Trait)){
+						$Trait[$t] += 1;
+					}else{
+						$Trait[$t] = 1;
+					}
+				}
+				ksort($Subchapter);
+				ksort($Trait);
+				$json = array("Subchapter"=>$Subchapter, "Trait"=>$Trait);
+				echo json_encode($json);
+			}
+		}else if(strcmp($type, 'Subchapter')==0){
+			if(strcmp($chapter,"null")==0 && strcmp($subchapter,"null")==0){
+				$results = DB::select('SELECT * FROM gwasDB WHERE Domain=?', [$domain]);
+				$Chapter = [];
+				$Subchapter = [];
+				$Trait = [];
+				foreach($results as $row){
+					$c = $row->ChapterLevel;
+					$s = $row->SubchapterLevel;
+					$t = $row->Trait;
+					$t = preg_replace("/(.+) \(.+\)/", "$1", $t);
+					$t = preg_replace("/(.+) - .+/", "$1", $t);
+					if(array_key_exists($c, $Chapter)){
+						$Chapter[$c] += 1;
+					}else{
+						$Chapter[$c] = 1;
+					}
+					if(array_key_exists($s, $Subchapter)){
+						$Subchapter[$s] += 1;
+					}else{
+						$Subchapter[$s] = 1;
+					}
+					if(array_key_exists($t, $Trait)){
+						$Trait[$t] += 1;
+					}else{
+						$Trait[$t] = 1;
+					}
+				}
+				ksort($Chapter);
+				ksort($Subchapter);
+				ksort($Trait);
+				$json = array("Chapter"=>$Chapter, "Subchapter"=>$Subchapter, "Trait"=>$Trait);
+				echo json_encode($json);
+			}else if(strcmp($subchapter,"null")==0){
+				$results = DB::select('SELECT * FROM gwasDB WHERE Domain=? AND ChapterLevel=?', [$domain, $chapter]);
+				$Subchapter = [];
+				$Trait = [];
+				foreach($results as $row){
+					$s = $row->SubchapterLevel;
+					$t = $row->Trait;
+					$t = preg_replace("/(.+) \(.+\)/", "$1", $t);
+					$t = preg_replace("/(.+) - .+/", "$1", $t);
+					if(array_key_exists($s, $Subchapter)){
+						$Subchapter[$s] += 1;
+					}else{
+						$Subchapter[$s] = 1;
+					}
+					if(array_key_exists($t, $Trait)){
+						$Trait[$t] += 1;
+					}else{
+						$Trait[$t] = 1;
+					}
+				}
+				ksort($Subchapter);
+				ksort($Trait);
+				$json = array("Subchapter"=>$Subchapter, "Trait"=>$Trait);
+				echo json_encode($json);
+			}else{
+				$results = DB::select('SELECT * FROM gwasDB WHERE Domain=? AND SubchapterLevel=?', [$domain, $subchapter]);
+				$Trait = [];
+				foreach($results as $row){
+					$t = $row->Trait;
+					$t = preg_replace("/(.+) \(.+\)/", "$1", $t);
+					$t = preg_replace("/(.+) - .+/", "$1", $t);
+					if(array_key_exists($t, $Trait)){
+						$Trait[$t] += 1;
+					}else{
+						$Trait[$t] = 1;
+					}
+				}
+				ksort($Trait);
+				$json = array("Trait"=>$Trait);
+				echo json_encode($json);
+			}
+		}else{
 
-    }else if(strcmp($type, 'Chapter')==0){
-      if(strcmp($chapter, "null")==0){
-        $results = DB::select('SELECT * FROM gwasDB WHERE Domain=?', [$domain]);
-        $Chapter = [];
-        $Subchapter = [];
-        $Trait = [];
-        foreach($results as $row){
-          $c = $row->ChapterLevel;
-          $s = $row->SubchapterLevel;
-          $t = $row->Trait;
-          if(array_key_exists($c, $Chapter)){
-            $Chapter[$c] += 1;
-          }else{
-            $Chapter[$c] = 1;
-          }
-          if(array_key_exists($s, $Subchapter)){
-            $Subchapter[$s] += 1;
-          }else{
-            $Subchapter[$s] = 1;
-          }
-          if(array_key_exists($t, $Trait)){
-            $Trait[$t] += 1;
-          }else{
-            $Trait[$t] = 1;
-          }
-        }
-        $json = array("Chapter"=>$Chapter, "Subchapter"=>$Subchapter, "Trait"=>$Trait);
-        echo json_encode($json);
-      }else{
-        $results = DB::select('SELECT * FROM gwasDB WHERE Domain=? AND ChapterLevel=?', [$domain, $chapter]);
-        $Subchapter = [];
-        $Trait = [];
-        foreach($results as $row){
-          $s = $row->SubchapterLevel;
-          $t = $row->Trait;
-          if(array_key_exists($s, $Subchapter)){
-            $Subchapter[$s] += 1;
-          }else{
-            $Subchapter[$s] = 1;
-          }
-          if(array_key_exists($t, $Trait)){
-            $Trait[$t] += 1;
-          }else{
-            $Trait[$t] = 1;
-          }
-        }
-        $json = array("Subchapter"=>$Subchapter, "Trait"=>$Trait);
-        echo json_encode($json);
-      }
-    }else if(strcmp($type, 'Subchapter')==0){
-      if(strcmp($chapter,"null")==0 && strcmp($subchapter,"null")==0){
-        $results = DB::select('SELECT * FROM gwasDB WHERE Domain=?', [$domain]);
-        $Chapter = [];
-        $Subchapter = [];
-        $Trait = [];
-        foreach($results as $row){
-          $c = $row->ChapterLevel;
-          $s = $row->SubchapterLevel;
-          $t = $row->Trait;
-          if(array_key_exists($c, $Chapter)){
-            $Chapter[$c] += 1;
-          }else{
-            $Chapter[$c] = 1;
-          }
-          if(array_key_exists($s, $Subchapter)){
-            $Subchapter[$s] += 1;
-          }else{
-            $Subchapter[$s] = 1;
-          }
-          if(array_key_exists($t, $Trait)){
-            $Trait[$t] += 1;
-          }else{
-            $Trait[$t] = 1;
-          }
-        }
-        $json = array("Chapter"=>$Chapter, "Subchapter"=>$Subchapter, "Trait"=>$Trait);
-        echo json_encode($json);
-      }
-      else if(strcmp($subchapter,"null")==0){
-        $results = DB::select('SELECT * FROM gwasDB WHERE Domain=? AND ChapterLevel=?', [$domain, $chapter]);
-        $Subchapter = [];
-        $Trait = [];
-        foreach($results as $row){
-          $s = $row->SubchapterLevel;
-          $t = $row->Trait;
-          if(array_key_exists($s, $Subchapter)){
-            $Subchapter[$s] += 1;
-          }else{
-            $Subchapter[$s] = 1;
-          }
-          if(array_key_exists($t, $Trait)){
-            $Trait[$t] += 1;
-          }else{
-            $Trait[$t] = 1;
-          }
-        }
-        $json = array("Subchapter"=>$Subchapter, "Trait"=>$Trait);
-        echo json_encode($json);
-      }else{
-        $results = DB::select('SELECT * FROM gwasDB WHERE Domain=? AND SubchapterLevel=?', [$domain, $subchapter]);
-        $Trait = [];
-        foreach($results as $row){
-          $t = $row->Trait;
-          if(array_key_exists($t, $Trait)){
-            $Trait[$t] += 1;
-          }else{
-            $Trait[$t] = 1;
-          }
-        }
-        $json = array("Trait"=>$Trait);
-        echo json_encode($json);
-      }
-    }else{
+		}
 
-    }
+	}
 
-  }
+	public function dbTable(Request $request){
+		// $type = $request -> input('type');
+		$domain = $request -> input('domain');
+		$chapter = $request -> input('chapter');
+		$subchapter = $request -> input('subchapter');
+		$trait = $request -> input('trait');
+		$yearFrom = $request -> input('yearFrom');
+		$yearTo = $request -> input('yearTo');
+		$nMin = $request -> input('nMin');
+		$nMax = $request -> input('nMax');
 
-  public function dbTable(Request $request){
-    // $type = $request -> input('type');
-    $domain = $request -> input('domain');
-    $chapter = $request -> input('chapter');
-    $subchapter = $request -> input('subchapter');
-    $trait = $request -> input('trait');
-    $yearFrom = $request -> input('yearFrom');
-    $yearTo = $request -> input('yearTo');
-    $nMin = $request -> input('nMin');
-    $nMax = $request -> input('nMax');
-    // if($domain=="null" && $chapter=="null" && $subchapter=="null" && $trait=="null" && $yearFrom=="null" && $yearTo=="null" && $nMin=="null" && $nMax=="null"){
-    if($this->NullCheck([$domain, $chapter, $subchapter, $trait, $yearFrom ,$yearTo, $nMin, $nMax])){
-      // All null
-      $query = 'SELECT id,PMID,Year,Domain,ChapterLevel,SubchapterLevel,Trait,Population,Ncase,Ncontrol,N, Genome,Nsnps, Nhits,SNPh2,File,Website FROM gwasDB';
-      $head = ['ID','PMID','Year','Domain','ChapterLevel','SubchapterLevel','Trait', 'Population','Ncase','Ncontrol','N','Genome', 'Nsnps', 'Nhits','SNPh2', 'File', 'Website'];
-      $results = DB::select($query);
-      $results = json_decode(json_encode($results), true);
-      $all_row = array();
-      foreach($results as $row){
-        $all_row[] = array_combine($head, $row);
-      }
-      $json = array('data'=>$all_row);
-      echo json_encode($json);
-    // }else if(strcmp($domain, "null")==0 || (strcmp($domain, "null")==0 && strcmp($chapter, "null")==0 && strcmp($subchapter, "null")==0 && strcmp($trait, "null")==0)){
-    }else if($this->NullCheck([$domain, $yearFrom ,$yearTo, $nMin, $nMax])){
-      $query = 'SELECT id,PMID,Year,Domain,ChapterLevel,SubchapterLevel,Trait,Population,Ncase,Ncontrol,N, Genome,Nsnps, Nhits,SNPh2,File,Website FROM gwasDB';
-      $head = ['ID','PMID','Year','Domain','ChapterLevel','SubchapterLevel','Trait', 'Population','Ncase','Ncontrol','N','Genome', 'Nsnps', 'Nhits','SNPh2', 'File', 'Website'];
-      $results = DB::select($query);
-      $results = json_decode(json_encode($results), true);
-      $all_row = array();
-      foreach($results as $row){
-        $all_row[] = array_combine($head, $row);
-        // $all_row[] = $row;
-      }
-      $json = array('data'=>$all_row);
-      echo json_encode($json);
-      // echo json_encode($all_row);
-      // echo json_encode($results);
-    }else{
-      $query = 'SELECT id,PMID,Year,Domain,ChapterLevel,SubchapterLevel,Trait,Population,Ncase,Ncontrol,N, Genome,Nsnps, Nhits,SNPh2,File,Website FROM gwasDB WHERE';
-      $head = ['ID','PMID','Year','Domain','ChapterLevel','SubchapterLevel','Trait', 'Population','Ncase','Ncontrol','N','Genome', 'Nsnps', 'Nhits','SNPh2', 'File', 'Website'];
-      $val = [];
-      if(strcmp($domain, "null")!=0){
-        $query .= ' Domain=?';
-        $val[] = $domain;
-      }
-      if(strcmp($chapter, "null")!=0){
-        if(count($val)!=0){$query .= " AND";}
-        $query .= ' ChapterLevel=?';
-        $val[] = $chapter;
-      }
-      if(strcmp($subchapter, "null")!=0){
-        if(count($val)!=0){$query .= " AND";}
-        $query .= ' SubchapterLevel=?';
-        $val[] = $subchapter;
-      }
-      if(strcmp($trait, "null")!=0){
-        if(count($val)!=0){$query .= " AND";}
-        $query .= ' Trait=?';
-        $val[] = $trait;
-      }
-      if($yearFrom != "null"){
-        if(count($val)!=0){$query .= " AND";}
-        $query .= ' Year>=?';
-        $val[] = $yearFrom;
-      }
-      if($yearTo != "null"){
-        if(count($val)!=0){$query .= " AND";}
-        $query .= ' Year<=?';
-        $val[] = $yearTo;
-      }
-      if($nMin != "null"){
-        if(count($val)!=0){$query .= " AND";}
-        $query .= ' N>=?';
-        $val[] = $nMin;
-      }
-      if($nMax != "null"){
-        if(count($val)!=0){$query .= " AND";}
-        $query .= ' N<=?';
-        $val[] = $nMax;
-      }
-      $results = DB::select($query, $val);
-      $results = json_decode(json_encode($results), true);
-      $all_row = array();
-      foreach($results as $row){
-        $all_row[] = array_combine($head, $row);
-      }
-      $json = array('data'=>$all_row);
-      echo json_encode($json);
-      // echo json_encode($results);
-    }
-  }
+		$head = ['ID','PMID','Year','Consortium','Domain','ChapterLevel','SubchapterLevel','Trait', 'Population','Ncase','Ncontrol','N', 'SNPh2'];
+		// if($domain=="null" && $chapter=="null" && $subchapter=="null" && $trait=="null" && $yearFrom=="null" && $yearTo=="null" && $nMin=="null" && $nMax=="null"){
+		if($this->NullCheck([$domain, $chapter, $subchapter, $trait, $yearFrom ,$yearTo, $nMin, $nMax])){
+			// All null
+			$query = 'SELECT id,PMID,Year,Consortium,Domain,ChapterLevel,SubchapterLevel,Trait,Population,Ncase,Ncontrol,N,SNPh2 FROM gwasDB';
+			$results = DB::select($query);
+			$results = json_decode(json_encode($results), true);
+			$all_row = array();
+			foreach($results as $row){
+				$all_row[] = array_combine($head, $row);
+			}
+			$json = array('data'=>$all_row);
+			echo json_encode($json);
+			// }else if(strcmp($domain, "null")==0 || (strcmp($domain, "null")==0 && strcmp($chapter, "null")==0 && strcmp($subchapter, "null")==0 && strcmp($trait, "null")==0)){
+		}else if($this->NullCheck([$domain, $trait, $yearFrom ,$yearTo, $nMin, $nMax])){
+			$query = 'SELECT id,PMID,Year,Consortium,Domain,ChapterLevel,SubchapterLevel,Trait,Population,Ncase,Ncontrol,N,SNPh2 FROM gwasDB';
+			$results = DB::select($query);
+			$results = json_decode(json_encode($results), true);
+			$all_row = array();
+			foreach($results as $row){
+				$all_row[] = array_combine($head, $row);
+				// $all_row[] = $row;
+			}
+			$json = array('data'=>$all_row);
+			echo json_encode($json);
+			// echo json_encode($all_row);
+			// echo json_encode($results);
+		}else{
+			$query = 'SELECT id,PMID,Year,Consortium,Domain,ChapterLevel,SubchapterLevel,Trait,Population,Ncase,Ncontrol,N,SNPh2 FROM gwasDB WHERE';
+			$val = [];
+			if(strcmp($domain, "null")!=0){
+				$query .= ' Domain=?';
+				$val[] = $domain;
+			}
+			if(strcmp($chapter, "null")!=0){
+				if(count($val)!=0){$query .= " AND";}
+				$query .= ' ChapterLevel=?';
+				$val[] = $chapter;
+			}
+			if(strcmp($subchapter, "null")!=0){
+				if(count($val)!=0){$query .= " AND";}
+				$query .= ' SubchapterLevel=?';
+				$val[] = $subchapter;
+			}
+			if(strcmp($trait, "null")!=0){
+				if(count($val)!=0){$query .= " AND";}
+				$query .= ' Trait LIKE '."'$trait%'";
+				// $val[] = $trait;
+			}
+			if($yearFrom != "null"){
+				if(count($val)!=0){$query .= " AND";}
+				$query .= ' Year>=?';
+				$val[] = $yearFrom;
+			}
+			if($yearTo != "null"){
+				if(count($val)!=0){$query .= " AND";}
+				$query .= ' Year<=?';
+				$val[] = $yearTo;
+			}
+			if($nMin != "null"){
+				if(count($val)!=0){$query .= " AND";}
+				$query .= ' N>=?';
+				$val[] = $nMin;
+			}
+			if($nMax != "null"){
+				if(count($val)!=0){$query .= " AND";}
+				$query .= ' N<=?';
+				$val[] = $nMax;
+			}
+			$results = DB::select($query, $val);
+			$results = json_decode(json_encode($results), true);
+			$all_row = array();
+			foreach($results as $row){
+				$all_row[] = array_combine($head, $row);
+			}
+			$json = array('data'=>$all_row);
+			echo json_encode($json);
+			// echo json_encode($results);
+		}
+	}
 
   // argument should be an array
-  public function NullCheck($data){
-    $check = true;
-    foreach($data as $d){
-      if($d!="null"){
-        $check = false;
-        return $check;
-      }
-    }
-    return $check;
-  }
+	public function NullCheck($data){
+		$check = true;
+		foreach($data as $d){
+			if($d!="null"){
+				$check = false;
+				return $check;
+			}
+		}
+		return $check;
+	}
 
-  public function getData(Request $request){
-    $id = $request->input("id");
-    $result = DB::table('gwasDB')->where('id', $id)->get();
-    return json_encode($result);
-  }
+	public function getIDs(Request $request){
+		$domain = $request -> input('domain');
+		$chapter = $request -> input('chapter');
+		$subchapter = $request -> input('subchapter');
+		$trait = $request -> input('trait');
+		$yearFrom = $request -> input('yearFrom');
+		$yearTo = $request -> input('yearTo');
+		$nMin = $request -> input('nMin');
+		$nMax = $request -> input('nMax');
+		// if($domain=="null" && $chapter=="null" && $subchapter=="null" && $trait=="null" && $yearFrom=="null" && $yearTo=="null" && $nMin=="null" && $nMax=="null"){
+		if($this->NullCheck([$domain, $chapter, $subchapter, $trait, $yearFrom ,$yearTo, $nMin, $nMax])){
+			// All null
+			$query = 'SELECT ID FROM gwasDB';
+			$results = DB::select($query);
+			$ids = array();
+			foreach($results as $row){
+				$ids[] = $row->ID;
+			}
+			echo json_encode($ids);
+			// return response()->json($results);
+			// }else if(strcmp($domain, "null")==0 || (strcmp($domain, "null")==0 && strcmp($chapter, "null")==0 && strcmp($subchapter, "null")==0 && strcmp($trait, "null")==0)){
+		}else if($this->NullCheck([$domain, $yearFrom ,$yearTo, $nMin, $nMax])){
+			$query = 'SELECT ID FROM gwasDB';
+			$results = DB::select($query);
+			$ids = array();
+			foreach($results as $row){
+				$ids[] = $row->ID;
+			}
+			echo json_encode($ids);
+			// return response()->json($results);
+		}else{
+			$query = 'SELECT ID FROM gwasDB WHERE';
+			$val = [];
+			if(strcmp($domain, "null")!=0){
+				$query .= ' Domain=?';
+				$val[] = $domain;
+			}
+			if(strcmp($chapter, "null")!=0){
+				if(count($val)!=0){$query .= " AND";}
+				$query .= ' ChapterLevel=?';
+				$val[] = $chapter;
+			}
+			if(strcmp($subchapter, "null")!=0){
+				if(count($val)!=0){$query .= " AND";}
+				$query .= ' SubchapterLevel=?';
+				$val[] = $subchapter;
+			}
+			if(strcmp($trait, "null")!=0){
+				if(count($val)!=0){$query .= " AND";}
+				$query .= ' Trait=?';
+				$val[] = $trait;
+			}
+			if($yearFrom != "null"){
+				if(count($val)!=0){$query .= " AND";}
+				$query .= ' Year>=?';
+				$val[] = $yearFrom;
+			}
+			if($yearTo != "null"){
+				if(count($val)!=0){$query .= " AND";}
+				$query .= ' Year<=?';
+				$val[] = $yearTo;
+			}
+			if($nMin != "null"){
+				if(count($val)!=0){$query .= " AND";}
+				$query .= ' N>=?';
+				$val[] = $nMin;
+			}
+			if($nMax != "null"){
+				if(count($val)!=0){$query .= " AND";}
+				$query .= ' N<=?';
+				$val[] = $nMax;
+			}
+			$results = DB::select($query, $val);
+			$ids = array();
+			foreach($results as $row){
+				$ids[] = $row->ID;
+			}
+			echo json_encode($ids);
+			// return response()->json($results);
+		}
+	}
 
-  public function manhattan($id, $file){
-    $filedir = config('app.datadir');
-    $filedir .= '/'.$id.'/';
-    $f = $filedir.$file;
-    if($file == "manhattan.txt"){
-      if(file_exists($f)){
-        $file = fopen($f, 'r');
-        $header = fgetcsv($file, 0, "\t");
-        $all_rows = [];
-        while($row = fgetcsv($file, 0, "\t")){
-          $row[0] = (int)$row[0];
-          $row[1] = (int)$row[1];
-          $row[2] = (float)$row[2];
-          // $all_rows[] = array_combine($header, $row);
-          $all_rows[] = $row;
-        }
-        echo json_encode($all_rows);
-      }
-    }else if($file == "magma.genes.out"){
-      if(file_exists($f)){
-        $file = fopen($f, 'r');
-        $header = fgetcsv($file, 0, "\t");
-        $all_rows = array();
-        while($row = fgetcsv($file, 0, "\t")){
-          if($row[1]=="X"){$row[1] = "23";}
-          $row[1] = (int)$row[1];
-          $row[2] = (int)$row[2];
-          $row[3] = (int)$row[3];
-          $row[8] = (float)$row[8];
-          // $all_rows[] = array_combine($header, $row);
-          $all_rows[] = array($row[1], $row[2], $row[3], $row[8], $row[9]);
-        }
-        echo json_encode($all_rows);
-      }
-    }
+	public function getData(Request $request){
+		$id = $request->input("id");
+		$result = DB::table('gwasDB')->where('id', $id)->get();
+		return json_encode($result);
+	}
 
-  }
+	public function manhattan($id, $file){
+		$host = config('app.ssh_host');
+		$user = config('app.ssh_user');
+		$passwd = config('app.ssh_passwd');
+		$datadir = config('app.ssh_datadir');
+		$datadir .= '/'.$id.'/';
+		$conn = ssh2_connect($host);
+		if(ssh2_auth_password($conn, $user, $passwd)){
+			$sftp = ssh2_sftp($conn);
+			if($file == "manhattan.txt"){
+				$stream = fopen("ssh2.sftp://$sftp".$datadir.$file, "r");
+				$header = fgetcsv($stream, 0, "\t");
+				$all_rows = [];
+				while($row = fgetcsv($stream, 0, "\t")){
+					$row[0] = (int)$row[0];
+					$row[1] = (int)$row[1];
+					$row[2] = (float)$row[2];
+					$all_rows[] = $row;
+				}
+				echo json_encode($all_rows);
+			}else if($file == "magma.genes.out"){
+				$stream = fopen("ssh2.sftp://$sftp".$datadir.$file, "r");
+				$header = fgetcsv($stream, 0, "\t");
+				$all_rows = [];
+				while($row = fgetcsv($stream, 0, "\t")){
+					if($row[1]=="X"){$row[1] = "23";}
+					$row[1] = (int)$row[1];
+					$row[2] = (int)$row[2];
+					$row[3] = (int)$row[3];
+					$row[8] = (float)$row[8];
+					$all_rows[] = array($row[1], $row[2], $row[3], $row[8], $row[9]);
+				}
+				echo json_encode($all_rows);
+			}
+		}
+	}
 
-  public function QQplot($id, $plot){
-    $filedir = config('app.datadir');
-    $filedir .= '/'.$id.'/';
+	public function QQplot($id, $plot){
+		$host = config('app.ssh_host');
+		$user = config('app.ssh_user');
+		$passwd = config('app.ssh_passwd');
+		$datadir = config('app.ssh_datadir');
+		$datadir .= '/'.$id.'/';
+		$conn = ssh2_connect($host);
+		if(ssh2_auth_password($conn, $user, $passwd)){
+			$sftp = ssh2_sftp($conn);
+			if($plot=="SNP"){
+				$stream = fopen("ssh2.sftp://$sftp".$datadir."QQSNPs.txt", "r");
+				$header = fgetcsv($stream, 0, "\t");
+				$all_rows = [];
+				while($row = fgetcsv($stream, 0, "\t")){
+					$all_rows[] = array_combine($header, $row);
+				}
+				echo json_encode($all_rows);
+			}else if($plot=="Gene"){
+				$stream = fopen("ssh2.sftp://$sftp".$datadir."magma.genes.out", "r");
+				$obs = array();
+				$exp = array();
+				$c = 0;
+				fgetcsv($stream, 0, "\t");
+				while($row = fgetcsv($stream, 0, "\t")){
+					$c++;
+					$obs[] = -log10($row[8]);
+				}
+				sort($obs);
+				$step = (1-1/$c)/$c;
+				$header = ["obs", "exp", "n"];
+				$all_rows = array();
+				for($i=0; $i<$c; $i++){
+					$all_rows[] = array_combine($header, [$obs[$i], -log10(1-$i*$step), $i+1]);
+				}
+				echo json_encode($all_rows);
+			}
+		}
+	}
 
-    if(strcmp($plot,"SNP")==0){
-      $file=$filedir."QQSNPs.txt";
-      $f = fopen($file, 'r');
-      $all_row = array();
-      $head = fgetcsv($f, 0, "\t");
-      while($row = fgetcsv($f, 0, "\t")){
-        $all_row[] = array_combine($head, $row);
-      }
-      echo json_encode($all_row);
+	public function getGCdata(Request $request){
+		$id = $request->input('id');
+		$topN = $request->input('topN');
+		$excSamePhe = $request->input('excSamePhe');
+		$maxNPhe = $request->input('maxNPhe');
+		$maxP = $request->input('maxP');
+		$maxPbon = $request->input('maxPbon');
+		$manual = $request->input('manual');
+		$manualids = $request->input('manualids');
+		$manualids = explode(":", $manualids);
 
-    }else if(strcmp($plot,"Gene")==0){
-      $file=$filedir."magma.genes.out";
-      $f = fopen($file, 'r');
-      $obs = array();
-      $exp = array();
-      $c = 0;
-      fgetcsv($f, 0, "\t");
-      while($row = fgetcsv($f, 0, "\t")){
-        $c++;
-        $obs[] = -log10($row[8]);
-      }
-      sort($obs);
-      $step = (1-1/$c)/$c;
-      $head = ["obs", "exp", "n"];
-      $all_row = array();
-      for($i=0; $i<$c; $i++){
-        $all_row[] = array_combine($head, [$obs[$i], -log10(1-$i*$step), $i+1]);
-      }
-      echo json_encode($all_row);
-    }
-  }
+		$gc_db = DB::select('SELECT gc.*, db.Trait FROM ( SELECT IF (id1 = ?, id2, id1) AS id, rg, se, z, p FROM GenCor WHERE (id1 = ? OR id2 = ?) ORDER BY ABS(rg) DESC) AS gc JOIN gwasDB AS db ON gc.id=db.id', [$id, $id, $id]);
+		$gc_db = json_decode(json_encode($gc_db), true);
 
-  public function GCplot($id, $n){
-    $results = DB::select('SELECT gc.*, db.Trait FROM ( SELECT IF (id1= ?, id2, id1) AS id, rg, se, z, p FROM GenCor WHERE (id1 = ? OR id2 = ?) AND ABS(rg)<=1.25 ORDER BY ABS(rg) DESC LIMIT ?) AS gc JOIN gwasDB AS db ON gc.id=db.id', [$id, $id, $id, $n]);
-    $n = (int) DB::table('gwasDB')->count();
-    $gc = [];
-    $head = ["id", "rg", "se", "z", "p", "Trait", "pbon"];
-    // $results = json_encode($results);
-    // file_put_contents("/media/sf_Documents/VU/Data/WebApp/test.txt", $results);
-    $results = json_decode(json_encode($results), true);
-    // $results = (array) $results;
-    foreach ($results as $r){
-      // $r = json_decode(json_encode($r), true);
-      // file_put_contents("/media/sf_Documents/VU/Data/WebApp/test.txt", $r['id']."\t".$r['p']."\n");
-      $pbon = (float) $r['p']*$n;
-      $r['pbon'] = $pbon;
-      $gc[] = $r;
-    }
-    return json_encode($gc);
-  }
+		$all_ids = [];
+		foreach($gc_db as $r){
+			if($manual=="true" && !in_array($r['id'], $manualids)){continue;}
+			$all_ids[] = $r['id'];
+		}
 
-  public function DTfile(Request $request){
-    $id = $request -> input('id');
-    $fin = $request -> input('infile');
-    $cols = $request -> input('header');
-    $cols = explode(":", $cols);
-    $filedir = config('app.datadir')."/".$id."/";
-    $f = $filedir.$fin;
-    if(file_exists($f)){
-      $file = fopen($f, 'r');
-      $all_rows = array();
-      $head = fgetcsv($file, 0, "\t");
-      $index = array();
+		// Exclude same trait
+		$exc_ids = [];
+		if($excSamePhe=="true"){
+			file_put_contents("/media/sf_Documents/VU/Data/WebApp/tmp.txt", $excSamePhe."\n", FILE_APPEND);
+			$trait = collect(DB::select('SELECT Trait FROM gwasDB WHERE id=?', [$id]))->first();
+			$trait = $trait->Trait;
+			file_put_contents("/media/sf_Documents/VU/Data/WebApp/tmp.txt", $trait."\n", FILE_APPEND);
+			$trait = preg_replace("/(.+) \(.+\)/", "$1", $trait);
+			$tmp = DB::select('SELECT id FROM gwasDB WHERE Trait=? OR Trait LIKE '."'$trait (%'", [$trait]);
+			file_put_contents("/media/sf_Documents/VU/Data/WebApp/tmp.txt", count($tmp)."\n", FILE_APPEND);
+			foreach($tmp as $row){
+				$exc_ids[] = $row->id;
+				file_put_contents("/media/sf_Documents/VU/Data/WebApp/tmp.txt", $row->id."\n", FILE_APPEND);
+			}
+		}
 
-      foreach($cols as $c){
-        if(in_array($c, $head)){
-          $index[] = array_search($c, $head);
-        }else{
-          $index[] = -1;
-        }
-      }
-      while($row = fgetcsv($file, 0, "\t")){
-        $temp = [];
-        foreach($index as $i){
-          if($i==-1){
-            $temp[] = "NA";
-          }else{
-            $temp[] = $row[$i];
-          }
-        }
-        $all_rows[] = $temp;
-      }
-      $json = (array('data'=> $all_rows));
+		// Get GWAS with max N per Trait
+		$maxN_ids = $all_ids;
+		if($maxNPhe=="true"){
+			$tmp = DB::select('SELECT id, Trait, N FROM gwasDB');
+			$maxN = [];
+			$maNid = [];
+			foreach($tmp as $row){
+				if(in_array($row->id, $all_ids)){
+					$t = $row->Trait;
+					$t = preg_replace("/(.+) \(.+\)/", "$1", $t);
+					if(array_key_exists($t, $maxN)){
+						if($row->N > $maxN{$t}){
+							$maxN{$t} = $row->N;
+							$maxNid{$t} = $row->id;
+						}
+					}else{
+						$maxN{$t} = $row->N;
+						$maxNid{$t} = $row->id;
+					}
+				}
+			}
+			$maxN_ids = array_values($maxNid);
+		}
 
-      echo json_encode($json);
-    }else{
-      echo '{"data":[]}';
-    }
-  }
+		// filter GC
+		$gc = [];
+		$n = 0;
+		foreach($gc_db as $r){
+			if(in_array($r['id'], $exc_ids)){continue;}
+			if(!in_array($r['id'], $maxN_ids)){continue;}
+			$n++;
+			if($r['p']>$maxP){continue;}
+			$gc[] = $r;
+		}
 
-  public function DomainPie(){
-    $results = DB::select("SELECT Domain, COUNT(*) AS count FROM gwasDB GROUP BY Domain ORDER BY count DESC");
-    return json_encode($results);
-  }
+		$count = 0;
+		$gcout = [];
+		foreach($gc as $r){
+			$pbon = (float) $r['p']*$n;
+			if($pbon>1){$pbon = 1;}
+			if($pbon>$maxPbon){continue;}
+			$r['pbon'] = $pbon;
+			$gcout[] = $r;
+			$count++;
+			if($count >= $topN){break;}
+		}
 
-  public function ChapterPie($domain){
-    $results = DB::select('SELECT ChapterLevel, COUNT(*) AS count FROM gwasDB WHERE Domain=? GROUP BY ChapterLevel ORDER BY count DESC', [$domain]);
-    return json_encode($results);
-  }
+		usort($gcout, function($a, $b){
+			if($a['rg']==$b['rg']){return 0;}
+			return ($a['rg'] < $b['rg']) ? 1: -1;
+		});
 
-  public function SubchapterPie($domain, $chapter){
-    $results = DB::select('SELECT SubchapterLevel, COUNT(*) AS count FROM gwasDB WHERE Domain=? AND ChapterLevel=? GROUP BY SubchapterLevel ORDER BY count DESC', [$domain, $chapter]);
-    return json_encode($results);
-  }
+		return json_encode(["GC"=>$gcout, "totalN"=>$n]);
+	}
 
-  public function NsampleYear(){
-    $results = DB::select('SELECT Year, N from gwasDB');
-    return json_encode($results);
-  }
+	public function getGClist(){
+		$results = DB::select("SELECT id, Trait, Year, N from gwasDB WHERE Population LIKE 'EUR%' AND SNPh2_z>2 AND Trait NOT LIKE '%male%' ORDER BY Trait");
+		return json_encode($results);
+	}
 
-  public function NsampleDomain(){
-    $results = DB::select('SELECT Domain, N from gwasDB ORDER BY Domain');
-    return json_encode($results);
-  }
-
-  public function GCheat($ids){
-    $script = storage_path().'/scripts/getGCheat.py';
-    $host = config('database.connections.mysql.host');
-    $user = config('database.connections.mysql.username');
-    $pass = config('database.connections.mysql.password');
-    $db = config('database.connections.mysql.database');
-
-    $out = shell_exec("python $script $host $user $pass $db $ids");
-
-    return $out;
-  }
-
-  public function MagmaGeneheat($ids){
-    $script = storage_path().'/scripts/getGeneheat.py';
-    $host = config('database.connections.mysql.host');
-    $user = config('database.connections.mysql.username');
-    $pass = config('database.connections.mysql.password');
-    $db = config('database.connections.mysql.database');
-
-    $out = shell_exec("python $script $host $user $pass $db $ids");
-    return $out;
-  }
-
-  public function MagmaGSheat($ids){
-    $script = storage_path().'/scripts/getGSheat.py';
-    $host = config('database.connections.mysql.host');
-    $user = config('database.connections.mysql.username');
-    $pass = config('database.connections.mysql.password');
-    $db = config('database.connections.mysql.database');
-
-    $out = shell_exec("python $script $host $user $pass $db $ids");
-    return $out;
-  }
+	public function DTfile(Request $request){
+		$id = $request -> input('id');
+		$file = $request -> input('infile');
+		$cols = $request -> input('header');
+		$cols = explode(":", $cols);
+		$host = config('app.ssh_host');
+		$user = config('app.ssh_user');
+		$passwd = config('app.ssh_passwd');
+		$datadir = config('app.ssh_datadir');
+		$datadir .= '/'.$id.'/';
+		$conn = ssh2_connect($host);
+		if(ssh2_auth_password($conn, $user, $passwd)){
+			$sftp = ssh2_sftp($conn);
+			if(file_exists("ssh2.sftp://$sftp".$datadir.$file)){
+				$stream = fopen("ssh2.sftp://$sftp".$datadir.$file, "r");
+				if(!$stream){
+					echo '{"data":[]}';
+				}else{
+					$header = fgetcsv($stream, 0, "\t");
+					$all_rows = array();
+					$index = array();
+					foreach($cols as $c){
+						if(in_array($c, $header)){
+							$index[] = array_search($c, $header);
+						}else{
+							$index[] = -1;
+						}
+					}
+					while($row = fgetcsv($stream, 0, "\t")){
+						$temp = [];
+						foreach($index as $i){
+							if($i==-1){
+								$temp[] = "NA";
+							}else{
+								$temp[] = $row[$i];
+							}
+						}
+						$all_rows[] = $temp;
+					}
+					$json = (array('data'=> $all_rows));
+					echo json_encode($json);
+				}
+			}else{
+				echo '{"data":[]}';
+			}
+		}else{
+			echo '{"data":[]}';
+		}
+	}
 }

@@ -11,9 +11,12 @@ import MySQLdb
 import numpy as np
 import json
 from scipy.cluster.hierarchy import linkage, leaves_list
+import time
 
 if len(sys.argv)<6:
     sys.exit("ERROR: Not enought argument.\nUSAGE: ./getGCheat.py <host> <user> <passwd> <database> <ids>")
+
+#start = time.time()
 
 ## Get arguments
 host = sys.argv[1]
@@ -40,23 +43,24 @@ for r in rows:
         gc.append(r)
 gc = np.array(gc)
 
-n = len(gc) # number of test performed for selected GWAS
-
 ## ids of GWAS which have at least one genetic correlation
 inids = np.unique(list(gc[:,0].astype(int))+list(gc[:,1].astype(int)))
+if len(inids) == 0:
+	sys.exit()
 inids.sort()
 
 ## get trait and domain info
-c.execute('SELECT id,Domain,Trait from gwasDB');
+c.execute('SELECT id,Domain,Trait,Year from gwasDB');
 rows = c.fetchall()
 traits = []
 for r in rows:
-    if int(r[0]) in inids:
-        traits.append(list(r))
+	if int(r[0]) in inids:
+		traits.append([r[0], r[1], r[2], str(r[0])+": "+r[2]+" ("+str(r[3])+")"])
 
 traits = np.array(traits)
 
 ## create matrix for hierarchical clustering
+n = len(inids)*(len(inids)-1)/2 # number of test to correct for
 rg = []
 mat = []
 for i in inids:
@@ -68,16 +72,22 @@ for i in inids:
             continue
         elif i<j:
             tmp = gc[gc[:,0].astype(int)==j]
+            if i not in tmp[:,1].astype(int):
+                row += [0]
+                continue
             tmp = tmp[tmp[:,1].astype(int)==i][0]
         else:
             tmp = gc[gc[:,0].astype(int)==i]
+            if j not in tmp[:,1].astype(int):
+                row += [0]
+                continue
             tmp = tmp[tmp[:,1].astype(int)==j][0]
 
         if len(tmp)==0:
             row += [0]
             continue
         elif abs(float(tmp[2]))>=1.25:
-            row += [0]
+            row += [1.25]
             continue
         else:
             row += [float(tmp[2])]
@@ -108,7 +118,7 @@ domain = {}
 trait = {}
 for l in traits:
     domain[str(int(l[0]))]=l[1]
-    trait[str(int(l[0]))]=l[2]
+    trait[str(int(l[0]))]=l[3]
 
 ## return nested json
 inids = list(inids)

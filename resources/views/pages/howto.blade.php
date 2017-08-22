@@ -6,4 +6,5 @@
 
 @section('content')
 <h4>How to use GWAS ATLAS</h4>
+Comming soon...
 @stop

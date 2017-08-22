@@ -2,55 +2,105 @@
 @section('head')
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<meta name="csrf-token" content="{{ csrf_token() }}"/>
 <script type="text/javascript">
-  $(document).ready(function(){
-    // $('#snp2genebtn').on('click', function(){
-    //   window.location.href="{{ Config::get('app.subdir') }}/snp2gene";
-    // });
-    //
-    // $('#gene2funcbtn').on('click', function(){
-    //   window.location.href="{{ Config::get('app.subdir') }}/gene2func";
-    // });
-
-  });
+	$.ajaxSetup({
+		headers: {'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')}
+	});
+</script>
+<script type="text/javascript" src="{!! URL::asset('js/odometer.min.js') !!}"></script>
+<link rel="stylesheet" href="{!! URL::asset('css/odometer-theme-default.css') !!}">
+<link rel="stylesheet" href="{!! URL::asset('css/style.css') !!}">
+<script type="text/javascript">
+	$(document).ready(function(){
+		$.ajax({
+			url: "/home/dbSum",
+			type: "POST",
+			success: function(data){
+				data = JSON.parse(data);
+				$('#totalGWAS').html(data.GWAS);
+				$('#uniqTrait').html(data.trait);
+				$('#uniqStudy').html(data.study);
+				$('#uniqDomain').html(data.domain);
+			}
+		});
+	});
 </script>
 @stop
+
 @section('content')
 <div class="container" style="padding-top:50px;">
-  <div style="text-align: center;">
-    <h2>GWAS ATLAS</h2>
-    <h2>Database of publiclly available summary statistics of genome-wide association studies.</h2>
-  </div>
-  <br/>
-  <p>FUMA is a platform that can be used to annotate, prioritize and visualize and interpret GWAS results.
-  <br/>
-    The <a href="{{ Config::get('app.subdir') }}/snp2gene">SNP2GENE</a> function takes GWAS summary statistics or a list of rsid’s as input,
-    and provides extensive functional annotation for all SNPs in genomic areas identified by lead SNPs.
-    <br/>
-    The <a href="{{ Config::get('app.subdir') }}/gene2func">GENE2FUNC</a> function takes a list of geneids (as identified by SNP2GENE or as provided manually)
-    and annotates genes in biological context
-    <br/>
-    Please log in to use FUMA.
-    If you have't registered yet, you can do from <a href="{{ url('/register') }}">here</a>.
-    <br/>
-    When using FUMA, please acknowledge Watanabe et al. xxx
-  </p>
-  <br/>
+	<div style="text-align: center;">
+		<h2>Welcome to GWAS ATLAS</h2>
+	</div>
+	<br/>
+	GWAS atlas is a databased of curated publicly available GWAS summary statistics.
+	Each GWAS can be borwsed their manhattan plot, risk loci, MAGMA results, SNP based heritability and genetic correlations with other GWAS in the databse.
+	<br/>
+	The database also contains 2,419 GWAS from UK Biobank release 2 cohort.
+	<br/>
+	<br/>
+	<p style="font-size: 18px;">
+		Currently the database contains <span style="font-size:28px; color:#FF5C33;" class="odometer" id="totalGWAS"></span> GWAS from
+		<span style="font-size:28px; color:#FF5C33;" class="odometer" id="uniqStudy"></span> unique studies
+		across <span style="font-size:28px; color:#FF5C33;" class="odometer" id="uniqTrait"></span> unique traits and
+		<span style="font-size:28px; color:#FF5C33;" class="odometer" id="uniqDomain"></span> domains.
+	</p>
+	<br/><br/>
+	<div class="row">
+		<div class="col-md-4 col-sm-4 col-xs-4">
+			<div class="panel panel-success">
+				<div class="panel-heading" style="padding-top:5px; padding-bottom:5px;"><h4>Browse GWAS</h4></div>
+				<div class="panel-body" style="height:160px;">
+					Overview of each GWAS such as Manhattan plots and QQ plot at SNP and gene levels, genetic ocrrelations with other GWAS in the database.<br/>
+					<br/><br/>
+					<button class="btn btn-success" style="opacity:0.8;"><a href="{{ Config::get('app.subdir') }}/traitDB" style="color:black;">Browse GWAS</a></button>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4 col-sm-4 col-xs-4">
+			<div class="panel panel-warning">
+				<div class="panel-heading" style="padding-top:5px; padding-bottom:5px;"><h4>Multiple GWAS comparison</h4></div>
+				<div class="panel-body" style="height:160px;">
+					Multiple GWAS can be compared in terms of genetic correlations, overlap of significant genes based on MAGMA gene-analysis and overlap of genetic risk loci.<br/>
+					<br/>
+					<button class="btn btn-warning" style="opacity:0.8;"><a href="{{ Config::get('app.subdir') }}/multiGWAS" style="color:black;">Multiple GWAS comparison</a></button>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4 col-sm-4 col-xs-4">
+			<div class="panel panel-info">
+				<div class="panel-heading" style="padding-top:5px; padding-bottom:5px;"><h4>Summary of database</h4></div>
+				<div class="panel-body" style="height:160px;">
+					Overview of the database such as number of GWAS, traits, study and sample size per domain.<br/>
+					<br/><br/><br/>
+					<button class="btn btn-info" style="opacity:0.8;"><a href="{{ Config::get('app.subdir') }}/stats" style="color:black;">Stats</a></button>
+				</div>
+			</div>
+		</div>
+	</div>
 
-  <!-- <div class="row">
-    <div class="col-md-6 col-xs-6 col-sm-6" style="text-align:center; padding: 20px;">
-      <div style="background-color: #dfdfdf; padding-top:20px; padding-bottom:20px;">
-        <button id="snp2genebtn" class="btn btn-primary">SNP2GENE</button>
-        <br/><br/>
-      </div>
-    </div>
-    <div class="col-md-6 col-xs-6 col-sm-6" style="text-align:center; padding: 20px;">
-      <div style="background-color: #dfdfdf; padding-top:20px; padding-bottom:20px;">
-        <button id="gene2funcbtn" class="btn btn-success">GENE2FUNC</button>
-        <br/><br/>
-      </div>
-    </div>
-  </div> -->
+	<div style="padding-top:20ox; padding-bottom:20px;">
+		<div class="panel panel-default">
+			<div class="panel-heading"><h4>What's new</h4></div>
+			<div class="panel-body">
+			</div>
+		</div>
+	</div>
+
+	<div style="padding-top:20ox; padding-bottom:20px;">
+		<div class="panel panel-default">
+			<div class="panel-heading"><h4>Project contributers</h4></div>
+			<div class="panel-body">
+				Ordered by first name.
+				<ul>
+					<li>Danielle Posthuma (VU University Amssterdam, Complex Trait Genetics)</li>
+					<li>Kyoko Watanabe (VU University Amsterdam, Complex Trait Genetics)</li>
+					<li>People from Ben's group</li>
+				</ul>
+			</div>
+		</div>
+	</div>
 
 </div>
 </br>

@@ -1,6 +1,6 @@
 body
-{ /*background: #F6F4F0;*/
-  color: #635B53;
+{ background: #F4F4F4;
+  /*color: #635B53;*/
   height: 100%;
   margin: 0;
   padding: 0;
@@ -112,9 +112,13 @@ button.accordion.active, button.accordion:hover {
   background-color: #ddd;
 }
 
-/*.panel-default > .panel-heading{
-  background-color: #c6d9ec;
-}*/
+.panel-default > .panel-heading{
+  background-color: #ffffff;
+}
+
+.panel{
+	border-radius: 5 !important;
+}
 
 .alert{
   padding: 10px 10px 10px 10px;

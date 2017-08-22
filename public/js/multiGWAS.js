@@ -1,145 +1,114 @@
 var selectTable;
-var panel = "";
+var ids = "";
+var domain_col;
+var domains;
 $(document).ready(function(){
-
-  var hash = window.location.hash;
-  if(hash){
-    panel = hash;
-  }else{
-    panel = "#GC";
-  }
-
-  // selectTable = $('#selectTable').DataTable();
-  Selection("Domain");
-
-  $("#sidebar.sidebar-nav").find(".active").removeClass("active");
-  $("#sidebar.sidebar-nav a[href='"+panel+"']").parent().addClass("active");
-
-  $('#sidebar.sidebar-nav li a').click(function(){
-    panel = $(this).attr("href");
-    loadPanel(panel);
-  });
-
-  // $('#selectTable tbody').on('click', 'tr', function(){
-  //   var rowData = selectTable.row(this).data();
-  //   var add = true;
-  //   $('#selectedGWAS input').each(function(i, d){
-  //     if($(d).val() == rowData['ID']){
-  //       add = false;
-  //       return false;
-  //     }
-  //   });
-  //   if(add){
-  //     selected = '<div class="selectedGWAS"><input type="checkbox" class="form-contorl" value="'+rowData['ID']+'"/>'
-  //       +" "+rowData['ID']+": "+rowData['Domain']+'; '+rowData['ChapterLevel']+'; '+rowData['SubchapterLevel']+'; '+rowData['Trait']+'</div>'
-  //     $('#selectedGWAS').append(selected)
-  //   }
-  // });
-
-  // $('#delGWAS').on('click', function(){
-  //   $(".selectedGWAS").each(function(){
-  //     if($(this).children("input").is(":checked")){
-  //       $(this).remove();
-  //     }
-  //   });
-  //   loadPanel(panel);
-  // });
-
-  $('#updatePlot').on('click', function(){
-    loadPanel(panel);
-  })
+	Selection("Domain");
+	$('#processGWAS').on('click', function(){
+		if(selectTable.data().count()>100){
+			$('#msg').html('<span style="font-size:14px; color:red;"><i class="fa fa-ban"></i> Maximum 100 GWAS can be processed at once.</span>');
+		}else if(selectTable.data().count()<2){
+			$('#msg').html('<span style="font-size:14px; color:red;"><i class="fa fa-ban"></i> Minimum 2 GWAS need to be selected to compare.</span>');
+		}else{
+			$('#msg').html('');
+			ids = selectTable.columns(0).data().eq(0).join(":");
+			displayData(ids);
+		}
+	});
 });
 
 function Selection(type){
-  var domain = $('#Domain').val();
-  var chapter = $('#Chapter').val();
-  var subchapter = $('#Subchapter').val();
-  var trait = $('#Trait').val();
-  var yearFrom = $('#yearFrom').val();
-  var yearTo = $('#yearTo').val();
-  var nMin = $('#nMin').val();
-  var nMax = $('#nMax').val();
-  if(yearFrom==""){yearFrom="null"}
-  if(yearTo==""){yearTo="null"}
-  if(nMin==""){nMin="null"}
-  if(nMax==""){nMax="null"}
+	var domain = $('#Domain').val();
+	var chapter = $('#Chapter').val();
+	var subchapter = $('#Subchapter').val();
+	var trait = $('#Trait').val();
+	var yearFrom = $('#yearFrom').val();
+	var yearTo = $('#yearTo').val();
+	var nMin = $('#nMin').val();
+	var nMax = $('#nMax').val();
+	if(yearFrom==""){yearFrom="null"}
+	if(yearTo==""){yearTo="null"}
+	if(nMin==""){nMin="null"}
+	if(nMax==""){nMax="null"}
 
-  if(type=="Domain"){
-    chapter="null";
-    subchapter="null";
-    trait="null";
-  }else if(type=="Chapter"){
-    subchapter="null";
-    trait="null";
-  }else if(type=="Subchapter"){
-    trait="null";
-  }
-  // $('#test').html(type+":"+domain+":"+chapter+":"+subchapter);
-  SelectOptions(type, domain, chapter, subchapter, trait);
-  TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin, nMax);
+	if(type=="Domain"){
+		chapter="null";
+		subchapter="null";
+		trait="null";
+	}else if(type=="Chapter"){
+		subchapter="null";
+		trait="null";
+	}else if(type=="Subchapter"){
+		trait="null";
+	}
+	// $('#test').html(type+":"+domain+":"+chapter+":"+subchapter);
+	if(type!="Trait"){
+		SelectOptions(type, domain, chapter, subchapter, trait);
+	}
+	TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin, nMax);
 }
 
 function SelectOptions(type, domain, chapter, subchapter, trait){
-  $.ajax({
-    url: subdir+"/traitDB/SelectOption",
-    type: "POST",
-    data: {
-      type: type,
-      domain: domain,
-      chapter: chapter,
-      subchapter: subchapter
-    },
-    processing: true,
-    success: function(data){
-      if(type=="Domain"){
-        data = JSON.parse(data);
-        $.each(data, function(key, val){
-          var out = '<option value=null>-- Please select '+key+' of interest --</option>';
-          $.each(val, function(k, v){
-            out += '<option value="'+k+'">'+k+' ('+v+')</option>';
-          });
-          $('#'+key).html(out).selectpicker('refresh');
-        });
-      }else if(type=="Chapter"){
-        data = JSON.parse(data);
-        $.each(data, function(key, val){
-          var out = '<option value=null>-- Please select '+key+' of interest --</option>';
-          $.each(val, function(k, v){
-            out += '<option value="'+k+'">'+k+' ('+v+')</option>';
-          });
-          $('#'+key).html(out).selectpicker('refresh');
-        });
-      }else if(type=="Subchapter"){
-        data = JSON.parse(data);
-        $.each(data, function(key, val){
-          var out = '<option value=null>-- Please select '+key+' of interest --</option>';
-          $.each(val, function(k, v){
-            out += '<option value="'+k+'">'+k+' ('+v+')</option>';
-          });
-          $('#'+key).html(out).selectpicker('refresh');
-        });
-      }
-    }
-  });
+	$.ajax({
+		url: subdir+"/traitDB/SelectOption",
+		type: "POST",
+		data: {
+			type: type,
+			domain: domain,
+			chapter: chapter,
+			subchapter: subchapter
+		},
+		processing: true,
+		success: function(data){
+			if(type=="Domain"){
+				data = JSON.parse(data);
+				$.each(data, function(key, val){
+					var out = '<option value=null>-- Please select '+key+' of interest --</option>';
+					$.each(val, function(k, v){
+						out += '<option value="'+k+'">'+k+' ('+v+')</option>';
+					});
+					$('#'+key).html(out).selectpicker('refresh');
+				});
+			}else if(type=="Chapter"){
+				data = JSON.parse(data);
+				$.each(data, function(key, val){
+					var out = '<option value=null>-- Please select '+key+' of interest --</option>';
+					$.each(val, function(k, v){
+						out += '<option value="'+k+'">'+k+' ('+v+')</option>';
+					});
+					$('#'+key).html(out).selectpicker('refresh');
+				});
+			}else if(type=="Subchapter"){
+			data = JSON.parse(data);
+				$.each(data, function(key, val){
+					var out = '<option value=null>-- Please select '+key+' of interest --</option>';
+					$.each(val, function(k, v){
+						out += '<option value="'+k+'">'+k+' ('+v+')</option>';
+					});
+					$('#'+key).html(out).selectpicker('refresh');
+				});
+			}
+		}
+	});
 }
 
 function SelectEnter(ele){
-  if(event.keyCode==13){
-    var domain = $('#Domain').val();
-    var chapter = $('#Chapter').val();
-    var subchapter = $('#Subchapter').val();
-    var trait = $('#Trait').val();
-    var yearFrom = $('#yearFrom').val();
-    var yearTo = $('#yearTo').val();
-    var nMin = $('#nMin').val();
-    var nMax = $('#nMax').val();
-    if(yearFrom==""){yearFrom="null"}
-    if(yearTo==""){yearTo="null"}
-    if(nMin==""){nMin="null"}
-    if(nMax==""){nMax="null"}
+	if(event.keyCode==13){
+		var domain = $('#Domain').val();
+		var chapter = $('#Chapter').val();
+		var subchapter = $('#Subchapter').val();
+		var trait = $('#Trait').val();
+		var yearFrom = $('#yearFrom').val();
+		var yearTo = $('#yearTo').val();
+		var nMin = $('#nMin').val();
+		var nMax = $('#nMax').val();
+		if(yearFrom==""){yearFrom="null"}
+		if(yearTo==""){yearTo="null"}
+		if(nMin==""){nMin="null"}
+		if(nMax==""){nMax="null"}
 
-    TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin, nMax);
-  }
+		TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin, nMax);
+	}
 }
 
 function TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin, nMax){
@@ -163,7 +132,8 @@ function TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin,
         nMax: nMax
       },
       complete: function(){
-        loadPanel(panel);
+        // getIDs(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin, nMax);
+        // loadPanel(panel);
       },
     },
     error: function(){
@@ -178,8 +148,6 @@ function TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin,
       {"data": "SubchapterLevel", name: "Subchapter level"},
       {"data": "Trait", name: "Trait"},
       {"data": "Population", name: "Populaion"},
-      {"data": "Ncase", name: "Case"},
-      {"data": "Ncontrol", name: "Control"},
       {"data": "N", name: "N"}
     ],
     columnDefs: [
@@ -190,593 +158,896 @@ function TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin,
   });
 }
 
-function loadPanel(panel){
-  switch (panel) {
-    case "#GC":
-      GC();
-      break;
-    case "#magmagenes":
-      magmagenes();
-      break;
-    case "#magmaGS":
-      magmaGS();
-      break;
-    default:
-      magmagenes();
-  }
+function displayData(ids){
+	$('.col4BoxBody').css({'height': 'auto'});
+	$('.col6BoxBody').css({'height': 'auto'});
+	$('#sumBody').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
+	$('#yearVSnBody').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
+	$('#lociVSnBody').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
+	$('#h2VSnBody').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
+	$('#h2VSlociBody').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
+	$('#gcPlot').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
+	$('#magmaPlot').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
+	$('#riskLociOverBody').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
+
+	$.ajax({
+		url: subdir+"/multiGWAS/getData",
+		type: "POST",
+		data: {
+			ids: ids
+		},
+		error: function(){
+			alert("getData error.")
+		},
+		success: function(data){
+			data = JSON.parse(data);
+
+			// GC and MAGMA row
+			if(data.gc.data.id.length>20 || data.magma.data.id.length>20){
+				$('#gc_magma_row').removeClass();
+				$('#gcCol').removeClass();
+				$('#magmaCol').removeClass();
+			}else{
+				$('#gc_magma_row').addClass('row');
+				$('#gcCol').addClass("col-md-6 col-sm-6 col-xs-6");
+				$('#magmaCol').addClass("col-md-6 col-sm-6 col-xs-6");
+				// GC and MAGMA max height
+				var maxTrait = 0;
+				data.gc.data.id.forEach(function(d){
+					if(data.gc.data.Trait[d].length > maxTrait){maxTrait = data.gc.data.Trait[d].length}
+				});
+				data.magma.data.id.forEach(function(d){
+					if(data.magma.data.Trait[d].length > maxTrait){maxTrait = data.magma.data.Trait[d].length}
+				});
+				var maxIDs = Math.max(data.gc.data.id.length, data.magma.data.id.length);
+				var height = 20 * maxIDs + maxTrait * 5 + 80;
+				$('.col6BoxBody').css({'height': height+"px"});
+			}
+
+			// heatmatp order select reset
+			$('#gcOrder option').each(function(){
+				$(this).prop("selected", false);
+			})
+			$('#magmaOrder option').each(function(){
+				$(this).prop("selected", false);
+			})
+
+			// Domain color
+			domains = d3.set(data.plotData.data.map(function(d){return d[2];})).values();
+			domains.sort();
+			domain_col = d3.scale.linear().domain([0, domains.length/4, domains.length/2, domains.length*3/4, domains.length]).range(["green", "yellow", "red", "purple", "blue"]);
+
+			// Road results
+			summary(data.sum);
+			corPlot(data.plotData.data, data.plotData.cor);
+			gcPlot(data.gc);
+			magmaPlot(data.magma);
+			lociOver(data.lociOver);
+		}
+	})
 }
 
-// function manhattan(){
-//   ids = []
-//   $(".selectedGWAS").each(function(){
-//     ids.push($(this).children("input").val())
-//   })
-//   if(ids.length==0){
-//     $('#panel').html('<div style="text-align: center;">Please select GWAS from the top panel.</div>');
-//   }else{
-//     $('#panel').html('<div style="text-align: center;" id="plot"></div>');
-//     ids.forEach(function(id){
-//       // $('#plot').append("manhattan plot of ID "+id+"<br/>");
-//       PlotManhattan(id, "snps");
-//     })
-//   }
-// }
-//
-// function geneManhattan(){
-//   ids = []
-//   $(".selectedGWAS").each(function(){
-//     ids.push($(this).children("input").val())
-//   })
-//   if(ids.length==0){
-//     $('#panel').html('<div style="text-align: center;">Please select GWAS from the top panel.</div>');
-//   }else{
-//     $('#panel').html('<div style="text-align: center;" id="plot"></div>');
-//     ids.forEach(function(id){
-//       // $('#plot').append("gene manhattan plot of ID "+id+"<br/>");
-//       PlotManhattan(id, "genes");
-//     })
-//   }
-// }
-function magmagenes(){
-  ids = selectTable.column(0).data();
-  if(ids.length<=1){
-    $('#panel').html('<div style="text-align: center;">Please select at lease 2 GWAS from the top panel.</div>');
-  }else{
-    $("#panel").html('Order by : <select id="orderHeat"><option value="alph">Alphabetical</option><option value="domain">Domain</option><option value="clst">Cluster</option></select>')
-    $('#panel').append('<div style="width:auto;overflow-x:auto;" id="plot"></div>');
-    ids = ids.join(":");
-    PlotMagmaGenes(ids);
-  }
+function summary(data){
+	var table = '<table class="table table-bordered"><tbody>'
+		+ '<tr><td>Selected GWAS</td><td>'+data.GWAS+'</td></tr>'
+		+ '<tr><td>Unique Traits</td><td>'+data.Trait+'</td></tr>'
+		+ '<tr><td>Unique Domain</td><td>'+data.Domain+'</td></tr>'
+		+ '<tr><td>Unique Studies</td><td>'+data.Study+'</td></tr>'
+		+ '<tr><td>Maximum sample size</td><td>'+data.maxN+'</td></tr>'
+		+ '<tr><td>Minimum sample size</td><td>'+data.minN+'</td></tr>'
+		+ '<tr><td>Average sample size</td><td>'+data.avgN+'</td></tr>'
+		+ '</tbody></table>';
+	$('#sumBody').html(table);
 }
 
-function magmaGS(){
-  ids = selectTable.column(0).data();
-  if(ids.length<=1){
-    $('#panel').html('<div style="text-align: center;">Please select at lease 2 GWAS from the top panel.</div>');
-  }else{
-    $("#panel").html('Order by : <select id="orderHeat"><option value="alph">Alphabetical</option><option value="domain">Domain</option><option value="clst">Cluster</option></select>')
-    $('#panel').append('<div style="width:auto;overflow-x:auto;" id="plot"></div>');
-    ids = ids.join(":");
-    PlotMagmaGS(ids);
-  }
+function corPlot(data, cor){
+	$('.col4BoxBody').css({'height': '320'});
+
+	//Domain color legend
+	$('#colorBody').html('<div id="domainColor"></div>');
+	var svg = d3.select("#domainColor").append("svg")
+		.attr("width", 350)
+		.attr("height", 300)
+		.append("g")
+		.attr("transform", "translate(40,10)");
+	var cur_height = 20;
+	domains.forEach(function(d){
+		svg.append('circle')
+			.attr('cx', 30)
+			.attr('cy', cur_height)
+			.attr('r', 4)
+			.style("fill", domain_col(domains.indexOf(d)));
+		svg.append('text')
+			.attr('x', 40)
+			.attr('y', cur_height+4)
+			.text(d)
+			.attr('text-anchor', 'start');
+		cur_height += 20;
+	});
+	// plot data
+	data.forEach(function(d){
+		d[0] = +d[0]; // id
+		d[1] = +d[1]; // year
+		d[4] = +d[4]; // N
+		d[5] = +d[5]; // Nhits
+		if(d[6]==null){d[6] = -9;}
+		else{d[6] = +d[6];} // h2
+		d[7] = +d[7]; // h2_z
+	});
+
+	// year vs sample size
+	$('#yearVSnBody').html('<div id="yearVSnPlot"></div>');
+	var margin = {top:10, right: 60, bottom:40, left:50},
+		width = 250,
+		height = 250;
+	var svg = d3.select("#yearVSnPlot").append("svg")
+		.attr("width", width+margin.left+margin.right)
+		.attr("height", height+margin.top+margin.bottom)
+		.append("g")
+		.attr("transform", "translate("+margin.left+","+margin.top+")");
+
+	var xMin = d3.min(data, function(d){return d[1]}),
+		xMax = d3.max(data, function(d){return d[1]}),
+		yMin = d3.min(data, function(d){return d[4]}),
+		yMax = d3.max(data, function(d){return d[4]});
+	var x = d3.scale.linear().range([0, width]);
+	x.domain([xMin-1, xMax+1]);
+	var xAxis = d3.svg.axis().scale(x).orient("bottom").tickFormat(d3.format("d"));
+	var y = d3.scale.linear().range([height, 0]);
+	y.domain([yMin-(yMax-yMin)*0.1, yMax+(yMax-yMin)*0.1]);
+	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
+
+	if(cor.yearVSn != null){
+		svg.append('line')
+			.attr('x1', x(cor.yearVSn.x1))
+			.attr('x2', x(cor.yearVSn.x2))
+			.attr('y1', y(cor.yearVSn.y1))
+			.attr('y2', y(cor.yearVSn.y2))
+			.style('stroke', 'red')
+			.style("stroke-dasharray", ("3,3"));
+		svg.append('text').attr('text-anchor', 'start')
+			.attr('transform', 'translate('+width+',0)')
+			.text("r = "+Math.round(cor.yearVSn.r*1000)/1000)
+			.style('font-size', '10px');
+		svg.append('text').attr('text-anchor', 'start')
+			.attr('transform', 'translate('+width+',15)')
+			.text("p = "+cor.yearVSn.p.toExponential(2))
+			.style('font-size', '10px');
+	}
+
+	svg.selectAll('.dot').data(data).enter()
+		.append('circle')
+		.attr("r", 3)
+		.attr("cx", function(d){return x(d[1])})
+		.attr("cy", function(d){return y(d[4])})
+		.style("fill", function(d){return domain_col(domains.indexOf(d[2]))})
+		.style("opacity", "0.6");
+	svg.append("g").attr("class", "x axis").call(xAxis)
+		.attr("transform", "translate(0,"+height+")")
+		.selectAll('text')
+		.style('text-anchor', 'end')
+		.attr("transform", "rotate(-60)")
+		.attr("dy", "-.25em")
+		.attr("dx", "-.65em");
+	svg.append("g").attr("class", "y axis").call(yAxis);
+	svg.append("text").attr("text-anchor", "middle")
+		.attr("transform", "translate(-35,"+(height/2)+")rotate(-90)")
+		.text("Number of samples / 10e3")
+		.attr("font-size", "10px");
+
+	// risk loci vs sample size
+	$('#lociVSnBody').html('<div id="lociVSnPlot"></div>');
+	var margin = {top:10, right: 60, bottom:40, left:50},
+		width = 250,
+		height = 250;
+	var svg = d3.select("#lociVSnPlot").append("svg")
+		.attr("width", width+margin.left+margin.right)
+		.attr("height", height+margin.top+margin.bottom)
+		.append("g")
+		.attr("transform", "translate("+margin.left+","+margin.top+")");
+
+	var xMin = d3.min(data, function(d){return d[5]}),
+		xMax = d3.max(data, function(d){return d[5]}),
+		yMin = d3.min(data, function(d){return d[4]}),
+		yMax = d3.max(data, function(d){return d[4]});
+	var x = d3.scale.linear().range([0, width]);
+	x.domain([xMin-(xMax-xMin)*0.1, xMax+(xMax-xMin)*0.1]);
+	var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(5);
+	var y = d3.scale.linear().range([height, 0]);
+	y.domain([yMin-(yMax-yMin)*0.1, yMax+(yMax-yMin)*0.1]);
+	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
+
+	if(cor.lociVSn != null){
+		svg.append('line')
+			.attr('x1', x(cor.lociVSn.x1))
+			.attr('x2', x(cor.lociVSn.x2))
+			.attr('y1', y(cor.lociVSn.y1))
+			.attr('y2', y(cor.lociVSn.y2))
+			.style('stroke', 'red')
+			.style("stroke-dasharray", ("3,3"));
+		svg.append('text').attr('text-anchor', 'start')
+			.attr('transform', 'translate('+width+',0)')
+			.text("r = "+Math.round(cor.lociVSn.r*1000)/1000)
+			.style('font-size', '10px');
+		svg.append('text').attr('text-anchor', 'start')
+			.attr('transform', 'translate('+width+',15)')
+			.text("p = "+cor.lociVSn.p.toExponential(2))
+			.style('font-size', '10px');
+	}
+
+	svg.selectAll('.dot').data(data).enter()
+		.append('circle')
+		.attr("r", 3)
+		.attr("cx", function(d){return x(d[5])})
+		.attr("cy", function(d){return y(d[4])})
+		.style("fill", function(d){return domain_col(domains.indexOf(d[2]))})
+		.style("opacity", "0.6");
+	svg.append("g").attr("class", "x axis").call(xAxis)
+		.attr("transform", "translate(0,"+height+")");
+	svg.append("g").attr("class", "y axis").call(yAxis);
+	svg.append("text").attr("text-anchor", "middle")
+		.attr("transform", "translate("+width/2+","+(height+30)+")")
+		.text("Number of risk loci")
+		.attr("font-size", "10px");
+	svg.append("text").attr("text-anchor", "middle")
+		.attr("transform", "translate(-35,"+(height/2)+")rotate(-90)")
+		.text("Number of samples / 10e3")
+		.attr("font-size", "10px");
+
+	// h2 vs sample size
+	$('#h2VSnBody').html('<div id="h2VSnPlot"></div>');
+	var margin = {top:10, right: 60, bottom:40, left:50},
+		width = 250,
+		height = 250;
+	var svg = d3.select("#h2VSnPlot").append("svg")
+		.attr("width", width+margin.left+margin.right)
+		.attr("height", height+margin.top+margin.bottom)
+		.append("g")
+		.attr("transform", "translate("+margin.left+","+margin.top+")");
+
+	var xMin = d3.min(data, function(d){if(d[6] > -9){return d[6]}}),
+		xMax = d3.max(data, function(d){return d[6]}),
+		yMin = d3.min(data, function(d){return d[4]}),
+		yMax = d3.max(data, function(d){return d[4]});
+	var x = d3.scale.linear().range([0, width]);
+	x.domain([xMin-(xMax-xMin)*0.1, xMax+(xMax-xMin)*0.1]);
+	var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(5);
+	var y = d3.scale.linear().range([height, 0]);
+	y.domain([yMin-(yMax-yMin)*0.1, yMax+(yMax-yMin)*0.1]);
+	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
+
+	if(cor.h2VSn != null){
+		svg.append('line')
+			.attr('x1', x(cor.h2VSn.x1))
+			.attr('x2', x(cor.h2VSn.x2))
+			.attr('y1', y(cor.h2VSn.y1))
+			.attr('y2', y(cor.h2VSn.y2))
+			.style('stroke', 'red')
+			.style("stroke-dasharray", ("3,3"));
+		svg.append('text').attr('text-anchor', 'start')
+			.attr('transform', 'translate('+width+',0)')
+			.text("r = "+Math.round(cor.h2VSn.r*1000)/1000)
+			.style('font-size', '10px');
+		svg.append('text').attr('text-anchor', 'start')
+			.attr('transform', 'translate('+width+',15)')
+			.text("p = "+cor.h2VSn.p.toExponential(2))
+			.style('font-size', '10px');
+	}
+
+	svg.selectAll('.dot').data(data.filter(function(d){if(d[6] > -9){return d}})).enter()
+		.append('circle')
+		.attr("r", 3)
+		.attr("cx", function(d){return x(d[6])})
+		.attr("cy", function(d){return y(d[4])})
+		.style("fill", function(d){return domain_col(domains.indexOf(d[2]))})
+		.style("opacity", "0.6");
+	svg.append("g").attr("class", "x axis").call(xAxis)
+		.attr("transform", "translate(0,"+height+")");
+	svg.append("g").attr("class", "y axis").call(yAxis);
+	svg.append("text").attr("text-anchor", "middle")
+		.attr("transform", "translate("+width/2+","+(height+30)+")")
+		.text("SNP h2")
+		.attr("font-size", "10px");
+	svg.append("text").attr("text-anchor", "middle")
+		.attr("transform", "translate(-35,"+(height/2)+")rotate(-90)")
+		.text("Number of samples / 10e3")
+		.attr("font-size", "10px");
+
+	// h2 vs risk loci
+	$('#h2VSlociBody').html('<div id="h2VSlociPlot"></div>');
+	var margin = {top:10, right: 60, bottom:40, left:50},
+		width = 250,
+		height = 250;
+	var svg = d3.select("#h2VSlociPlot").append("svg")
+		.attr("width", width+margin.left+margin.right)
+		.attr("height", height+margin.top+margin.bottom)
+		.append("g")
+		.attr("transform", "translate("+margin.left+","+margin.top+")");
+
+	var xMin = d3.min(data, function(d){if(d[6] > -9){return d[6]}}),
+		xMax = d3.max(data, function(d){return d[6]}),
+		yMin = d3.min(data, function(d){return d[5]}),
+		yMax = d3.max(data, function(d){return d[5]});
+	var x = d3.scale.linear().range([0, width]);
+	x.domain([xMin-(xMax-xMin)*0.1, xMax+(xMax-xMin)*0.1]);
+	var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(5);
+	var y = d3.scale.linear().range([height, 0]);
+	y.domain([yMin-(yMax-yMin)*0.1, yMax+(yMax-yMin)*0.1]);
+	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
+
+	if(cor.h2VSloci != null){
+		svg.append('line')
+			.attr('x1', x(cor.h2VSloci.x1))
+			.attr('x2', x(cor.h2VSloci.x2))
+			.attr('y1', y(cor.h2VSloci.y1))
+			.attr('y2', y(cor.h2VSloci.y2))
+			.style('stroke', 'red')
+			.style("stroke-dasharray", ("3,3"));
+		svg.append('text').attr('text-anchor', 'start')
+			.attr('transform', 'translate('+width+',0)')
+			.text("r = "+Math.round(cor.h2VSloci.r*1000)/1000)
+			.style('font-size', '10px');
+		svg.append('text').attr('text-anchor', 'start')
+			.attr('transform', 'translate('+width+',15)')
+			.text("p = "+cor.h2VSloci.p.toExponential(2))
+			.style('font-size', '10px');
+	}
+
+	svg.selectAll('.dot').data(data.filter(function(d){if(d[6] > -9){return d}})).enter()
+		.append('circle')
+		.attr("r", 3)
+		.attr("cx", function(d){return x(d[6])})
+		.attr("cy", function(d){return y(d[5])})
+		.style("fill", function(d){return domain_col(domains.indexOf(d[2]))})
+		.style("opacity", "0.6");
+	svg.append("g").attr("class", "x axis").call(xAxis)
+		.attr("transform", "translate(0,"+height+")");
+	svg.append("g").attr("class", "y axis").call(yAxis);
+	svg.append("text").attr("text-anchor", "middle")
+		.attr("transform", "translate("+width/2+","+(height+30)+")")
+		.text("Number of risk loci")
+		.attr("font-size", "11px");
+	svg.append("text").attr("text-anchor", "middle")
+		.attr("transform", "translate(-35,"+(height/2)+")rotate(-90)")
+		.text("Number of risk loci")
+		.attr("font-size", "11px");
 }
 
-function GC(){
-  ids = selectTable.column(0).data();
-  if(ids.length<=1){
-    $('#panel').html('<div style="text-align: center;">Please select at lease 2 GWAS from the top panel.</div>');
-  }else{
-    $("#panel").html('Order by : <select id="orderHeat"><option value="alph">Alphabetical</option><option value="domain">Domain</option><option value="clst">Cluster</option></select>')
-    $('#panel').append('<div style="width:auto;overflow-x:auto;" id="plot"></div>');
-    ids = ids.join(":");
-    PlotGC(ids);
-  }
+function gcPlot(data){
+	$('#gcPlot').html("");
+	if(data == undefined || data == null || data.length==0){
+		$('#gcPlot').html("No genetic correlatioin is available for selected GWAS.");
+	}else{
+		var ids = data.data["id"];
+		var n = ids.length;
+		var cellsize = 12;
+		if(n < 20){cellsize = 20;}
+		else if(n < 50){cellsize = 15;}
+		data.data.rg.forEach(function(d){
+			d[0] = +d[0]; //id1
+			d[1] = +d[1]; //id2
+			d[2] = +d[2]; //rg
+			d[3] = +d[3]; //p
+			d[4] = +d[4]; //pbon
+		});
+
+		var maxTrait = 0;
+		ids.forEach(function(d){
+			if(data.data.Trait[d].length > maxTrait){
+				maxTrait = data.data.Trait[d].length;
+			}
+		});
+
+		var margin = {top: maxTrait*5, right: 100, bottom: 50, left: maxTrait*5.5},
+			width = cellsize*n,
+			height = cellsize*n;
+		var svg = d3.select('#gcPlot').append('svg')
+			.attr("width", width+margin.left+margin.right)
+			.attr("height", height+margin.top+margin.bottom)
+			.append("g").attr("transform", "translate("+margin.left+","+margin.top+")");
+		var colorScale = d3.scale.linear().domain([-1.25, 0, 1.25]).range(["#000099", "#fff", "#b30000"]);
+		var sizeScale = d3.scale.linear().domain([0.05, 1]).range([1, 0]);
+
+		// legened
+		var t = [];
+		for(var i =0; i<26; i++){t.push(i);}
+		var legendRect = svg.selectAll(".legend").data(t).enter().append("g")
+			.append("rect")
+			.attr("class", 'legendRect')
+			.attr("x", width+15)
+			.attr("y", function(d){return (25-d)*3})
+			.attr("width", 15)
+			.attr("height", 3)
+			.attr("fill", function(d){return colorScale(d*0.1-1.25)});
+		var legendText = svg.selectAll("text.legend").data([0,12.5,25]).enter().append("g")
+			.append("text")
+			.attr("text-anchor", "start")
+			.attr("class", "legenedText")
+			.attr("x", width+32)
+			.attr("y", function(d){return (25-d)*3+5})
+			.text(function(d){return d*0.1-1.25})
+			.style("font-size", "12px");
+
+		// y axis label
+		var rowLabels = svg.append("g").selectAll(".rowLabel")
+			.data(ids).enter().append("text")
+			.text(function(d){return data.data.Trait[d];})
+			.attr("x", -3)
+			.attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;})
+			.style("font-size", "10px")
+			.style("text-anchor", "end")
+			.attr('dy', function(){if(cellsize==20){return ".1em"}else{return ".2em"}});
+		// x axis label
+		var colLabels = svg.append("g").selectAll(".colLabel")
+			.data(ids).enter().append("text")
+			.text(function(d){return data.data.Trait[d];})
+			.style("text-anchor", "start")
+			.style("font-size", "10px")
+			.attr("transform", function(d){
+				return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
+			});
+
+		// heatmap for significant rg
+		var heatMapSig = svg.append("g").attr("class", "cell heatmapcell")
+			.selectAll("rect.cell").data(data.data.rg.filter(function(d){if(d[3]<0.05){return d}})).enter()
+			.append("rect")
+			.attr("width", cellsize-1).attr("height", cellsize-1)
+			.attr('x', function(d){return data.data.order.alph[d[0]]*cellsize})
+			.attr('y', function(d){return data.data.order.alph[d[1]]*cellsize})
+			.attr('fill', function(d){
+				if(d[2]>1.25){return colorScale(1.25)}
+				else if(d[2] < -1.25){return colorScale(-1.25)}
+				else{return colorScale(d[2])}
+			});
+		// stars for significant rg after bon correction
+		var stars = svg.append("g").attr("class", "cell star")
+			.selectAll("star").data(data.data.rg.filter(function(d){if(d[4]<0.05 && d[0] != d[1]){return d}})).enter()
+			.append("text")
+			.attr('x', function(d){return data.data.order.alph[d[0]]*cellsize+(cellsize-1)/2})
+			.attr('y', function(d){return data.data.order.alph[d[1]]*cellsize+cellsize*0.75})
+			.text("*")
+			.style("text-anchor", "middle")
+			.attr('dy', function(){if(cellsize==20){return ".1em"}else{return ".2em"}});
+		// heatmap for non-significant rg
+		var heatMapNonsig = svg.append("g").attr("class", "cell heatmapcell")
+			.selectAll("rect.cell.nonsig").data(data.data.rg.filter(function(d){if(d[3]>=0.05){return d}})).enter()
+			.append("rect")
+			.attr("width", function(d){return (cellsize-1)*sizeScale(d[3])})
+			.attr("height", function(d){return (cellsize-1)*sizeScale(d[3])})
+			.attr("x", function(d){return data.data.order.alph[d[0]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)})
+			.attr("y", function(d){return data.data.order.alph[d[1]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)})
+			.attr('fill', function(d){return colorScale(d[2])});
+
+		// reordering labels
+		function sortOptions(type){
+			if(type == "alph"){
+				heatMapSig.transition().duration(1000)
+					.attr("x", function(d){return data.data.order.alph[d[0]]*cellsize})
+					.attr("y", function(d){return data.data.order.alph[d[1]]*cellsize});
+				stars.transition().duration(1000)
+					.attr("x", function(d){return data.data.order.alph[d[0]]*cellsize+(cellsize-1)/2})
+					.attr("y", function(d){return data.data.order.alph[d[1]]*cellsize+cellsize*0.75});
+				heatMapNonsig.transition().duration(1000)
+					.attr("x", function(d){return data.data.order.alph[d[0]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)})
+					.attr("y", function(d){return data.data.order.alph[d[1]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)});
+				rowLabels.transition().duration(1000)
+					.attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;});
+				colLabels.transition().duration(1000)
+					.attr("transform", function(d){
+						return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
+					});
+			}else if(type == "domain"){
+				heatMapSig.transition().duration(1000)
+					.attr("x", function(d){return data.data.order.domain[d[0]]*cellsize})
+					.attr("y", function(d){return data.data.order.domain[d[1]]*cellsize});
+				stars.transition().duration(1000)
+					.attr("x", function(d){return data.data.order.domain[d[0]]*cellsize+(cellsize-1)/2})
+					.attr("y", function(d){return data.data.order.domain[d[1]]*cellsize+cellsize*0.75});
+				heatMapNonsig.transition().duration(1000)
+					.attr("x", function(d){return data.data.order.domain[d[0]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)})
+					.attr("y", function(d){return data.data.order.domain[d[1]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)});
+				rowLabels.transition().duration(1000)
+					.attr("y", function(d){return data.data.order.domain[d]*cellsize+(cellsize-1)/2;});
+				colLabels.transition().duration(1000)
+					.attr("transform", function(d){
+						return "translate("+(data.data.order.domain[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
+					});
+			}else if(type == "clst"){
+				heatMapSig.transition().duration(1000)
+					.attr("x", function(d){return data.data.order.clst[d[0]]*cellsize})
+					.attr("y", function(d){return data.data.order.clst[d[1]]*cellsize});
+				stars.transition().duration(1000)
+					.attr("x", function(d){return data.data.order.clst[d[0]]*cellsize+(cellsize-1)/2})
+					.attr("y", function(d){return data.data.order.clst[d[1]]*cellsize+cellsize*0.75});
+				heatMapNonsig.transition().duration(1000)
+					.attr("x", function(d){return data.data.order.clst[d[0]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)})
+					.attr("y", function(d){return data.data.order.clst[d[1]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)});
+				rowLabels.transition().duration(1000)
+					.attr("y", function(d){return data.data.order.clst[d]*cellsize+(cellsize-1)/2;});
+				colLabels.transition().duration(1000)
+					.attr("transform", function(d){
+						return "translate("+(data.data.order.clst[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
+					});
+			}
+		}
+
+		$('#gcOrder').on("change", function(){
+			var type = $('#gcOrder').val();
+			sortOptions(type);
+		});
+	}
 }
 
-function PlotGC(ids){
-  d3.select('#plot').select('svg').remove();
-  d3.json(subdir+"/multiGWAS/GCheat/"+ids, function(data){
-    if(data == undefined || data == null || data.length==0){
-      $('#plot').html("No genetic correlatioin is available for selected GWAS.");
-    }else{
-      var ids = data.data["id"];
-      var n = ids.length;
-      var cellsize = 10;
-      if(n < 50){
-        cellsize = 20;
-      }
-      data.data.rg.forEach(function(d){
-        d[0] = +d[0]; //id1
-        d[1] = +d[1]; //id2
-        d[2] = +d[2]; //rg
-        d[3] = +d[3]; //p
-        d[4] = +d[4]; //pbon
-      });
+function magmaPlot(data){
+	$('#magmaPlot').html("");
 
-      var maxTrait = 0;
-      ids.forEach(function(d){
-        if(data.data.Trait[d].length > maxTrait){
-          maxTrait = data.data.Trait[d].length;
-        }
-      });
+	if(data == undefined || data == null || data.length==0){
+		$('#magmaPlot').html("No MAGMA gene analysis is available for selcted GWAS.");
+	}else{
+		var ids = data.data["id"];
+		var n = ids.length;
+		var cellsize = 12;
+		if(n < 20){cellsize = 20;}
+		else if(n < 50){cellsize = 15;}
 
-      var margin = {top: maxTrait*5.5, right: 100, bottom: 50, left: maxTrait*5.5},
-        width = cellsize*n,
-        height = cellsize*n;
-      var svg = d3.select('#plot').append('svg')
-                .attr("width", width+margin.left+margin.right)
-                .attr("height", height+margin.top+margin.bottom)
-                .append("g").attr("transform", "translate("+margin.left+","+margin.top+")");
-      var colorScale = d3.scale.linear().domain([-1.25, 0, 1.25]).range(["#000099", "#fff", "#b30000"]);
-      var sizeScale = d3.scale.linear().domain([0.05, 1]).range([1, 0]);
+		data.data.go.forEach(function(d){
+			d[0] = +d[0]; //id1
+			d[1] = +d[1]; //id2
+			d[2] = +d[2]; //overlap
+		});
 
-      // legened
-      var t = [];
-      for(var i =0; i<26; i++){t.push(i);}
-      var legendRect = svg.selectAll(".legend").data(t).enter().append("g")
-        .append("rect")
-        .attr("class", 'legendRect')
-        .attr("x", width+10)
-        .attr("y", function(d){return (25-d)*5+20})
-        .attr("width", 20)
-        .attr("height", 10)
-        .attr("fill", function(d){return colorScale(d*0.1-1.25)});
-      var legendText = svg.selectAll("text.legend").data([0,12.5,25]).enter().append("g")
-        .append("text")
-        .attr("text-anchor", "start")
-        .attr("class", "legenedText")
-        .attr("x", width+32)
-        .attr("y", function(d){return (25-d)*5+11+20})
-        .text(function(d){return d*0.1-1.25})
-        .style("font-size", "12px");
+		data.data.ng.forEach(function(d){
+			d[0] = +d[0] //id
+			d[1] = +d[1] //n genes
+		});
 
-      // y axis label
-      var rowLabels = svg.append("g").selectAll(".rowLabel")
-                      .data(ids).enter().append("text")
-                      .text(function(d){return data.data.Trait[d];})
-                      .attr("x", -3)
-                      .attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;})
-                      .style("font-size", "10px")
-                      .style("text-anchor", "end");
-      // x axis label
-      var colLabels = svg.append("g").selectAll(".colLabel")
-                      .data(ids).enter().append("text")
-                      .text(function(d){return data.data.Trait[d];})
-                      .style("text-anchor", "start")
-                      .style("font-size", "10px")
-                      .attr("transform", function(d){
-                        return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
-                      });
+		var maxTrait = 0;
+		ids.forEach(function(d){
+			if(data.data.Trait[d].length > maxTrait){
+				maxTrait = data.data.Trait[d].length;
+			}
+		});
 
-      // heatmap for significant rg
-      var heatMapSig = svg.append("g").attr("class", "cell heatmapcell")
-                    .selectAll("rect.cell").data(data.data.rg.filter(function(d){if(d[3]<0.05){return d}})).enter()
-                    .append("rect")
-                    .attr("width", cellsize-1).attr("height", cellsize-1)
-                    .attr('x', function(d){return data.data.order.alph[d[0]]*cellsize})
-                    .attr('y', function(d){return data.data.order.alph[d[1]]*cellsize})
-                    .attr('fill', function(d){return colorScale(d[2])});
-      // stars for significant rg after bon correction
-      var stars = svg.append("g").attr("class", "cell star")
-                    .selectAll("star").data(data.data.rg.filter(function(d){if(d[4]<0.05 && d[0] != d[1]){return d}})).enter()
-                    .append("text")
-                    .attr('x', function(d){return data.data.order.alph[d[0]]*cellsize+(cellsize-1)/2})
-                    .attr('y', function(d){return data.data.order.alph[d[1]]*cellsize+(cellsize-4)})
-                    .text("*")
-                    .style("text-anchor", "middle");
-      // heatmap for non-significant rg
-      var heatMapNonsig = svg.append("g").attr("class", "cell heatmapcell")
-                    .selectAll("rect.cell.nonsig").data(data.data.rg.filter(function(d){if(d[3]>=0.05){return d}})).enter()
-                    .append("rect")
-                    .attr("width", function(d){return (cellsize-1)*sizeScale(d[3])})
-                    .attr("height", function(d){return (cellsize-1)*sizeScale(d[3])})
-                    .attr("x", function(d){return data.data.order.alph[d[0]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)})
-                    .attr("y", function(d){return data.data.order.alph[d[1]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)})
-                    .attr('fill', function(d){return colorScale(d[2])});
+		var barWidth = 50;
+		var space = 5;
+		var margin = {top: maxTrait*5, right: 100, bottom: 50, left: maxTrait*5.5},
+			width = cellsize*n+space+barWidth,
+			height = cellsize*n;
+		var svg = d3.select('#magmaPlot').append('svg')
+			.attr("width", width+margin.left+margin.right)
+			.attr("height", height+margin.top+margin.bottom)
+			.append("g").attr("transform", "translate("+margin.left+","+margin.top+")");
+		var colorScale = d3.scale.linear().domain([0, 1]).range(["#fff", "#b30000"]);
+		// var sizeScale = d3.scale.linear().domain([0.05, 1]).range([1, 0]);
 
-      // reordering labels
-      function sortOptions(type){
-        if(type == "alph"){
-          heatMapSig.transition().duration(1000)
-            .attr("x", function(d){return data.data.order.alph[d[0]]*cellsize})
-            .attr("y", function(d){return data.data.order.alph[d[1]]*cellsize});
-          stars.transition().duration(1000)
-            .attr("x", function(d){return data.data.order.alph[d[0]]*cellsize+(cellsize-1)/2})
-            .attr("y", function(d){return data.data.order.alph[d[1]]*cellsize+(cellsize-4)});
-          heatMapNonsig.transition().duration(1000)
-            .attr("x", function(d){return data.data.order.alph[d[0]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)})
-            .attr("y", function(d){return data.data.order.alph[d[1]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)});
-          rowLabels.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;});
-          colLabels.transition().duration(1000)
-          .attr("transform", function(d){
-            return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
-          });
-        }else if(type == "domain"){
-          heatMapSig.transition().duration(1000)
-            .attr("x", function(d){return data.data.order.domain[d[0]]*cellsize})
-            .attr("y", function(d){return data.data.order.domain[d[1]]*cellsize});
-          stars.transition().duration(1000)
-            .attr("x", function(d){return data.data.order.domain[d[0]]*cellsize+(cellsize-1)/2})
-            .attr("y", function(d){return data.data.order.domain[d[1]]*cellsize+(cellsize-4)});
-          heatMapNonsig.transition().duration(1000)
-            .attr("x", function(d){return data.data.order.domain[d[0]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)})
-            .attr("y", function(d){return data.data.order.domain[d[1]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)});
-          rowLabels.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.domain[d]*cellsize+(cellsize-1)/2;});
-          colLabels.transition().duration(1000)
-          .attr("transform", function(d){
-            return "translate("+(data.data.order.domain[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
-          });
-        }else if(type == "clst"){
-          heatMapSig.transition().duration(1000)
-            .attr("x", function(d){return data.data.order.clst[d[0]]*cellsize})
-            .attr("y", function(d){return data.data.order.clst[d[1]]*cellsize});
-          stars.transition().duration(1000)
-            .attr("x", function(d){return data.data.order.clst[d[0]]*cellsize+(cellsize-1)/2})
-            .attr("y", function(d){return data.data.order.clst[d[1]]*cellsize+(cellsize-4)});
-          heatMapNonsig.transition().duration(1000)
-            .attr("x", function(d){return data.data.order.clst[d[0]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)})
-            .attr("y", function(d){return data.data.order.clst[d[1]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)});
-          rowLabels.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.clst[d]*cellsize+(cellsize-1)/2;});
-          colLabels.transition().duration(1000)
-          .attr("transform", function(d){
-            return "translate("+(data.data.order.clst[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
-          });
-        }
-      }
+		// legened
+		var t = [];
+		for(var i =0; i<11; i++){t.push(i);}
+		var legendRect = svg.selectAll(".legend").data(t).enter().append("g")
+			.append("rect")
+			.attr("class", 'legendRect')
+			.attr("x", width+20)
+			.attr("y", function(d){return (d)*8})
+			.attr("width", 15)
+			.attr("height", 8)
+			.attr("fill", function(d){return colorScale(1-d*0.1)});
+		var legendText = svg.selectAll("text.legend").data([0,5,10]).enter().append("g")
+			.append("text")
+			.attr("text-anchor", "start")
+			.attr("class", "legenedText")
+			.attr("x", width+38)
+			.attr("y", function(d){return (d)*8+10})
+			.text(function(d){return 1-d*0.1})
+			.style("font-size", "12px");
 
-      d3.select('#orderHeat').on("change", function(){
-        var type = $('#orderHeat').val();
-        sortOptions(type);
-      })
-    }
-  });
+		// y axis label
+		var rowLabels = svg.append("g").selectAll(".rowLabel")
+			.data(ids).enter().append("text")
+			.text(function(d){return data.data.Trait[d];})
+			.attr("x", -3)
+			.attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;})
+			.style("font-size", "10px")
+			.style("text-anchor", "end")
+			.attr('dy', function(){if(cellsize==20){return ".1em"}else{return ".2em"}});
+		// x axis label
+		var colLabels = svg.append("g").selectAll(".colLabel")
+			.data(ids).enter().append("text")
+			.text(function(d){return data.data.Trait[d];})
+			.style("text-anchor", "start")
+			.style("font-size", "10px")
+			.attr("transform", function(d){
+				return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
+			});
+
+		// heatmap for non zero overlap
+		var heatMap = svg.append("g").attr("class", "cell heatmapcell")
+			.selectAll("rect.cell").data(data.data.go).enter()
+			.append("rect")
+			.attr("width", cellsize-1).attr("height", cellsize-1)
+			.attr('x', function(d){return data.data.order.alph[d[0]]*cellsize})
+			.attr('y', function(d){return data.data.order.alph[d[1]]*cellsize})
+			.attr('fill', function(d){if(d[2]==-1){return "grey";}else{return colorScale(d[2])}});
+
+		// n genes bar plot
+		var x = d3.scale.linear().range([cellsize*n+space, width]);
+		var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(3);
+		x.domain([0, d3.max(data.data.ng, function(d){return d[1]})]);
+
+		var barPlot = svg.append("g").attr("class", "bar")
+			.selectAll("bar").data(data.data.ng).enter()
+			.append("rect")
+			.attr("width", function(d){return x(d[1])-x(0)})
+			.attr("height", cellsize-1)
+			.attr("x", cellsize*n+space)
+			.attr("y", function(d){return data.data.order.alph[d[0]]*cellsize})
+			.attr("fill", "skyblue");
+		var barText = svg.append("g")
+			.selectAll("bar.text").data(data.data.ng).enter()
+			.append("text")
+			.attr("x", function(d){return x(d[1])})
+			.attr("y", function(d){return data.data.order.alph[d[0]]*cellsize+cellsize/2})
+			.text(function(d){return d[1];})
+			.style("text-anchor", "start")
+			.style("font-size", "9px")
+			.attr('dy', function(){if(cellsize==20){return ".1em"}else{return ".2em"}});
+
+		svg.append('g').attr("class", "x axis")
+			.attr("transform", "translate(0,"+height+")")
+			.call(xAxis).selectAll("text")
+			.attr("transform", "translate(-12, 3)rotate(-60)")
+			.style("text-anchor", "end");
+
+
+		// reordering labels
+		function sortOptions(type){
+			if(type == "alph"){
+				heatMap.transition().duration(1000)
+					.attr("x", function(d){return data.data.order.alph[d[0]]*cellsize})
+					.attr("y", function(d){return data.data.order.alph[d[1]]*cellsize});
+				barPlot.transition().duration(1000)
+					.attr("y", function(d){return data.data.order.alph[d[0]]*cellsize});
+				barText.transition().duration(1000)
+					.attr("y", function(d){return data.data.order.alph[d[0]]*cellsize+cellsize/2});
+				rowLabels.transition().duration(1000)
+					.attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;});
+				colLabels.transition().duration(1000)
+					.attr("transform", function(d){
+						return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
+					});
+			}else if(type == "domain"){
+				heatMap.transition().duration(1000)
+					.attr("x", function(d){return data.data.order.domain[d[0]]*cellsize})
+					.attr("y", function(d){return data.data.order.domain[d[1]]*cellsize});
+				barPlot.transition().duration(1000)
+					.attr("y", function(d){return data.data.order.domain[d[0]]*cellsize});
+				barText.transition().duration(1000)
+					.attr("y", function(d){return data.data.order.domain[d[0]]*cellsize+cellsize/2});
+				rowLabels.transition().duration(1000)
+					.attr("y", function(d){return data.data.order.domain[d]*cellsize+(cellsize-1)/2;});
+				colLabels.transition().duration(1000)
+					.attr("transform", function(d){
+						return "translate("+(data.data.order.domain[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
+					});
+			}else if(type == "clst"){
+				heatMap.transition().duration(1000)
+					.attr("x", function(d){return data.data.order.clst[d[0]]*cellsize})
+					.attr("y", function(d){return data.data.order.clst[d[1]]*cellsize});
+				barPlot.transition().duration(1000)
+					.attr("y", function(d){return data.data.order.clst[d[0]]*cellsize});
+				barText.transition().duration(1000)
+					.attr("y", function(d){return data.data.order.clst[d[0]]*cellsize+cellsize/2});
+				rowLabels.transition().duration(1000)
+					.attr("y", function(d){return data.data.order.clst[d]*cellsize+(cellsize-1)/2;});
+				colLabels.transition().duration(1000)
+					.attr("transform", function(d){
+						return "translate("+(data.data.order.clst[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
+					});
+			}
+		}
+
+		d3.select('#magmaOrder').on("change", function(){
+			var type = $('#magmaOrder').val();
+			sortOptions(type);
+		})
+	}
 }
 
-function PlotMagmaGenes(ids){
-  d3.select('#plot').select('svg').remove();
-  d3.json(subdir+"/multiGWAS/MagmaGeneheat/"+ids, function(data){
-    if(data == undefined || data == null || data.length==0){
-      $('#plot').html("No MAGMA gene analysis is available for selcted GWAS.");
-    }else{
-      var ids = data.data["id"];
-      var n = ids.length;
-      var cellsize = 10;
-      if(n < 50){
-        cellsize = 20;
-      }
+function lociOver(data){
+	$('#riskLociOverBody').html('<div id="lociPlot"></div><div id="locusPlot"></div>');
+	var chromSize = [249250621, 243199373, 198022430, 191154276, 180915260, 171115067,
+		159138663, 146364022, 141213431, 135534747, 135006516, 133851895, 115169878, 107349540,
+		102531392, 90354753, 81195210, 78077248, 63025520, 59128983, 48129895, 51304566, 155270560];
+	var chromStart = [];
+	chromStart.push(0);
+	for(var i=1; i<chromSize.length; i++){
+		chromStart.push(chromStart[i-1]+chromSize[i-1]);
+	}
 
-      data.data.go.forEach(function(d){
-        d[0] = +d[0]; //id1
-        d[1] = +d[1]; //id2
-        d[2] = +d[2]; //overlap
-      });
+	data.data.loci_group.forEach(function(d){
+		d[0] = +d[0] // id
+		d[1] = +d[1] // chr
+		d[2] = +d[2] // start
+		d[3] = +d[3] // end
+		d[4] = +d[4] // N
+	});
+	data.data.loci.forEach(function(d){
+		// d[0] = +d[0] // id
+		d[3] = +d[3] // chr
+		d[4] = +d[4] // pos
+		d[5] = +d[5] // p
+		d[6] = +d[6] // start
+		d[7] = +d[7] // end
+		d[8] = +d[8] // lociid
+	});
 
-      data.data.ng.forEach(function(d){
-        d[0] = +d[0] //id
-        d[1] = +d[1] //n genes
-      });
+	var margin = {top:30, right: 30, bottom:50, left:50},
+		width = 800,
+		height = 250;
+	var svg = d3.select("#lociPlot").append("svg")
+		.attr("width", width+margin.left+margin.right)
+		.attr("height", height+margin.top+margin.bottom)
+		.append("g")
+		.attr("transform", "translate("+margin.left+","+margin.top+")");
 
-      var maxTrait = 0;
-      ids.forEach(function(d){
-        if(data.data.Trait[d].length > maxTrait){
-          maxTrait = data.data.Trait[d].length;
-        }
-      });
+	var chr = [];
+	var max_chr = d3.max(data.data.loci_group, function(d){return d[1]});
+	for(var i=1; i<=22; i++){
+		chr.push(i);
+	}
+	if(max_chr==23){chr.push(23)}
+	max_chr = Math.max(...chr);
 
-      var barWidth = 80;
-      var space = 5;
-      var margin = {top: maxTrait*5.5, right: 100, bottom: 50, left: maxTrait*5.5},
-        width = cellsize*n+space+barWidth,
-        height = cellsize*n;
-      var svg = d3.select('#plot').append('svg')
-                .attr("width", width+margin.left+margin.right)
-                .attr("height", height+margin.top+margin.bottom)
-                .append("g").attr("transform", "translate("+margin.left+","+margin.top+")");
-      var colorScale = d3.scale.linear().domain([0, 1]).range(["#fff", "#b30000"]);
-      // var sizeScale = d3.scale.linear().domain([0.05, 1]).range([1, 0]);
+	var max_n = d3.max(data.data.loci_group, function(d){return d[4]});
 
-      // legened
-      var t = [];
-      for(var i =0; i<11; i++){t.push(i);}
-      var legendRect = svg.selectAll(".legend").data(t).enter().append("g")
-        .append("rect")
-        .attr("class", 'legendRect')
-        .attr("x", width+20)
-        .attr("y", function(d){return (d)*10+20})
-        .attr("width", 20)
-        .attr("height", 10)
-        .attr("fill", function(d){return colorScale(1-d*0.1)});
-      var legendText = svg.selectAll("text.legend").data([0,5,10]).enter().append("g")
-        .append("text")
-        .attr("text-anchor", "start")
-        .attr("class", "legenedText")
-        .attr("x", width+42)
-        .attr("y", function(d){return (d)*10+11+20})
-        .text(function(d){return 1-d*0.1})
-        .style("font-size", "12px");
+	var x = d3.scale.linear().range([0, width]);
+	x.domain([0, (chromStart[max_chr-1]+chromSize[max_chr-1])]);
+	var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(0);
+	var y = d3.scale.linear().range([height, 0]);
+	y.domain([1, max_n+1]);
+	var yAxis = d3.svg.axis().scale(y).orient("left").tickFormat(d3.format("d"));
 
-      // y axis label
-      var rowLabels = svg.append("g").selectAll(".rowLabel")
-                      .data(ids).enter().append("text")
-                      .text(function(d){return data.data.Trait[d];})
-                      .attr("x", -3)
-                      .attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;})
-                      .style("font-size", "10px")
-                      .style("text-anchor", "end");
-      // x axis label
-      var colLabels = svg.append("g").selectAll(".colLabel")
-                      .data(ids).enter().append("text")
-                      .text(function(d){return data.data.Trait[d];})
-                      .style("text-anchor", "start")
-                      .style("font-size", "10px")
-                      .attr("transform", function(d){
-                        return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
-                      });
+	// tip
+	var tip = d3.tip()
+		.attr('class', 'd3-tip')
+		.offset([-5,0])
+		.html(function(d){return 'Chr: '+d[1]+'</br>Start: '+d[2]+'</br>End: '+d[3]+'</br>#GWAS: '+d[4]});
+	svg.call(tip);
 
-      // heatmap for non zero overlap
-      var heatMap = svg.append("g").attr("class", "cell heatmapcell")
-                    .selectAll("rect.cell").data(data.data.go).enter()
-                    .append("rect")
-                    .attr("width", cellsize-1).attr("height", cellsize-1)
-                    .attr('x', function(d){return data.data.order.alph[d[0]]*cellsize})
-                    .attr('y', function(d){return data.data.order.alph[d[1]]*cellsize})
-                    .attr('fill', function(d){if(d[2]==-1){return "grey";}else{return colorScale(d[2])}});
+	// zoom
+	var zoom = d3.behavior.zoom().x(x).scaleExtent([1,10]).on("zoom", zoomed);
+	svg.call(zoom);
+	// add rect
+	svg.append("rect").attr("width", width).attr("height", height)
+		.style("fill", "transparent")
+		.style("shape-rendering", "crispEdges");
 
-      // n genes bar plot
-      var x = d3.scale.linear().range([(cellsize+1)*n+space, width]);
-      var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(3);
-      x.domain([0, d3.max(data.data.ng, function(d){return d[1]})]);
+	svg.selectAll(".dot").data(data.data.loci_group).enter()
+		.append("circle")
+		.attr('class', 'locidot')
+		.attr("r", function(d){return d[4]/max_n*7+3;})
+		.attr("cx", function(d){return x((d[2]+d[3])/2+chromStart[d[1]-1])})
+		.attr("cy", function(d){return y(d[4])})
+		.attr("fill", function(d){
+			if(d[1]%2==0){return "steelblue"}
+			else{return "blue"}
+		})
+		.on("mouseover", tip.show)
+		.on("mouseout", tip.hide)
+		.on("click", function(d){
+			if(d[4]>1){
+				locusPlot(d[0]);
+			}
+		});
 
-      var barPlot = svg.append("g").attr("class", "bar")
-                    .selectAll("bar").data(data.data.ng).enter()
-                    .append("rect")
-                    .attr("width", function(d){return x(d[1])-x(0)})
-                    .attr("height", cellsize-1)
-                    .attr("x", (cellsize+1)*n+space)
-                    .attr("y", function(d){return data.data.order.alph[d[0]]*cellsize})
-                    .attr("fill", "skyblue");
-      var barText = svg.append("g")
-                    .selectAll("bar.text").data(data.data.ng).enter()
-                    .append("text")
-                    .attr("x", function(d){return x(d[1])})
-                    .attr("y", function(d){return data.data.order.alph[d[0]]*cellsize+cellsize/2})
-                    .text(function(d){return d[1];})
-                    .style("text-anchor", "start")
-                    .style("font-size", "10px");
-      svg.append('g').attr("class", "x axis")
-          .attr("transform", "translate(0,"+height+")")
-          .call(xAxis).selectAll("text")
-          .attr("transform", "translate(-12, 3)rotate(-60)")
-          .style("text-anchor", "end");
+	svg.append("g").attr("class", "x axis")
+		.attr("transform", "translate(0,"+height+")").call(xAxis).selectAll("text").remove();
+	svg.append("g").attr("class", "y axis").call(yAxis)
+		.selectAll('text').style('font-size', '11px');
 
+	//Chr label
+	svg.selectAll('.chr').data(chr).enter()
+		.append('text')
+		.attr('class', 'chrtext')
+		.attr('x', function(d){return x((chromStart[d-1]*2+chromSize[d-1])/2)})
+		.attr('y', height+20)
+		.text(function(d){return d})
+		.style("font-size", "10px");
+	svg.append("text").attr("text-anchor", "middle")
+		.attr("transform", "translate("+width/2+","+(height+35)+")")
+		.text("Chromosome");
+	svg.append("text").attr("text-anchor", "middle")
+		.attr("transform", "translate("+(-35)+","+(height/2)+")rotate(-90)")
+		.text("Number of GWAS");
 
-      // reordering labels
-      function sortOptions(type){
-        if(type == "alph"){
-          heatMap.transition().duration(1000)
-            .attr("x", function(d){return data.data.order.alph[d[0]]*cellsize})
-            .attr("y", function(d){return data.data.order.alph[d[1]]*cellsize});
-          barPlot.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.alph[d[0]]*cellsize});
-          barText.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.alph[d[0]]*cellsize+cellsize/2});
-          rowLabels.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;});
-          colLabels.transition().duration(1000)
-          .attr("transform", function(d){
-            return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
-          });
-        }else if(type == "domain"){
-          heatMap.transition().duration(1000)
-            .attr("x", function(d){return data.data.order.domain[d[0]]*cellsize})
-            .attr("y", function(d){return data.data.order.domain[d[1]]*cellsize});
-          barPlot.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.domain[d[0]]*cellsize});
-          barText.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.domain[d[0]]*cellsize+cellsize/2});
-          rowLabels.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.domain[d]*cellsize+(cellsize-1)/2;});
-          colLabels.transition().duration(1000)
-          .attr("transform", function(d){
-            return "translate("+(data.data.order.domain[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
-          });
-        }else if(type == "clst"){
-          heatMap.transition().duration(1000)
-            .attr("x", function(d){return data.data.order.clst[d[0]]*cellsize})
-            .attr("y", function(d){return data.data.order.clst[d[1]]*cellsize});
-          barPlot.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.clst[d[0]]*cellsize});
-          barText.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.clst[d[0]]*cellsize+cellsize/2});
-          rowLabels.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.clst[d]*cellsize+(cellsize-1)/2;});
-          colLabels.transition().duration(1000)
-          .attr("transform", function(d){
-            return "translate("+(data.data.order.clst[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
-          });
-        }
-      }
+	function zoomed(){
+		svg.selectAll(".chrtext")
+			.attr('x', function(d){return x((chromStart[d-1]*2+chromSize[d-1])/2)})
+			.style('fill', function(d){
+					var x_tmp = x((chromStart[d-1]*2+chromSize[d-1])/2);
+					if(x_tmp<0 || x_tmp>width){return "none"}
+					else{return "black"}
+			});
+		svg.selectAll(".locidot")
+			.attr("cx", function(d){return x((d[2]+d[3])/2+chromStart[d[1]-1]);})
+			.style("fill", function(d){
+				var x_tmp = x((d[2]+d[3])/2+chromStart[d[1]-1]);
+				if(x_tmp<0 || x_tmp>width){return "transparent";}
+				else if(d[1]%2==0){return "steelblue"}
+				else{return "blue"}
+			});
+	}
 
-      d3.select('#orderHeat').on("change", function(){
-        var type = $('#orderHeat').val();
-        sortOptions(type);
-      })
-    }
-  });
-}
+	function locusPlot(lociid){
+		$('#locusPlot').html("");
+		var tmpdata = data.data.loci.filter(function(d){if(d[8]==lociid){return d}});
+		var ids = d3.set(tmpdata.map(function(d){return d[0];})).values();
 
-function PlotMagmaGS(ids){
-  d3.select('#plot').select('svg').remove();
-  d3.json(subdir+"/multiGWAS/MagmaGSheat/"+ids, function(data){
-    if(data == undefined || data == null || data.length==0){
-      $('#plot').html("No MAGMA gene-set analysis is available for selected GWAS.");
-    }else{
-      var ids = data.data["id"];
-      var n = ids.length;
-      var cellsize = 10;
-      if(n < 50){
-        cellsize = 20;
-      }
+		var traits = [];
+		var maxTrait = 0;
+		ids.forEach(function(d){
+			if(traits.indexOf(data.data.Trait[d])<0){
+				if(data.data.Trait[d].length > maxTrait){maxTrait = data.data.Trait[d].length}
+				traits.push(data.data.Trait[d]);
+			}
+		})
 
-      data.data.gso.forEach(function(d){
-        d[0] = +d[0]; //id1
-        d[1] = +d[1]; //id2
-        d[2] = +d[2]; //overlap
-      });
+		var cellheight = 20;
+		if(ids.length>15){
+			cellheight = 15;
+		}
 
-      data.data.ngs.forEach(function(d){
-        d[0] = +d[0] //id
-        d[1] = +d[1] //n gene-sets
-      });
+		var margin = {top:30, right: 30, bottom:50, left:maxTrait*5.5},
+			width = 500,
+			height = (cellheight)*ids.length;
+		if(height < 100){height = 100}
 
-      var maxTrait = 0;
-      ids.forEach(function(d){
-        if(data.data.Trait[d].length > maxTrait){
-          maxTrait = data.data.Trait[d].length;
-        }
-      });
+		var maxP = d3.max(tmpdata, function(d){return -Math.log10(d[5])});
+		var maxX = d3.max(tmpdata, function(d){return d[7]});
+		var minX = d3.min(tmpdata, function(d){return d[6]});
+		var side = (maxX-minX)*0.1;
 
-      var barWidth = 80;
-      var space = 5;
-      var margin = {top: maxTrait*5.5, right: 100, bottom: 50, left: maxTrait*5.5},
-        width = cellsize*n+space+barWidth,
-        height = cellsize*n;
-      var svg = d3.select('#plot').append('svg')
-                .attr("width", width+margin.left+margin.right)
-                .attr("height", height+margin.top+margin.bottom)
-                .append("g").attr("transform", "translate("+margin.left+","+margin.top+")");
-      var colorScale = d3.scale.linear().domain([0, 1]).range(["#fff", "#b30000"]);
-      // var sizeScale = d3.scale.linear().domain([0.05, 1]).range([1, 0]);
+		var x = d3.scale.linear().range([0, width]);
+		x.domain([minX-side, maxX+side]);
+		var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(4);
+		var y = d3.scale.ordinal().domain(traits).rangeBands([height, 0], 0.1);
+		var yAxis = d3.svg.axis().scale(y).orient("left");
 
-      // legened
-      var t = [];
-      for(var i =0; i<11; i++){t.push(i);}
-      var legendRect = svg.selectAll(".legend").data(t).enter().append("g")
-        .append("rect")
-        .attr("class", 'legendRect')
-        .attr("x", width+20)
-        .attr("y", function(d){return (d)*10+20})
-        .attr("width", 20)
-        .attr("height", 10)
-        .attr("fill", function(d){return colorScale(1-d*0.1)});
-      var legendText = svg.selectAll("text.legend").data([0,5,10]).enter().append("g")
-        .append("text")
-        .attr("text-anchor", "start")
-        .attr("class", "legenedText")
-        .attr("x", width+42)
-        .attr("y", function(d){return (d)*10+11+20})
-        .text(function(d){return 1-d*0.1})
-        .style("font-size", "12px");
+		var svg = d3.select("#locusPlot").append("svg")
+			.attr("width", width+margin.left+margin.right)
+			.attr("height", height+margin.top+margin.bottom)
+			.append("g")
+			.attr("transform", "translate("+margin.left+","+margin.top+")");
 
-      // y axis label
-      var rowLabels = svg.append("g").selectAll(".rowLabel")
-                      .data(ids).enter().append("text")
-                      .text(function(d){return data.data.Trait[d];})
-                      .attr("x", -3)
-                      .attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;})
-                      .style("font-size", "10px")
-                      .style("text-anchor", "end");
-      // x axis label
-      var colLabels = svg.append("g").selectAll(".colLabel")
-                      .data(ids).enter().append("text")
-                      .text(function(d){return data.data.Trait[d];})
-                      .style("text-anchor", "start")
-                      .style("font-size", "10px")
-                      .attr("transform", function(d){
-                        return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
-                      });
+		// line
+		svg.selectAll('.line').data(tmpdata).enter()
+			.append("line")
+			.attr("x1", function(d){return x(d[6])})
+			.attr("x2", function(d){return x(d[7])})
+			.attr("y1", function(d){return y(data.data.Trait[d[0]])+y.rangeBand()*0.5})
+			.attr("y2", function(d){return y(data.data.Trait[d[0]])+y.rangeBand()*0.5})
+			.style("stroke", function(d){return domain_col(domains.indexOf(data.data.Domain[d[0]]))});
 
-      // heatmap for non zero overlap
-      var heatMap = svg.append("g").attr("class", "cell heatmapcell")
-                    .selectAll("rect.cell").data(data.data.gso).enter()
-                    .append("rect")
-                    .attr("width", cellsize-1).attr("height", cellsize-1)
-                    .attr('x', function(d){return data.data.order.alph[d[0]]*cellsize})
-                    .attr('y', function(d){return data.data.order.alph[d[1]]*cellsize})
-                    .attr('fill', function(d){if(d[2]==-1){return "grey";}else{return colorScale(d[2])}});
+		// top SNP
+		svg.selectAll(".dot").data(tmpdata).enter()
+			.append("circle")
+			.attr("cx", function(d){return x(d[4])})
+			.attr("cy", function(d){return y(data.data.Trait[d[0]])+y.rangeBand()*0.5})
+			.attr("r", function(d){return -Math.log10(d[5])/maxP*(cellheight*0.85/2-3)+3;})
+			.style("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d[0]]))});
+		svg.selectAll(".rsID").data(tmpdata).enter()
+			.append("text")
+			.attr("x", function(d){return x(d[4])})
+			.attr("y", function(d){return y(data.data.Trait[d[0]])+3})
+			.text(function(d){return d[2]})
+			.attr("text-anchor", "start")
+			.attr("font-size", "9.5px");
 
-      // n genes bar plot
-      var x = d3.scale.linear().range([(cellsize+1)*n+space, width]);
-      var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(3);
-      x.domain([0, d3.max(data.data.ngs, function(d){return d[1]})]);
-
-      var barPlot = svg.append("g").attr("class", "bar")
-                    .selectAll("bar").data(data.data.ngs).enter()
-                    .append("rect")
-                    .attr("width", function(d){return x(d[1])-x(0)})
-                    .attr("height", cellsize-1)
-                    .attr("x", (cellsize+1)*n+space)
-                    .attr("y", function(d){return data.data.order.alph[d[0]]*cellsize})
-                    .attr("fill", "skyblue");
-      var barText = svg.append("g")
-                    .selectAll("bar.text").data(data.data.ngs).enter()
-                    .append("text")
-                    .attr("x", function(d){return x(d[1])})
-                    .attr("y", function(d){return data.data.order.alph[d[0]]*cellsize+cellsize/2})
-                    .text(function(d){return d[1];})
-                    .style("text-anchor", "start")
-                    .style("font-size", "10px");
-      svg.append('g').attr("class", "x axis")
-          .attr("transform", "translate(0,"+height+")")
-          .call(xAxis).selectAll("text")
-          .attr("transform", "translate(-12, 3)rotate(-60)")
-          .style("text-anchor", "end");
-
-
-      // reordering labels
-      function sortOptions(type){
-        if(type == "alph"){
-          heatMap.transition().duration(1000)
-            .attr("x", function(d){return data.data.order.alph[d[0]]*cellsize})
-            .attr("y", function(d){return data.data.order.alph[d[1]]*cellsize});
-          barPlot.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.alph[d[0]]*cellsize});
-          barText.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.alph[d[0]]*cellsize+cellsize/2});
-          rowLabels.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;});
-          colLabels.transition().duration(1000)
-          .attr("transform", function(d){
-            return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
-          });
-        }else if(type == "domain"){
-          heatMap.transition().duration(1000)
-            .attr("x", function(d){return data.data.order.domain[d[0]]*cellsize})
-            .attr("y", function(d){return data.data.order.domain[d[1]]*cellsize});
-          barPlot.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.domain[d[0]]*cellsize});
-          barText.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.domain[d[0]]*cellsize+cellsize/2});
-          rowLabels.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.domain[d]*cellsize+(cellsize-1)/2;});
-          colLabels.transition().duration(1000)
-          .attr("transform", function(d){
-            return "translate("+(data.data.order.domain[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
-          });
-        }else if(type == "clst"){
-          heatMap.transition().duration(1000)
-            .attr("x", function(d){return data.data.order.clst[d[0]]*cellsize})
-            .attr("y", function(d){return data.data.order.clst[d[1]]*cellsize});
-          barPlot.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.clst[d[0]]*cellsize});
-          barText.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.clst[d[0]]*cellsize+cellsize/2});
-          rowLabels.transition().duration(1000)
-            .attr("y", function(d){return data.data.order.clst[d]*cellsize+(cellsize-1)/2;});
-          colLabels.transition().duration(1000)
-          .attr("transform", function(d){
-            return "translate("+(data.data.order.clst[d]*cellsize+(cellsize-1)/2)+",0)rotate(-60)";
-          });
-        }
-      }
-
-      d3.select('#orderHeat').on("change", function(){
-        var type = $('#orderHeat').val();
-        sortOptions(type);
-      })
-    }
-  });
+		svg.append("g").attr("class", "x axis")
+			.attr("transform", "translate(0,"+height+")").call(xAxis);
+		svg.append("g").attr("class", "y axis").call(yAxis)
+			.selectAll('text').style('font-size', '11px');
+		svg.append("text").attr("text-anchor", "middle")
+			.attr("transform", "translate("+width/2+","+(height+35)+")")
+			.text("Chromosome "+tmpdata[0][3]);
+	}
 }

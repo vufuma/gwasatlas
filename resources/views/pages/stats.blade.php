@@ -14,59 +14,108 @@
 <script type="text/javascript" src="//d3js.org/queue.v1.min.js"></script>
 <meta name="csrf-token" content="{{ csrf_token() }}"/>
 <script type="text/javascript">
-  $.ajaxSetup({
-    headers: {'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')}
-  });
-  var subdir = "{{ Config::get('app.subdir') }}";
+	$.ajaxSetup({
+		headers: {'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')}
+	});
+	var subdir = "{{ Config::get('app.subdir') }}";
 </script>
+<script type="text/javascript" src="{!! URL::asset('js/odometer.min.js') !!}"></script>
 <script type="text/javascript" src="{!! URL::asset('js/stats.js') !!}"></script>
+<link rel="stylesheet" href="{!! URL::asset('css/odometer-theme-default.css') !!}">
 <link rel="stylesheet" href="{!! URL::asset('css/style.css') !!}">
 @stop
 
 @section('content')
-<div style="padding:50px;">
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title"><a data-toggle="collapse" href="#PhePanel">Phenotypes in GWAS ATLAS</a></h4>
-    </div>
-    <div id="PhePanel" class="panel-collapse collapse in">
-      <br/>
-      <div class="row">
-        <div class="col-md-4 col-sm-4 col-xs-4" style="text-align: center;">
-          <h4>Domain</h4>
-          <div id="DomainPlot"></div>
-        </div>
-        <div class="col-md-4 col-sm-4 col-xs-4" style="text-align: center;">
-          <h4>Chapter level</h4>
-          <div id="ChapterPlot"></div>
-        </div>
-        <div class="col-md-4 col-sm-4 col-xs-4" style="text-align: center;">
-          <h4>Subchapter level</h4>
-          <div id="SubchapterPlot"></div>
-        </div>
-      </div>
-      <br/>
-    </div>
-  </div>
+<div style="padding-top: 50px; padding-right: 50px; padding-left: 50px;">
+	<div class="row">
+		<div class="col-md-4 col-sm-4 col-xs-4">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">Database Summary</h4>
+				</div>
+				<div class="panel-body" style="height: 380px;">
+					<div class="row" style="padding-top:30px;">
+						<div class="col-md-6 col-sm-6 col-xs-6" style="text-align:center; padding:20px;">
+							<div id="totalGWAS" class="odometer" style="font-size:35px;"></div><br/>
+							<span style="font-size:20px;">GWAS</span>
+						</div>
+						<div class="col-md-6 col-sm-6 col-xs-6" style="text-align:center; padding:20px;">
+							<div id="uniqTrait" class="odometer" style="font-size:35px;"></div><br/>
+							<span style="font-size:20px;">Unique Traits</span>
+						</div>
+					</div>
+					<div class="row" style="padding-top:30px;">
+						<div class="col-md-6 col-sm-6 col-xs-6" style="text-align:center; padding:20px;">
+							<div id="uniqStudy" class="odometer" style="font-size:35px;"></div><br/>
+							<span style="font-size:20px;">Unique Studies</span>
+						</div>
+						<div class="col-md-6 col-sm-6 col-xs-6" style="text-align:center; padding:20px;">
+							<div id="uniqDomain" class="odometer" style="font-size:35px;"></div><br/>
+							<span style="font-size:20px;">Domains</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-8 col-sm-8 col-xs-8">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">Summary by Published Year</h4>
+				</div>
+				<div class="panel-body" style="height: 380px; overflow-x: auto;">
+					<div id="yearSumPlot" style="text-align: center;">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title"><a data-toggle="collapse" href="#NsampleYearPanel">Smple size per year</a></h4>
-    </div>
-    <div id="NsampleYearPanel" class="panel-collapse collapse in">
-      <div id="NsampleYearPlot" style="text-align: center;">
-      </div>
-    </div>
-  </div>
+	<div class="row">
+		<div class="col-md-4 col-sm-4 col-xs-4">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">Domain Distribution (per study)</h4>
+				</div>
+				<div class="panel-body" style="height: 400px; overflow: auto;">
+					<div id="DomainPie" style="text-align: center;">
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4 col-sm-4 col-xs-4">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">Chapter Distribution (per study)</h4>
+				</div>
+				<div class="panel-body" style="height: 400px; overflow: auto;">
+					<div id="ChapterPie" style="text-align: center;">
+						Click one of the domains from the left pie chart.
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4 col-sm-4 col-xs-4">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">Sub-chapter Distribution (per study)</h4>
+				</div>
+				<div class="panel-body" style="height: 400px; overflow: auto;">
+					<div id="SubchapterPie" style="text-align: center;">
+						Click one of the chapters from the left pie chart.
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title"><a data-toggle="collapse" href="#NsampleDomainPanel">Smple size per domain</a></h4>
-    </div>
-    <div id="NsampleDomainPanel" class="panel-collapse collapse in">
-      <div id="NsampleDomainPlot" style="text-align: center;">
-      </div>
-    </div>
-  </div>
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4 class="panel-title">Summary by Domain</h4>
+		</div>
+		<div class="panel-body">
+			<div id="domainSumPlot" style="text-align: center;">
+			</div>
+		</div>
+	</div>
 </div>
 @stop

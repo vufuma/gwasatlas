@@ -21,10 +21,10 @@
 <script type="text/javascript" src="//d3js.org/queue.v1.min.js"></script>
 <meta name="csrf-token" content="{{ csrf_token() }}"/>
 <script type="text/javascript">
-  $.ajaxSetup({
-    headers: {'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')}
-  });
-  var subdir = "{{ Config::get('app.subdir') }}";
+	$.ajaxSetup({
+		headers: {'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')}
+	});
+	var subdir = "{{ Config::get('app.subdir') }}";
 </script>
 <script type="text/javascript" src="{!! URL::asset('js/multiGWAS.js') !!}"></script>
 <script type="text/javascript" src="{!! URL::asset('js/sidebar.js') !!}"></script>
@@ -32,110 +32,192 @@
 @stop
 
 @section('content')
-<div id="wrapper" class="active">
-  <!-- Side bar -->
-  <div id="sidebar-wrapper">
-    <ul class="sidebar-nav" id="sidebar-menu">
-      <li class="sidebar-brand"><a id="menu-toggle"><tab><i id="main_icon" class="fa fa-chevron-left"></i></a></li>
-    </ul>
-    <ul class="sidebar-nav" id="sidebar">
-      <li><a href="#GC">Generic Correlation<i class="sub_icon fa fa-bar-chart"></i></a></li>
-      <li><a href="#magmagenes">MAGMA genes<i class="sub_icon fa fa-bar-chart"></i></a></li>
-      <li><a href="#magmaGS">MAGMA gene-set<i class="sub_icon fa fa-area-chart"></i></a></li>
-    </ul>
-  </div>
+<div style="padding-top: 50px; padding-right: 50px; padding-left: 50px;">
+	<!-- GWAS selectionz -->
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4 class="panel-title">Select GWAS</h4>
+		</div>
+		<div class="panel-body">
+			<div class="container">
+				Filter GWAS<br/>
+				<strong>By trait categories</strong><br/>
+				<div class="row">
+					<div class="col-md-4 col-sm-4 col-xs-4">
+						Domain:<br/>
+						<select class="selectpicker" name="Domain" id="Domain" onchange='Selection("Domain");'>
+							<option value=null>-- Please select Domain of interest --</option>
+						</select>
+					</div>
+					<div class="col-md-4 col-sm-4 col-xs-4">
+						Chapter level:<br/>
+						<select class="selectpicker" name="Chapter" id="Chapter" onchange='Selection("Chapter");'>
+							<option value=null>-- Please select Chapter of interest --</option>
+						</select>
+					</div>
+					<div class="col-md-4 col-sm-4 col-xs-4">
+						Subchapter level:<br/>
+						<select class="selectpicker" name="Subchapter" id="Subchapter" onchange='Selection("Subchapter");'>
+							<option value=null>-- Please select Subchapter of interest --</option>
+						</select>
+					</div>
+				</div>
+				<br/>
+				<span class="form-inline">
+					<strong>By trait</strong><br/>
+					<select class="selectpicker" data-width="75%" name="Trait" id="Trait" onchange='Selection("Trait");'>
+						<option value=null>-- Please select Domain of interest --</option>
+					</select><br/>
+				</span>
+				<br/>
+				<span class="form-inline">
+					<strong>By published year</strong><br/>
+					From <input type="number" class="form-control" id="yearFrom" name="yearFrom" onkeydown="SelectEnter(this)">
+					to <input type="number" class="form-control" id="yearTo" name="yearTo" onkeydown="SelectEnter(this)">
+				</span>
+				<br/><br/>
+				<span class="form-inline">
+					<strong>By total sample size</strong><br/>
+					Minimum: <input type="number" class="form-control" id="nMin" name="nMin" onkeydown="SelectEnter(this)">
+					Maximum: <input type="number" class="form-control" id="nMax" name="nMax" onkeydown="SelectEnter(this)">
+				</span>
+				<br/>
+			</div>
 
-  <!-- Page content -->
-  <div id="page-content-wrapper">
-    <div class="page-content inset">
-      <!-- Phenotype selector (shonw in all panels) -->
-      <div style="padding: 50px">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h4 class="panel-title"><a data-toggle="collapse" href="#selector">Select GWAS</a></h4>
-          </div>
-          <div id="selector" class="panel-collapse collapse in container">
-            <br/>
-            <strong>Phenotype filtering</strong><br/>
-            <div class="row">
-              <div class="col-md-3">
-                Domain:<br/>
-                <select class="selectpicker" name="Domain" id="Domain" onchange='Selection("Domain");'>
-                  <option value=null>-- Please select Domain of interest --</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                Chapter level:<br/>
-                <select class="selectpicker" name="Chapter" id="Chapter" onchange='Selection("Chapter");'>
-                  <option value=null>-- Please select Chapter of interest --</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                Subchapter level:<br/>
-                <select class="selectpicker" name="Subchapter" id="Subchapter" onchange='Selection("Subchapter");'>
-                  <option value=null>-- Please select Subchapter of interest --</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                Trait:<br/>
-                <select class="selectpicker" name="Trait" id="Trait" onchange='Selection("Trait");'>
-                  <option value=null>-- Please select Trait of interest --</option>
-                </select>
-              </div>
-            </div>
-            <br/>
-            <span class="form-inline">
-              <strong>Year</strong><br/>
-              From <input type="number" class="form-control" id="yearFrom" name="yearFrom" onkeydown="SelectEnter(this)">
-              to <input type="number" class="form-control" id="yearTo" name="yearTo" onkeydown="SelectEnter(this)">
-            </span>
-            <br/><br/>
-            <span class="form-inline">
-              <strong>Total sample size</strong><br/>
-              Minimum: <input type="number" class="form-control" id="nMin" name="nMin" onkeydown="SelectEnter(this)">
-              Maximum: <input type="number" class="form-control" id="nMax" name="nMax" onkeydown="SelectEnter(this)">
-            </span>
-            <br/><br/>
-            <table id="selectTable" class="display compact dt-body-right dt-head-center" width="100%" cellspacing="0" style="display: block; overflow-x: auto; font-size:12px;">
-              <thead>
-                <th>ID</th>
-                <th>PMID</th>
-                <th>Year</th>
-                <th>Domain</th>
-                <th>Chapter level</th>
-                <th>Subchapter level</th>
-                <th>Trait</th>
-                <th>Population</th>
-                <th>Case</th>
-                <th>Control</th>
-                <th>N</th>
-              </thead>
-            </table>
-            <br/>
-
-          </div>
-        </div>
-
-        <!-- <div class="panel panel-default">
-          <div class="panel-heading">
-            <h4 class="panel-title"><a data-toggle="collapse" href="#selected">Selected GWAS</a></h4>
-          </div>
-          <div id="selected" class="panel-collapse collapse in container">
-            <br/>
-            <div id="selectedGWAS">
-            </div>
-            <br/>
-            <button class="btn btn-xs" id="updatePlot">Update Plots</button>
-            <button class="btn btn-xs" id="delGWAS">Delete checked GWAS</button>
-            <br/><br/>
-          </div>
-        </div> -->
-        <button class="btn btn-xs" id="updatePlot">Update Plots</button><br/><br/>
-        <div id="panel">
-        </div>
-      </div>
-    </div>
-  </div>
+			<div class="row" style="padding:25px;">
+				<!-- <div class="col-md-8 col-sm-8 col-xs-8"> -->
+					<!-- <span class="info" style="font-size:14px;"><i class="fa fa-info"></i>
+						Click row to select a GWAS or
+					</span>
+					<button class="btn btn-sm">select all GWAS in the table</button><br/> -->
+					<table id="selectTable" class="display compact dt-body-right dt-head-center" width="90%" cellspacing="0" style="display: block; overflow-x: auto; font-size:12px;">
+						<thead>
+							<th>ID</th>
+							<th>PMID</th>
+							<th>Year</th>
+							<th>Domain</th>
+							<th>Chapter level</th>
+							<th>Subchapter level</th>
+							<th>Trait</th>
+							<th>Population</th>
+							<th>N</th>
+						</thead>
+					</table>
+				<!-- </div> -->
+				<!-- <div class="col-md-4 col-sm-4 col-xs-4">
+					Selected GWAS<br/>
+					<textarea rows="20" cols="50"></textarea>
+				</div> -->
+			</div>
+			<button class="btn" id="processGWAS">Compare displayed GWAS</button>
+			<div id="msg"></div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-4 col-sm-4 col-xs-4">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">Summary of selected GWAS</h4>
+				</div>
+				<div class="panel-body col4BoxBody" id="sumBody" style="text-align:center; overfloat:auto;">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4 col-sm-4 col-xs-4">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">Year vs Sample size</h4>
+				</div>
+				<div class="panel-body col4BoxBody" id="yearVSnBody" style="text-align:center; overfloat:auto;">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4 col-sm-4 col-xs-4">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">Number of risk loci vs Sample size</h4>
+				</div>
+				<div class="panel-body col4BoxBody" id="lociVSnBody" style="text-align:center; overfloat:auto;">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-4 col-sm-4 col-xs-4">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">SNP heritability vs Sample size</h4>
+				</div>
+				<div class="panel-body col4BoxBody" id="h2VSnBody" style="text-align:center; overfloat:auto;">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4 col-sm-4 col-xs-4">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">SNP heritability vs Number of risk loci</h4>
+				</div>
+				<div class="panel-body col4BoxBody" id="h2VSlociBody" style="text-align:center; overfloat:auto;">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4 col-sm-4 col-xs-4">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">Domain Color-code</h4>
+				</div>
+				<div class="panel-body col4BoxBody" id="colorBody" style="text-align:center; overfloat:auto;">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row" id="gc_magma_row">
+		<div class="col-md-6 col-sm-6 col-xs-6" id="gcCol">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">Genetic Correlation</h4>
+				</div>
+				<div class="panel-body col6BoxBody" id="gcBody" style="overflow: auto;">
+					<div>
+						<span class="form-inline">Sort traits by:
+							<select id="gcOrder" class="forn-control">
+								<option value="alph">Alphabetically</option>
+								<option value="domain">Domain</option>
+								<option value="clst">Cluster</option>
+							</select>
+						</span>
+					</div>
+					<div id="gcPlot" style="text-align:center;"></div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6 col-sm-6 col-xs-6" id="magmaCol">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">MAGMA genes overlap</h4>
+				</div>
+				<div class="panel-body col6BoxBody" id="magmaBody" style="overflow: auto;">
+					<div>
+						<span class="form-inline">Sort traits by:
+							<select id="magmaOrder" class="forn-control">
+								<option value="alph">Alphabetically</option>
+								<option value="domain">Domain</option>
+								<option value="clst">Cluster</option>
+							</select>
+						</span>
+					</div>
+					<div id="magmaPlot" style="text-align:center;"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4 class="panel-title">Genomic risk loci</h4>
+		</div>
+		<div class="panel-body" id="riskLociOverBody" style="text-align:center;">
+		</div>
+	</div>
 </div>
 
 @stop

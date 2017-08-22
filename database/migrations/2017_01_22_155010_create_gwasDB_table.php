@@ -18,6 +18,7 @@ class CreateGwasDBTable extends Migration
             $table->integer('Year');
             $table->string('File');
             $table->string('Website');
+			$table->string('Consortium');
             $table->string('Domain');
             $table->string('ChapterLevel');
             $table->string('SubchapterLevel');
@@ -31,6 +32,7 @@ class CreateGwasDBTable extends Migration
             $table->integer('Nhits');
             $table->float('SNPh2');
             $table->float('SNPh2_se');
+			$table->float('SNPh2_z');
             $table->float('LambdaGC');
             $table->float('Chi2');
             $table->float('Intercept');

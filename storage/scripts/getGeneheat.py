@@ -47,17 +47,19 @@ c = conn.cursor()
 genes = []
 
 with open(datadir+"/magma.sig.genes", 'r') as fin:
-    fin.readline()
-    for l in fin:
-        l = l.strip().split()
-        if int(l[0]) not in ids:
-            continue
-        g = l[1].split(":")
-        if len(g) > 0:
-            genes.append(g)
-        else:
-            genes.append([])
-    fin.close()
+	fin.readline()
+	for l in fin:
+		l = l.strip().split("\t")
+		if int(l[0]) not in ids:
+			continue
+		if len(l) < 2:
+			genes.append([])
+		else:
+			g = l[1].split(":")
+			if len(g) > 0:
+				genes.append(g)
+			else:
+				genes.append([])
 
 ## n genes
 ng = []
@@ -90,12 +92,12 @@ for i in range(0,len(ids)):
 mat = np.array(mat)
 
 ## get trait and domain info
-c.execute('SELECT id,Domain,Trait from gwasDB');
+c.execute('SELECT id,Domain,Trait,Year from gwasDB');
 rows = c.fetchall()
 traits = []
 for r in rows:
     if int(r[0]) in ids:
-        traits.append(list(r))
+        traits.append([r[0], r[1], r[2], str(r[0])+": "+r[2]+" ("+str(r[3])+")"])
 
 traits = np.array(traits)
 
@@ -121,7 +123,7 @@ domain = {}
 trait = {}
 for l in traits:
     domain[str(int(l[0]))]=l[1]
-    trait[str(int(l[0]))]=l[2]
+    trait[str(int(l[0]))]=l[3]
 
 ## return nested json
 data = {"data":{"id":ids, "Domain":domain, "Trait":trait, "go":go, "ng":ng, "order":{"alph":otrait, "domain":odomain, "clst": oclst}}}
