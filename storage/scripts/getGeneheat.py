@@ -45,47 +45,44 @@ c = conn.cursor()
 
 ## get sig genes
 genes = []
-
+inids = []
 with open(datadir+"/magma.sig.genes", 'r') as fin:
 	fin.readline()
 	for l in fin:
 		l = l.strip().split("\t")
 		if int(l[0]) not in ids:
 			continue
-		if len(l) < 2:
-			genes.append([])
-		else:
+		if len(l) >= 2:
 			g = l[1].split(":")
 			if len(g) > 0:
+				inids.append(int(l[0]))
 				genes.append(g)
-			else:
-				genes.append([])
 
 ## n genes
 ng = []
-for i in range(0, len(ids)):
-    ng.append([ids[i], len(genes[i])])
+for i in range(0, len(inids)):
+    ng.append([inids[i], len(genes[i])])
 
 ## create matrix for hierarchical clustering
 go = []
 mat = []
-for i in range(0,len(ids)):
+for i in range(0,len(inids)):
     row = []
     if len(genes[i]) == 0:
-        row = [0]*len(ids)
-        for j in range(0,len(ids)):
-            go.append([ids[i], ids[j], -1])
+        row = [0]*len(inids)
+        for j in range(0,len(inids)):
+            go.append([inids[i], inids[j], -1])
     else:
-        for j in range(0,len(ids)):
+        for j in range(0,len(inids)):
             if i==j:
                 row.append(1)
-                go.append([ids[i], ids[j], 1])
+                go.append([inids[i], inids[j], 1])
             elif len(genes[j])==0:
                 row.append(0)
-                go.append([ids[i], ids[j], -1])
+                go.append([inids[i], inids[j], -1])
             else:
                 n = len(ArrayIn(np.array(genes[i]), np.array(genes[j])))
-                go.append([ids[i], ids[j], float(n)/float(len(genes[j]))])
+                go.append([inids[i], inids[j], float(n)/float(len(genes[j]))])
                 row.append(float(n)/float(len(genes[j])))
     mat.append(row)
 
@@ -96,7 +93,7 @@ c.execute('SELECT id,Domain,Trait,Year from gwasDB');
 rows = c.fetchall()
 traits = []
 for r in rows:
-    if int(r[0]) in ids:
+    if int(r[0]) in inids:
         traits.append([r[0], r[1], r[2], str(r[0])+": "+r[2]+" ("+str(r[3])+")"])
 
 traits = np.array(traits)
@@ -113,10 +110,10 @@ odomain = {}
 trait = list(np.argsort(traits[:,2]))
 otrait = {}
 
-for i in range(0,len(ids)):
-    oclst[str(int(ids[int(clst[i])]))] = i
-    odomain[str(int(ids[domain[i]]))] = i
-    otrait[str(int(ids[trait[i]]))] = i
+for i in range(0,len(inids)):
+    oclst[str(int(inids[int(clst[i])]))] = i
+    odomain[str(int(inids[domain[i]]))] = i
+    otrait[str(int(inids[trait[i]]))] = i
 
 ## domain and trait name
 domain = {}
@@ -126,5 +123,5 @@ for l in traits:
     trait[str(int(l[0]))]=l[3]
 
 ## return nested json
-data = {"data":{"id":ids, "Domain":domain, "Trait":trait, "go":go, "ng":ng, "order":{"alph":otrait, "domain":odomain, "clst": oclst}}}
+data = {"data":{"id":inids, "Domain":domain, "Trait":trait, "go":go, "ng":ng, "order":{"alph":otrait, "domain":odomain, "clst": oclst}}}
 print json.dumps(data)

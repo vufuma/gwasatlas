@@ -46,8 +46,6 @@ h2_idx = getH2idx(indata[:,4].astype(str))
 # year vs sample size
 if max(indata[:,1].astype(int))-min(indata[:,1].astype(int)) > 0:
 	out['yearVSn'] = getLinReg(indata[:,1].astype(int), indata[:,2].astype(float))
-	with open("/media/sf_Documents/VU/Data/WebApp/tmp.txt", 'w') as o:
-		o.write("\n".join(indata[:,1].astype(str)))
 
 # risk loci vs sample size
 out['lociVSn'] = getLinReg(indata[:,3].astype(int), indata[:,2].astype(float))

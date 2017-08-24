@@ -508,16 +508,12 @@ class DBController extends Controller
 		// Exclude same trait
 		$exc_ids = [];
 		if($excSamePhe=="true"){
-			file_put_contents("/media/sf_Documents/VU/Data/WebApp/tmp.txt", $excSamePhe."\n", FILE_APPEND);
 			$trait = collect(DB::select('SELECT Trait FROM gwasDB WHERE id=?', [$id]))->first();
 			$trait = $trait->Trait;
-			file_put_contents("/media/sf_Documents/VU/Data/WebApp/tmp.txt", $trait."\n", FILE_APPEND);
 			$trait = preg_replace("/(.+) \(.+\)/", "$1", $trait);
 			$tmp = DB::select('SELECT id FROM gwasDB WHERE Trait=? OR Trait LIKE '."'$trait (%'", [$trait]);
-			file_put_contents("/media/sf_Documents/VU/Data/WebApp/tmp.txt", count($tmp)."\n", FILE_APPEND);
 			foreach($tmp as $row){
 				$exc_ids[] = $row->id;
-				file_put_contents("/media/sf_Documents/VU/Data/WebApp/tmp.txt", $row->id."\n", FILE_APPEND);
 			}
 		}
 

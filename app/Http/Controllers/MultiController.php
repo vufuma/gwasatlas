@@ -48,6 +48,7 @@ class MultiController extends Controller
 		}
 
 		$script = storage_path().'/scripts/getPlotCor.py';
+		file_put_contents("/media/sf_Documents/VU/Data/WebApp/tmp.txt", json_encode(['data'=>$tmpdata]));
 		$plotCor = shell_exec("python $script '".json_encode(['data'=>$tmpdata])."'");
 		if($plotCor == ""){$plotCor = [];}
 		else{$plotCor = json_decode($plotCor);}

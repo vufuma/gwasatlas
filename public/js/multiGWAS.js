@@ -166,9 +166,11 @@ function displayData(ids){
 	$('#lociVSnBody').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
 	$('#h2VSnBody').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
 	$('#h2VSlociBody').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
+	$('#colorBody').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
 	$('#gcPlot').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
 	$('#magmaPlot').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
-	$('#riskLociOverBody').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
+	$('#lociPlot').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
+	$('#lousPlot').html("");
 
 	$.ajax({
 		url: subdir+"/multiGWAS/getData",
@@ -505,7 +507,7 @@ function corPlot(data, cor){
 	svg.append("g").attr("class", "y axis").call(yAxis);
 	svg.append("text").attr("text-anchor", "middle")
 		.attr("transform", "translate("+width/2+","+(height+30)+")")
-		.text("Number of risk loci")
+		.text("SNP h2")
 		.attr("font-size", "11px");
 	svg.append("text").attr("text-anchor", "middle")
 		.attr("transform", "translate(-35,"+(height/2)+")rotate(-90)")
@@ -538,7 +540,7 @@ function gcPlot(data){
 			}
 		});
 
-		var margin = {top: maxTrait*5, right: 100, bottom: 50, left: maxTrait*5.5},
+		var margin = {top: maxTrait*5+5, right: 100, bottom: 50, left: maxTrait*5.5+5},
 			width = cellsize*n,
 			height = cellsize*n;
 		var svg = d3.select('#gcPlot').append('svg')
@@ -572,7 +574,7 @@ function gcPlot(data){
 		var rowLabels = svg.append("g").selectAll(".rowLabel")
 			.data(ids).enter().append("text")
 			.text(function(d){return data.data.Trait[d];})
-			.attr("x", -3)
+			.attr("x", -7)
 			.attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;})
 			.style("font-size", "10px")
 			.style("text-anchor", "end")
@@ -584,7 +586,7 @@ function gcPlot(data){
 			.style("text-anchor", "start")
 			.style("font-size", "10px")
 			.attr("transform", function(d){
-				return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
+				return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",-7)rotate(-60)";
 			});
 
 		// heatmap for significant rg
@@ -617,6 +619,24 @@ function gcPlot(data){
 			.attr("x", function(d){return data.data.order.alph[d[0]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)})
 			.attr("y", function(d){return data.data.order.alph[d[1]]*cellsize+((1-sizeScale(d[3]))/2)*(cellsize-1)})
 			.attr('fill', function(d){return colorScale(d[2])});
+		// Domain labels col
+		var colDomain = svg.append("g").attr("class", "colDomain")
+			.selectAll("rect.colDomain").data(data.data.id).enter()
+			.append("rect")
+			.attr('x', function(d){return data.data.order.alph[d]*cellsize})
+			.attr('y', -4)
+			.attr("width", cellsize-1)
+			.attr("height", 3)
+			.attr("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d]))});
+		// Domain labels row
+		var rowDomain = svg.append("g").attr("class", "rowDomain")
+			.selectAll("rect.rowDomain").data(data.data.id).enter()
+			.append("rect")
+			.attr('x', -4)
+			.attr('y', function(d){return data.data.order.alph[d]*cellsize})
+			.attr("width", 3)
+			.attr("height", cellsize-1)
+			.attr("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d]))});
 
 		// reordering labels
 		function sortOptions(type){
@@ -636,6 +656,10 @@ function gcPlot(data){
 					.attr("transform", function(d){
 						return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
 					});
+				colDomain.transition().duration(1000)
+					.attr("x", function(d){return data.data.order.alph[d]*cellsize});
+				rowDomain.transition().duration(1000)
+					.attr("y", function(d){return data.data.order.alph[d]*cellsize});
 			}else if(type == "domain"){
 				heatMapSig.transition().duration(1000)
 					.attr("x", function(d){return data.data.order.domain[d[0]]*cellsize})
@@ -652,6 +676,10 @@ function gcPlot(data){
 					.attr("transform", function(d){
 						return "translate("+(data.data.order.domain[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
 					});
+				colDomain.transition().duration(1000)
+					.attr("x", function(d){return data.data.order.domain[d]*cellsize});
+				rowDomain.transition().duration(1000)
+					.attr("y", function(d){return data.data.order.domain[d]*cellsize});
 			}else if(type == "clst"){
 				heatMapSig.transition().duration(1000)
 					.attr("x", function(d){return data.data.order.clst[d[0]]*cellsize})
@@ -668,6 +696,10 @@ function gcPlot(data){
 					.attr("transform", function(d){
 						return "translate("+(data.data.order.clst[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
 					});
+				colDomain.transition().duration(1000)
+					.attr("x", function(d){return data.data.order.clst[d]*cellsize});
+				rowDomain.transition().duration(1000)
+					.attr("y", function(d){return data.data.order.clst[d]*cellsize});
 			}
 		}
 
@@ -710,14 +742,14 @@ function magmaPlot(data){
 
 		var barWidth = 50;
 		var space = 5;
-		var margin = {top: maxTrait*5, right: 100, bottom: 50, left: maxTrait*5.5},
+		var margin = {top: maxTrait*5+5, right: 100, bottom: 50, left: maxTrait*5.5+5},
 			width = cellsize*n+space+barWidth,
 			height = cellsize*n;
 		var svg = d3.select('#magmaPlot').append('svg')
 			.attr("width", width+margin.left+margin.right)
 			.attr("height", height+margin.top+margin.bottom)
 			.append("g").attr("transform", "translate("+margin.left+","+margin.top+")");
-		var colorScale = d3.scale.linear().domain([0, 1]).range(["#fff", "#b30000"]);
+		var colorScale = d3.scale.linear().domain([0, 0.5, 1]).range(["#fff", "#ffba70", "#b30000"]);
 		// var sizeScale = d3.scale.linear().domain([0.05, 1]).range([1, 0]);
 
 		// legened
@@ -744,7 +776,7 @@ function magmaPlot(data){
 		var rowLabels = svg.append("g").selectAll(".rowLabel")
 			.data(ids).enter().append("text")
 			.text(function(d){return data.data.Trait[d];})
-			.attr("x", -3)
+			.attr("x", -7)
 			.attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;})
 			.style("font-size", "10px")
 			.style("text-anchor", "end")
@@ -756,7 +788,7 @@ function magmaPlot(data){
 			.style("text-anchor", "start")
 			.style("font-size", "10px")
 			.attr("transform", function(d){
-				return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
+				return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",-7)rotate(-60)";
 			});
 
 		// heatmap for non zero overlap
@@ -767,6 +799,25 @@ function magmaPlot(data){
 			.attr('x', function(d){return data.data.order.alph[d[0]]*cellsize})
 			.attr('y', function(d){return data.data.order.alph[d[1]]*cellsize})
 			.attr('fill', function(d){if(d[2]==-1){return "grey";}else{return colorScale(d[2])}});
+
+		// Domain labels col
+		var colDomain = svg.append("g").attr("class", "colDomain")
+			.selectAll("rect.colDomain").data(data.data.id).enter()
+			.append("rect")
+			.attr('x', function(d){return data.data.order.alph[d]*cellsize})
+			.attr('y', -4)
+			.attr("width", cellsize-1)
+			.attr("height", 3)
+			.attr("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d]))});
+		// Domain labels row
+		var rowDomain = svg.append("g").attr("class", "rowDomain")
+			.selectAll("rect.rowDomain").data(data.data.id).enter()
+			.append("rect")
+			.attr('x', -4)
+			.attr('y', function(d){return data.data.order.alph[d]*cellsize})
+			.attr("width", 3)
+			.attr("height", cellsize-1)
+			.attr("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d]))});
 
 		// n genes bar plot
 		var x = d3.scale.linear().range([cellsize*n+space, width]);
@@ -814,6 +865,10 @@ function magmaPlot(data){
 					.attr("transform", function(d){
 						return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
 					});
+				colDomain.transition().duration(1000)
+					.attr("x", function(d){return data.data.order.alph[d]*cellsize});
+				rowDomain.transition().duration(1000)
+					.attr("y", function(d){return data.data.order.alph[d]*cellsize});
 			}else if(type == "domain"){
 				heatMap.transition().duration(1000)
 					.attr("x", function(d){return data.data.order.domain[d[0]]*cellsize})
@@ -828,6 +883,10 @@ function magmaPlot(data){
 					.attr("transform", function(d){
 						return "translate("+(data.data.order.domain[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
 					});
+				colDomain.transition().duration(1000)
+					.attr("x", function(d){return data.data.order.domain[d]*cellsize});
+				rowDomain.transition().duration(1000)
+					.attr("y", function(d){return data.data.order.domain[d]*cellsize});
 			}else if(type == "clst"){
 				heatMap.transition().duration(1000)
 					.attr("x", function(d){return data.data.order.clst[d[0]]*cellsize})
@@ -842,6 +901,10 @@ function magmaPlot(data){
 					.attr("transform", function(d){
 						return "translate("+(data.data.order.clst[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
 					});
+				colDomain.transition().duration(1000)
+					.attr("x", function(d){return data.data.order.clst[d]*cellsize});
+				rowDomain.transition().duration(1000)
+					.attr("y", function(d){return data.data.order.clst[d]*cellsize});
 			}
 		}
 
@@ -853,7 +916,8 @@ function magmaPlot(data){
 }
 
 function lociOver(data){
-	$('#riskLociOverBody').html('<div id="lociPlot"></div><div id="locusPlot"></div>');
+	$('#lociPlot').html("");
+	$('#locusPlot').html("");
 	var chromSize = [249250621, 243199373, 198022430, 191154276, 180915260, 171115067,
 		159138663, 146364022, 141213431, 135534747, 135006516, 133851895, 115169878, 107349540,
 		102531392, 90354753, 81195210, 78077248, 63025520, 59128983, 48129895, 51304566, 155270560];
@@ -996,12 +1060,13 @@ function lociOver(data){
 			cellheight = 15;
 		}
 
-		var margin = {top:30, right: 30, bottom:50, left:maxTrait*5.5},
+		var margin = {top:30, right: 50, bottom:50, left:maxTrait*5.5},
 			width = 500,
 			height = (cellheight)*ids.length;
 		if(height < 100){height = 100}
 
 		var maxP = d3.max(tmpdata, function(d){return -Math.log10(d[5])});
+		var minP = 8;
 		var maxX = d3.max(tmpdata, function(d){return d[7]});
 		var minX = d3.min(tmpdata, function(d){return d[6]});
 		var side = (maxX-minX)*0.1;
@@ -1017,6 +1082,48 @@ function lociOver(data){
 			.attr("height", height+margin.top+margin.bottom)
 			.append("g")
 			.attr("transform", "translate("+margin.left+","+margin.top+")");
+
+		// legend
+		var midP = (maxP+minP)/2;
+		svg.append("text")
+			.attr("x", width+18)
+			.attr("y", 0)
+			.text("-log10 P")
+			.attr("text-anchor", "middle")
+			.style("font-size", "10px");
+		svg.append("circle")
+			.attr("cx", width+13)
+			.attr("cy", 15)
+			.attr("r", Math.round(maxP)/maxP*(cellheight*0.85/2-3)+3)
+			.attr("fill", "grey")
+			.attr("oppacity", "0.8");
+		svg.append("text")
+			.attr("x", width+23)
+			.attr("y", 18)
+			.text(Math.round(maxP))
+			.style("font-size", "10px");
+		svg.append("circle")
+			.attr("cx", width+13)
+			.attr("cy", 32)
+			.attr("r", Math.round(midP)/maxP*(cellheight*0.85/2-3)+3)
+			.attr("fill", "grey")
+			.attr("oppacity", "0.8");
+		svg.append("text")
+			.attr("x", width+23)
+			.attr("y", 35)
+			.text(Math.round(midP))
+			.style("font-size", "10px");
+		svg.append("circle")
+			.attr("cx", width+13)
+			.attr("cy", 48)
+			.attr("r", Math.round(minP)/maxP*(cellheight*0.85/2-3)+3)
+			.attr("fill", "grey")
+			.attr("oppacity", "0.8");
+		svg.append("text")
+			.attr("x", width+23)
+			.attr("y", 51)
+			.text(Math.round(minP))
+			.style("font-size", "10px");
 
 		// line
 		svg.selectAll('.line').data(tmpdata).enter()

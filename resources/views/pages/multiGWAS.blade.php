@@ -215,7 +215,14 @@
 		<div class="panel-heading">
 			<h4 class="panel-title">Genomic risk loci</h4>
 		</div>
-		<div class="panel-body" id="riskLociOverBody" style="text-align:center;">
+		<div class="panel-body" id="riskLociOverBody">
+			<span class="info"><i class="fa fa-info"></i>
+				Each dot represents a group of risk loci (grouped physically overlapped risk loci).
+				The genome wide plot can be zoomed in and out by scroll.
+				By clicking a dot, another plot for a specific group of risk loci will be plotted (only if the number of GWAS in the grouped locus is > 1).
+			</span><br/>
+			<div id="lociPlot" style="text-align:center;"></div>
+			<div id="locusPlot" style="text-align:center;"></div>
 		</div>
 	</div>
 </div>
