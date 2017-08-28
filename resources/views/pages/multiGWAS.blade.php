@@ -74,12 +74,14 @@
 					<strong>By published year</strong><br/>
 					From <input type="number" class="form-control" id="yearFrom" name="yearFrom" onkeydown="SelectEnter(this)">
 					to <input type="number" class="form-control" id="yearTo" name="yearTo" onkeydown="SelectEnter(this)">
+					<span class="info"><i class="fa fa-info"></i> Press enter to update the table below.</span>
 				</span>
 				<br/><br/>
 				<span class="form-inline">
 					<strong>By total sample size</strong><br/>
 					Minimum: <input type="number" class="form-control" id="nMin" name="nMin" onkeydown="SelectEnter(this)">
 					Maximum: <input type="number" class="form-control" id="nMax" name="nMax" onkeydown="SelectEnter(this)">
+					<span class="info"><i class="fa fa-info"></i> Press enter to update the table below.</span>
 				</span>
 				<br/>
 			</div>
@@ -119,7 +121,7 @@
 				<div class="panel-heading">
 					<h4 class="panel-title">Summary of selected GWAS</h4>
 				</div>
-				<div class="panel-body col4BoxBody" id="sumBody" style="text-align:center; overfloat:auto;">
+				<div class="panel-body col4BoxBody" id="sumBody" style="text-align:center; overflow:auto;">
 				</div>
 			</div>
 		</div>
@@ -128,7 +130,7 @@
 				<div class="panel-heading">
 					<h4 class="panel-title">Year vs Sample size</h4>
 				</div>
-				<div class="panel-body col4BoxBody" id="yearVSnBody" style="text-align:center; overfloat:auto;">
+				<div class="panel-body col4BoxBody" id="yearVSnBody" style="text-align:center; overflow:auto;">
 				</div>
 			</div>
 		</div>
@@ -137,7 +139,7 @@
 				<div class="panel-heading">
 					<h4 class="panel-title">Number of risk loci vs Sample size</h4>
 				</div>
-				<div class="panel-body col4BoxBody" id="lociVSnBody" style="text-align:center; overfloat:auto;">
+				<div class="panel-body col4BoxBody" id="lociVSnBody" style="text-align:center; overflow:auto;">
 				</div>
 			</div>
 		</div>
@@ -148,7 +150,7 @@
 				<div class="panel-heading">
 					<h4 class="panel-title">SNP heritability vs Sample size</h4>
 				</div>
-				<div class="panel-body col4BoxBody" id="h2VSnBody" style="text-align:center; overfloat:auto;">
+				<div class="panel-body col4BoxBody" id="h2VSnBody" style="text-align:center; overflow:auto;">
 				</div>
 			</div>
 		</div>
@@ -157,7 +159,7 @@
 				<div class="panel-heading">
 					<h4 class="panel-title">SNP heritability vs Number of risk loci</h4>
 				</div>
-				<div class="panel-body col4BoxBody" id="h2VSlociBody" style="text-align:center; overfloat:auto;">
+				<div class="panel-body col4BoxBody" id="h2VSlociBody" style="text-align:center; overflow:auto;">
 				</div>
 			</div>
 		</div>
@@ -166,7 +168,7 @@
 				<div class="panel-heading">
 					<h4 class="panel-title">Domain Color-code</h4>
 				</div>
-				<div class="panel-body col4BoxBody" id="colorBody" style="text-align:center; overfloat:auto;">
+				<div class="panel-body col4BoxBody" id="colorBody" style="text-align:center; overflow:auto;">
 				</div>
 			</div>
 		</div>
@@ -186,6 +188,12 @@
 								<option value="clst">Cluster</option>
 							</select>
 						</span>
+						<br/><br/>
+						<span class="info"><i class="fa fa-info"></i>
+							The heatmap is symmetric.
+							Significant genetic correlations after Bonferroni correction (< 0.05) are labeled with "*".
+							Rectangles next to the trait labels are colored based on the domain of the trait.
+						</span>
 					</div>
 					<div id="gcPlot" style="text-align:center;"></div>
 				</div>
@@ -204,6 +212,12 @@
 								<option value="domain">Domain</option>
 								<option value="clst">Cluster</option>
 							</select>
+						</span>
+						<br/><br/>
+						<span class="info"><i class="fa fa-info"></i>
+							The heatmap is asymmetric.
+							The cell of <i>i</i>th column and <i>j</i>th row represents the proportion of oberlapped significant genes between two GWAS (the number of genes significant in both GWAS <i>i</i> and <i>j</i> divided by the number of significant genes in GWAS <i>i</i>).
+							Rectangles next to the trait labels are colored based on the domain of the trait.
 						</span>
 					</div>
 					<div id="magmaPlot" style="text-align:center;"></div>

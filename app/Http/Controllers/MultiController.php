@@ -48,7 +48,6 @@ class MultiController extends Controller
 		}
 
 		$script = storage_path().'/scripts/getPlotCor.py';
-		file_put_contents("/media/sf_Documents/VU/Data/WebApp/tmp.txt", json_encode(['data'=>$tmpdata]));
 		$plotCor = shell_exec("python $script '".json_encode(['data'=>$tmpdata])."'");
 		if($plotCor == ""){$plotCor = [];}
 		else{$plotCor = json_decode($plotCor);}
@@ -75,27 +74,5 @@ class MultiController extends Controller
 
 		$out = ["sum"=>$sum, "plotData"=>['data'=>$plotData, 'cor'=>$plotCor], "gc"=>$gc, "magma"=>$magma, "lociOver"=>$lociOver];
 		return json_encode($out);
-	}
-
-	public function MagmaGeneheat($ids){
-		$script = storage_path().'/scripts/getGeneheat.py';
-		$host = config('database.connections.mysql.host');
-		$user = config('database.connections.mysql.username');
-		$pass = config('database.connections.mysql.password');
-		$db = config('database.connections.mysql.database');
-
-		$out = shell_exec("python $script $host $user $pass $db $ids");
-		return $out;
-	}
-
-	public function MagmaGSheat($ids){
-		$script = storage_path().'/scripts/getGSheat.py';
-		$host = config('database.connections.mysql.host');
-		$user = config('database.connections.mysql.username');
-		$pass = config('database.connections.mysql.password');
-		$db = config('database.connections.mysql.database');
-
-		$out = shell_exec("python $script $host $user $pass $db $ids");
-		return $out;
 	}
 }

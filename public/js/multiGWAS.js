@@ -154,7 +154,8 @@ function TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin,
       {width:"200px", target:4}
     ],
     "lengthMenue": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-    "iDisplayLength": 10
+    "iDisplayLength": 10,
+	"stripeClasses": []
   });
 }
 
@@ -202,7 +203,7 @@ function displayData(ids){
 					if(data.magma.data.Trait[d].length > maxTrait){maxTrait = data.magma.data.Trait[d].length}
 				});
 				var maxIDs = Math.max(data.gc.data.id.length, data.magma.data.id.length);
-				var height = 20 * maxIDs + maxTrait * 5 + 80;
+				var height = 20 * maxIDs + maxTrait * 5 + 180;
 				$('.col6BoxBody').css({'height': height+"px"});
 			}
 
@@ -243,7 +244,7 @@ function summary(data){
 }
 
 function corPlot(data, cor){
-	$('.col4BoxBody').css({'height': '320'});
+	$('.col4BoxBody').css({'height': '340'});
 
 	//Domain color legend
 	$('#colorBody').html('<div id="domainColor"></div>');
@@ -540,7 +541,7 @@ function gcPlot(data){
 			}
 		});
 
-		var margin = {top: maxTrait*5+5, right: 100, bottom: 50, left: maxTrait*5.5+5},
+		var margin = {bottom: maxTrait*5+5, right: 100, top: 20, left: maxTrait*5+5},
 			width = cellsize*n,
 			height = cellsize*n;
 		var svg = d3.select('#gcPlot').append('svg')
@@ -586,8 +587,9 @@ function gcPlot(data){
 			.style("text-anchor", "start")
 			.style("font-size", "10px")
 			.attr("transform", function(d){
-				return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",-7)rotate(-60)";
-			});
+				return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+","+(height+7)+")rotate(90)";
+			})
+			.attr('dy', function(){if(cellsize==20){return ".4em"}else{return ".35em"}});
 
 		// heatmap for significant rg
 		var heatMapSig = svg.append("g").attr("class", "cell heatmapcell")
@@ -624,7 +626,7 @@ function gcPlot(data){
 			.selectAll("rect.colDomain").data(data.data.id).enter()
 			.append("rect")
 			.attr('x', function(d){return data.data.order.alph[d]*cellsize})
-			.attr('y', -4)
+			.attr('y', height+1)
 			.attr("width", cellsize-1)
 			.attr("height", 3)
 			.attr("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d]))});
@@ -654,7 +656,7 @@ function gcPlot(data){
 					.attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;});
 				colLabels.transition().duration(1000)
 					.attr("transform", function(d){
-						return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
+						return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+","+(height+7)+")rotate(90)";
 					});
 				colDomain.transition().duration(1000)
 					.attr("x", function(d){return data.data.order.alph[d]*cellsize});
@@ -674,7 +676,7 @@ function gcPlot(data){
 					.attr("y", function(d){return data.data.order.domain[d]*cellsize+(cellsize-1)/2;});
 				colLabels.transition().duration(1000)
 					.attr("transform", function(d){
-						return "translate("+(data.data.order.domain[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
+						return "translate("+(data.data.order.domain[d]*cellsize+(cellsize-1)/2)+","+(height+7)+")rotate(90)";
 					});
 				colDomain.transition().duration(1000)
 					.attr("x", function(d){return data.data.order.domain[d]*cellsize});
@@ -694,7 +696,7 @@ function gcPlot(data){
 					.attr("y", function(d){return data.data.order.clst[d]*cellsize+(cellsize-1)/2;});
 				colLabels.transition().duration(1000)
 					.attr("transform", function(d){
-						return "translate("+(data.data.order.clst[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
+						return "translate("+(data.data.order.clst[d]*cellsize+(cellsize-1)/2)+","+(height+7)+")rotate(90)";
 					});
 				colDomain.transition().duration(1000)
 					.attr("x", function(d){return data.data.order.clst[d]*cellsize});
@@ -742,7 +744,7 @@ function magmaPlot(data){
 
 		var barWidth = 50;
 		var space = 5;
-		var margin = {top: maxTrait*5+5, right: 100, bottom: 50, left: maxTrait*5.5+5},
+		var margin = {bottom: maxTrait*5+5, right: 100, top: 20, left: maxTrait*5+5},
 			width = cellsize*n+space+barWidth,
 			height = cellsize*n;
 		var svg = d3.select('#magmaPlot').append('svg')
@@ -788,8 +790,9 @@ function magmaPlot(data){
 			.style("text-anchor", "start")
 			.style("font-size", "10px")
 			.attr("transform", function(d){
-				return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",-7)rotate(-60)";
-			});
+				return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+","+(height+7)+")rotate(90)";
+			})
+			.attr('dy', function(){if(cellsize==20){return ".4em"}else{return ".35em"}});
 
 		// heatmap for non zero overlap
 		var heatMap = svg.append("g").attr("class", "cell heatmapcell")
@@ -805,7 +808,7 @@ function magmaPlot(data){
 			.selectAll("rect.colDomain").data(data.data.id).enter()
 			.append("rect")
 			.attr('x', function(d){return data.data.order.alph[d]*cellsize})
-			.attr('y', -4)
+			.attr('y', height+1)
 			.attr("width", cellsize-1)
 			.attr("height", 3)
 			.attr("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d]))});
@@ -846,7 +849,8 @@ function magmaPlot(data){
 			.attr("transform", "translate(0,"+height+")")
 			.call(xAxis).selectAll("text")
 			.attr("transform", "translate(-12, 3)rotate(-60)")
-			.style("text-anchor", "end");
+			.style("text-anchor", "end")
+			.style("font-size", "10px");
 
 
 		// reordering labels
@@ -863,7 +867,7 @@ function magmaPlot(data){
 					.attr("y", function(d){return data.data.order.alph[d]*cellsize+(cellsize-1)/2;});
 				colLabels.transition().duration(1000)
 					.attr("transform", function(d){
-						return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
+						return "translate("+(data.data.order.alph[d]*cellsize+(cellsize-1)/2)+","+(height+7)+")rotate(90)";
 					});
 				colDomain.transition().duration(1000)
 					.attr("x", function(d){return data.data.order.alph[d]*cellsize});
@@ -881,7 +885,7 @@ function magmaPlot(data){
 					.attr("y", function(d){return data.data.order.domain[d]*cellsize+(cellsize-1)/2;});
 				colLabels.transition().duration(1000)
 					.attr("transform", function(d){
-						return "translate("+(data.data.order.domain[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
+						return "translate("+(data.data.order.domain[d]*cellsize+(cellsize-1)/2)+","+(height+7)+")rotate(90)";
 					});
 				colDomain.transition().duration(1000)
 					.attr("x", function(d){return data.data.order.domain[d]*cellsize});
@@ -899,7 +903,7 @@ function magmaPlot(data){
 					.attr("y", function(d){return data.data.order.clst[d]*cellsize+(cellsize-1)/2;});
 				colLabels.transition().duration(1000)
 					.attr("transform", function(d){
-						return "translate("+(data.data.order.clst[d]*cellsize+(cellsize-1)/2)+",-3)rotate(-60)";
+						return "translate("+(data.data.order.clst[d]*cellsize+(cellsize-1)/2)+","+(height+7)+")rotate(90)";
 					});
 				colDomain.transition().duration(1000)
 					.attr("x", function(d){return data.data.order.clst[d]*cellsize});
