@@ -86,9 +86,6 @@ for i in inids:
         if len(tmp)==0:
             row += [0]
             continue
-        elif abs(float(tmp[2]))>=1.25:
-            row += [1.25]
-            continue
         else:
             row += [float(tmp[2])]
             rg.append([i,j,float(tmp[2]), float(tmp[5]), float(tmp[5])*n, float(tmp[3])])

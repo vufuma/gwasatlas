@@ -133,17 +133,22 @@ function topSNPtable(id){
       select: true,
 	  searching: false,
       "ajax" : {
-        url: subdir+"/traitDB/DTfile",
+        url: subdir+"/traitDB/topSNPs",
         type: "POST",
         data: {
           id: id,
-          infile: "GenomicRiskLoci.txt",
           header: "chr:pos:rsID:p"
         }
       },
       error: function(){
         alert("topSNPtable table error");
       },
+	  "columns":[
+		{"data": "chr", name: "CHR"},
+		{"data": "pos", name: "POS"},
+		{"data": "rsID", name: "rsID"},
+		{"data": "p", name: "P"},
+	  ],
       "lengthMenue": [[10, 25, 50, -1], [10, 25, 50, "All"]],
       "iDisplayLength": 10,
 	  "pagingType": "simple",

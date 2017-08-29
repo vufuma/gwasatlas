@@ -76,8 +76,8 @@
 							</span><br/><br/>
 							<table id="topSNPtable" class="display compact nowrap row-border dt-body-right dt-head-center" cellspacing="0" style="display: block; overflow-x: auto; font-size: 14px;">
 								<thead>
-									<th>Chr</th>
-									<th>BP</th>
+									<th>CHR</th>
+									<th>POS</th>
 									<th>rsID</th>
 									<th>P</th>
 								</thead>

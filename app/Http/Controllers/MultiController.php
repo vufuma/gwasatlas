@@ -64,7 +64,7 @@ class MultiController extends Controller
 
 		// MAGMA genes
 		$script = storage_path().'/scripts/getGeneheat.py';
-		$magma = shell_exec("python $script $host $user $pass $db ".implode(":", $ids));
+		$magma = shell_exec("python $script $host $user $pass $db ".implode(":", $ids)." 2.5e-6");
 		$magma = json_decode($magma);
 
 		// Overlapped risk loci

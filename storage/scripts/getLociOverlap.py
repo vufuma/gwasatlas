@@ -39,12 +39,21 @@ cfg.read(os.path.dirname(os.path.realpath(__file__))+'/app.config')
 
 datadir = cfg.get('path', 'data')
 
-## get risk loci
-loci = pd.read_table(datadir+"/RiskLoci.txt", sep="\t")
-loci = np.array(loci)
-loci = loci[ArrayIn(loci[:,0], ids)]
+## connect mysql
+conn = MySQLdb.connect(host=host, user=user, passwd=passwd, db=db)
+c = conn.cursor()
 
+## get risk loci
+loci = []
+for i in ids:
+	c.execute('SELECT * FROM RiskLoci WHERE id='+str(i))
+	rows = c.fetchall()
+	for r in rows:
+		loci.append([int(r[0]), str(r[2]), str(r[3]), int(r[4]), int(r[5]), float(r[6]), int(r[7]), int(r[8])])
+
+loci = np.array(loci, dtype=object)
 loci = loci[np.lexsort((loci[:,4], loci[:,3]))]
+
 
 ## identify overlapped loci
 lociid = []
@@ -80,10 +89,6 @@ for i in lociid:
 	start = min(tmp[:,6])
 	end = max(tmp[:,7])
 	loci_group.append([i, chrom, start, end, len(unique(tmp[:,0]))])
-
-## connect mysql
-conn = MySQLdb.connect(host=host, user=user, passwd=passwd, db=db)
-c = conn.cursor()
 
 ## get trait and domain info
 ids = unique(loci[:,0])

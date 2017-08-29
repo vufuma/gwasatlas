@@ -212,11 +212,13 @@
 								<option value="domain">Domain</option>
 								<option value="clst">Cluster</option>
 							</select>
+							<!-- P-value threshold:
+							<input type="number" class="form-contorl" id="magmaP" value="2.5e-6"> -->
 						</span>
 						<br/><br/>
 						<span class="info"><i class="fa fa-info"></i>
 							The heatmap is asymmetric.
-							The cell of <i>i</i>th column and <i>j</i>th row represents the proportion of oberlapped significant genes between two GWAS (the number of genes significant in both GWAS <i>i</i> and <i>j</i> divided by the number of significant genes in GWAS <i>i</i>).
+							The cell of <i>i</i>th column and <i>j</i>th row represents the proportion of overlapped significant genes (P-value < 2.5e-6) between two GWAS (the number of genes significant in both GWAS <i>i</i> and <i>j</i> divided by the number of significant genes in GWAS <i>i</i>).
 							Rectangles next to the trait labels are colored based on the domain of the trait.
 						</span>
 					</div>

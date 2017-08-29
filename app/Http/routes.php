@@ -26,6 +26,8 @@ Route::get('/traitDB/{id}', function($id){
 
 Route::post('/traitDB/getData', 'DBController@getData');
 
+Route::post('/traitDB/topSNPs', 'DBController@topSNPs');
+
 Route::post('/traitDB/DTfile', 'DBController@DTfile');
 
 Route::get('/traitDB/manhattan/{id}/{file}', 'DBController@manhattan');

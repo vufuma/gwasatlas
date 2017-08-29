@@ -14,7 +14,7 @@ import json
 from scipy.cluster.hierarchy import linkage, leaves_list
 
 if len(sys.argv)<6:
-    sys.exit("ERROR: Not enought argument.\nUSAGE: ./getGeneheat.py <host> <user> <passwd> <database> <ids>")
+    sys.exit("ERROR: Not enought argument.\nUSAGE: ./getGeneheat.py <host> <user> <passwd> <database> <ids> <p-value>")
 
 ##### Return index of a1 which exists in a2 #####
 def ArrayIn(a1, a2):
@@ -30,8 +30,8 @@ db = sys.argv[4]
 ids = sys.argv[5]
 ids = ids.split(":")
 ids = [int(s) for s in ids]
-
 ids.sort()
+p = float(sys.argv[6])
 
 ## config
 cfg = ConfigParser.ConfigParser()
@@ -46,17 +46,15 @@ c = conn.cursor()
 ## get sig genes
 genes = []
 inids = []
-with open(datadir+"/magma.sig.genes", 'r') as fin:
-	fin.readline()
-	for l in fin:
-		l = l.strip().split("\t")
-		if int(l[0]) not in ids:
-			continue
-		if len(l) >= 2:
-			g = l[1].split(":")
-			if len(g) > 0:
-				inids.append(int(l[0]))
-				genes.append(g)
+for i in ids:
+	c.execute('SELECT * FROM magmaGenes WHERE p<'+str(p)+' AND id='+str(i))
+	rows = c.fetchall()
+	g = []
+	for r in rows:
+		g.append(r[1])
+	if len(g)>0:
+		genes.append(g)
+		inids.append(i)
 
 ## n genes
 ng = []
