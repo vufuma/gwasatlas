@@ -410,30 +410,63 @@ class DBController extends Controller
 	}
 
 	public function manhattan($id, $file){
-		$host = config('app.ssh_host');
-		$user = config('app.ssh_user');
-		$passwd = config('app.ssh_passwd');
-		$datadir = config('app.ssh_datadir');
-		$datadir .= '/'.$id.'/';
-		$conn = ssh2_connect($host);
-		if(ssh2_auth_password($conn, $user, $passwd)){
-			$sftp = ssh2_sftp($conn);
-			if($file == "manhattan.txt"){
-				$stream = fopen("ssh2.sftp://$sftp".$datadir.$file, "r");
-				$header = fgetcsv($stream, 0, "\t");
+		// $host = config('app.ssh_host');
+		// $user = config('app.ssh_user');
+		// $passwd = config('app.ssh_passwd');
+		// $datadir = config('app.ssh_datadir');
+		// $datadir .= '/'.$id.'/';
+		$filedir = config('app.datadir').'/'.$id.'/';
+		// $conn = ssh2_connect($host);
+		// if(ssh2_auth_password($conn, $user, $passwd)){
+		// 	$sftp = ssh2_sftp($conn);
+		// 	if($file == "manhattan.txt"){
+		// 		$stream = fopen("ssh2.sftp://$sftp".$datadir.$file, "r");
+		// 		$header = fgetcsv($stream, 0, "\t");
+		// 		$all_rows = [];
+		// 		while($row = fgetcsv($stream, 0, "\t")){
+		// 			$row[0] = (int)$row[0];
+		// 			$row[1] = (int)$row[1];
+		// 			$row[2] = (float)$row[2];
+		// 			$all_rows[] = $row;
+		// 		}
+		// 		echo json_encode($all_rows);
+		// 	}else if($file == "magma.genes.out"){
+		// 		$stream = fopen("ssh2.sftp://$sftp".$datadir.$file, "r");
+		// 		$header = fgetcsv($stream, 0, "\t");
+		// 		$all_rows = [];
+		// 		while($row = fgetcsv($stream, 0, "\t")){
+		// 			if($row[1]=="X"){$row[1] = "23";}
+		// 			$row[1] = (int)$row[1];
+		// 			$row[2] = (int)$row[2];
+		// 			$row[3] = (int)$row[3];
+		// 			$row[8] = (float)$row[8];
+		// 			$all_rows[] = array($row[1], $row[2], $row[3], $row[8], $row[9]);
+		// 		}
+		// 		echo json_encode($all_rows);
+		// 	}
+		// }
+		if($file == "manhattan.txt"){
+			if(file_exists($filedir.$file)){
+				$f = fopen($filedir.$file, "r");
+				$header = fgetcsv($f, 0, "\t");
 				$all_rows = [];
-				while($row = fgetcsv($stream, 0, "\t")){
+				while($row = fgetcsv($f, 0, "\t")){
 					$row[0] = (int)$row[0];
 					$row[1] = (int)$row[1];
 					$row[2] = (float)$row[2];
 					$all_rows[] = $row;
 				}
-				echo json_encode($all_rows);
-			}else if($file == "magma.genes.out"){
-				$stream = fopen("ssh2.sftp://$sftp".$datadir.$file, "r");
-				$header = fgetcsv($stream, 0, "\t");
+				return json_encode($all_rows);
+			}else{
+				return "{}";
+			}
+
+		}else if($file == "magma.genes.out"){
+			if(file_exists($filedir.$file)){
+				$f = fopen($filedir.$file, "r");
+				$header = fgetcsv($f, 0, "\t");
 				$all_rows = [];
-				while($row = fgetcsv($stream, 0, "\t")){
+				while($row = fgetcsv($f, 0, "\t")){
 					if($row[1]=="X"){$row[1] = "23";}
 					$row[1] = (int)$row[1];
 					$row[2] = (int)$row[2];
@@ -441,35 +474,37 @@ class DBController extends Controller
 					$row[8] = (float)$row[8];
 					$all_rows[] = array($row[1], $row[2], $row[3], $row[8], $row[9]);
 				}
-				echo json_encode($all_rows);
+				return json_encode($all_rows);
+			}else{
+				return "{}";
 			}
 		}
 	}
 
 	public function QQplot($id, $plot){
-		$host = config('app.ssh_host');
-		$user = config('app.ssh_user');
-		$passwd = config('app.ssh_passwd');
-		$datadir = config('app.ssh_datadir');
-		$datadir .= '/'.$id.'/';
-		$conn = ssh2_connect($host);
-		if(ssh2_auth_password($conn, $user, $passwd)){
-			$sftp = ssh2_sftp($conn);
-			if($plot=="SNP"){
-				$stream = fopen("ssh2.sftp://$sftp".$datadir."QQSNPs.txt", "r");
-				$header = fgetcsv($stream, 0, "\t");
+		$filedir = config('app.datadir').'/'.$id.'/';
+		if($plot=="SNP"){
+			$file="QQSNPs.txt";
+			if(file_exists($filedir.$file)){
+				$f = fopen($filedir.$file, "r");
+				$header = fgetcsv($f, 0, "\t");
 				$all_rows = [];
-				while($row = fgetcsv($stream, 0, "\t")){
+				while($row = fgetcsv($f, 0, "\t")){
 					$all_rows[] = array_combine($header, $row);
 				}
-				echo json_encode($all_rows);
-			}else if($plot=="Gene"){
-				$stream = fopen("ssh2.sftp://$sftp".$datadir."magma.genes.out", "r");
+				return json_encode($all_rows);
+			}else{
+				return "{}";
+			}
+		}else if($plot=="Gene"){
+			$file="magma.genes.out";
+			if(file_exists($filedir.$file)){
+				$f = fopen($filedir.$file, "r");
 				$obs = array();
 				$exp = array();
 				$c = 0;
-				fgetcsv($stream, 0, "\t");
-				while($row = fgetcsv($stream, 0, "\t")){
+				fgetcsv($f, 0, "\t");
+				while($row = fgetcsv($f, 0, "\t")){
 					$c++;
 					$obs[] = -log10($row[8]);
 				}
@@ -480,7 +515,9 @@ class DBController extends Controller
 				for($i=0; $i<$c; $i++){
 					$all_rows[] = array_combine($header, [$obs[$i], -log10(1-$i*$step), $i+1]);
 				}
-				echo json_encode($all_rows);
+				return json_encode($all_rows);
+			}else{
+				return "{}";
 			}
 		}
 	}
@@ -584,11 +621,6 @@ class DBController extends Controller
 		$cols = str_replace(":", ", ", $cols);
 		$results = DB::select("SELECT ".$cols." FROM RiskLoci WHERE id=?", [$id]);
 		$results = json_decode(json_encode($results), true);
-		// $all_rows = [];
-		// foreach($results as $row){
-		// 	// $all_rows[] = array_combine($header, $row);
-		// 	$all_rows[] = $row;
-		// }
 		$results = array('data'=>$results);
 		return json_encode($results);
 	}
@@ -598,48 +630,34 @@ class DBController extends Controller
 		$file = $request -> input('infile');
 		$cols = $request -> input('header');
 		$cols = explode(":", $cols);
-		$host = config('app.ssh_host');
-		$user = config('app.ssh_user');
-		$passwd = config('app.ssh_passwd');
-		$datadir = config('app.ssh_datadir');
-		$datadir .= '/'.$id.'/';
-		$conn = ssh2_connect($host);
-		if(ssh2_auth_password($conn, $user, $passwd)){
-			$sftp = ssh2_sftp($conn);
-			if(file_exists("ssh2.sftp://$sftp".$datadir.$file)){
-				$stream = fopen("ssh2.sftp://$sftp".$datadir.$file, "r");
-				if(!$stream){
-					echo '{"data":[]}';
+		$filedir = config('app.datadir').'/'.$id.'/';
+		if(file_exists($filedir.$file)){
+			$f = fopen($filedir.$file, "r");
+			$header = fgetcsv($f, 0, "\t");
+			$all_rows = array();
+			$index = array();
+			foreach($cols as $c){
+				if(in_array($c, $header)){
+					$index[] = array_search($c, $header);
 				}else{
-					$header = fgetcsv($stream, 0, "\t");
-					$all_rows = array();
-					$index = array();
-					foreach($cols as $c){
-						if(in_array($c, $header)){
-							$index[] = array_search($c, $header);
-						}else{
-							$index[] = -1;
-						}
-					}
-					while($row = fgetcsv($stream, 0, "\t")){
-						$temp = [];
-						foreach($index as $i){
-							if($i==-1){
-								$temp[] = "NA";
-							}else{
-								$temp[] = $row[$i];
-							}
-						}
-						$all_rows[] = $temp;
-					}
-					$json = (array('data'=> $all_rows));
-					echo json_encode($json);
+					$index[] = -1;
 				}
-			}else{
-				echo '{"data":[]}';
 			}
+			while($row = fgetcsv($f, 0, "\t")){
+				$temp = [];
+				foreach($index as $i){
+					if($i==-1){
+						$temp[] = "NA";
+					}else{
+						$temp[] = $row[$i];
+					}
+				}
+				$all_rows[] = $temp;
+			}
+			$json = (array('data'=> $all_rows));
+			return json_encode($json);
 		}else{
-			echo '{"data":[]}';
+			return '{"data":[]}';
 		}
 	}
 }
