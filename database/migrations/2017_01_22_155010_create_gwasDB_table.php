@@ -23,6 +23,7 @@ class CreateGwasDBTable extends Migration
             $table->string('ChapterLevel');
             $table->string('SubchapterLevel');
             $table->string('Trait');
+			$table->string('uniqTrait');
             $table->string('Population');
             $table->string('Ncase');
             $table->string('Ncontrol');

@@ -5,6 +5,113 @@
 @stop
 
 @section('content')
-<h4>How to use GWAS ATLAS</h4>
-Comming soon...
+<div style="padding:40px;">
+	<h2 id="top">How to use GWAS atlas website</h2>
+	<p><h3><strong>Contents</strong></h3>
+		<div style="padding-left:20px;">
+			<a href="#1">1. Browse individual GWAS</a><br/>
+			<div style="padding-left:20px;">
+				1.1. Find your trait<br/>
+				1.2. Summary of GWAS results<br/>
+				1.3. Genetic correlation<br/>
+			</div>
+			<a href="#2">2. Compare multiple GWAS</a><br/>
+			<div style="padding-left:20px;">
+				2.1. Select GWAS to compare<br/>
+				2.2. Understanding results<br/>
+			</div>
+		</div>
+	</p>
+	<p><h3 id="1"><strong>1. Browse individual GWAS</strong></h3>
+		<div style="padding-left:20px;">
+			<h4>1.1. Find your trait</h4>
+			Go to the "Browse GWAS" page which displays a table of full entries of GWAS in the database.
+			If you know which trait you are looking for, you can either select from the list of traits (alphabetically ordered)
+			or type keyword in the serch box.
+			If you are just looking for what kind of traits are available in the database,
+			you can also filter by domain, chapter or subchapter level.
+			Traits can also be filtered by published year and sample size in the filtering box.
+			Any keyward can be serached from the search box at the right top of the table.
+			<h4>1.2. Summary of GWAS results</h4>
+			When a row of the table is clicked, it will open a new tab with summary of
+			GWAS results.<br/>
+			(a) GWAS information table:
+			There are variety of basic information about the study.
+			Original study is accessible from PMID field.
+			Original summary staitics file can be accessed from the link.
+			If submission of webform is required to download a file, the link is to
+			the website, otherwise directly linked to the file.</br>
+			(b) Manhattan plot<br/>
+			(c) Q-Q plot<br/>
+			(d) List of top SNPs in each genomic risk locus<br/>
+			(e) Gene manhattan plot: P-value is based on MAGMA gene ananlysis.
+			Top genes can be labeled by changing the number of the box.<br/>
+			(f) Gene Q-Q plot<br/>
+			(g) Top associated gene set: Results of MAGMA gene-set ananlysis.
+			Gene sets which are significantly associated after Bonferroni correction are
+			displayed. If the number of significant gene sets are less than 10,
+			top 10 significant gene sets are displayed. <br/>
+			(h) Generic correlation: Genetic correlation of the trait with user selected traits.
+			See next section for detils.
+			<h4>1.3. Genetic correlation</h4>
+			By default, top 10 traits with the highest absolute genetic correlation are
+			shown regardless of significance.
+			Nothing is shown for traits which are not eligible for estimation of genetic correlation
+			(see <a>5.3. Genetic correlation</a> in the Documentation).
+			Several options are available to obtain genetic correlation with a custom list of traits.
+			(a) Exclude same trait: If there is any other same traits in the databse, those can be
+			excluded by activating this option.<br/>
+			(b) Select GWAS with the maximum sample size per trait: For traits with more than one GWAS
+			in the database, one with the largest sample size is selected per trait.
+			Note that this selection is performed after other filterings.<br/>
+			(c) P-value and Bonferroni corrected P-value threshold.<br/>
+			(d) The number of traits to display.</br>
+			(e) Manual selection of trait: Traits can also be manually selected.
+			Other filterings are still performed on the selected traits.<br/>
+			(f) Genetic correlation plot: Each bar is colored based on P-value;
+			grey for P-value >= 0.05, high transparency red (positive) and blue (negative) for P-value < 0.05,
+			and red or blue for P-value < P<sub>bon</sub>.
+			Bonferroni correction is performed for the number of possible pairs
+			before filtering of P-value but after other filterings.<br/>
+			(g) Genetic correlation table: same as (f) but in table format.
+		</div>
+	</p>
+	<p><h3 id="2"><strong>2. Compare multiple GWAS</strong></h3>
+		<div style="padding-left:20px;">
+			<h4>2.1. Select GWAS to compare</h4>
+			Database entries can be filtered same as in the "Browse GWAS" page.
+			GWAS can be selected by checking the box manually.<br/>
+			(a) Number of selected GWAS: This number should be > 1 and &le; 100.<br/>
+			(b) Select all displayed GWAS: this button only checks "currently displayed"
+			GWAS, but not all the GWAS after filtering.
+			You can change the number of GWAS to display from the left top of the table.<br/>
+			(c) Clear all selected GWAS: Reset the selection of GWAS regardless of displayed or not.<br/>
+			(d) Submit selected GWAS<br/>
+			<h4>2.2. Understanding results</h4>
+			When selected GWAS are submitted correctly, several plots will be displayed
+			in the page.
+			See <a>7. Multi GWAS comparison</a> of documentation for details.<br/>
+			(a) Summary of selected GWAS.<br/>
+			(b) Scatterplot of published year and sample size: Each dot is a GWAS colored by domain.<br/>
+			(c) Scatterplot of sample size and number of risk loci: Each dot is a GWAS colored by domain.<br/>
+			(d) Scatterplot of SNP heritability and sample size: Each dot is a GWAS colored by domain.<br/>
+			(e) Scatterplot of SNP heritability and number of risk loci: Each dot is a GWAS colored by domain.<br/>
+			(f) Color code: Color of each domain. This color code is used in all plots in the page.<br/>
+			(g) Genetic correlation heatmap: Each cell is colored by r<sub>g</sub> and sized by P-value.
+			The significant ones are labeled by "*".
+			The order of row and column can be selected from alphabetically, domain and hierarchical clustering.
+			The color of rectangles next to the GWAS label represent the color of domain. <br/>
+			(h) MAGMA gene overlap heatmap: Each cell is colored by proportion of overlapping significant genes.
+			The order of row and column can be selected from alphabetically, domain and hierarchical clustering.
+			The color of rectangles next to the GWAS label represent the color of domain. <br/>
+			(i) Manhattan like plot of risk loci: Each dot is a locai group (see <a>7.4. Risk loci overlap</a>
+			in the documentation for details) sized by the the number of GWAS in the loci group (same as Y-axis).
+			The plot is zoomable and it will display plot (j) by cliking a dot.<br/>
+			(j) Zoomed plot of a selected loci group: Each dot represents a top SNP in the locus of given GWAS
+			sized by P-value, colored by domain and labelled by rsID.
+			A horizontal line represents the region of the risk locus.
+			See <a>4.2. Risk loci<a/> in the documentation for the definition of risk loci.
+		</div>
+	</p>
+</div>
 @stop

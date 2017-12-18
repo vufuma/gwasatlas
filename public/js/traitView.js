@@ -1,5 +1,5 @@
 var table_desriptions = {
-	"File": "Link to the original soruce of summary statistics file id available.",
+	"File": "Link to the original soruce of summary statistics file.",
 	"Population": "Population assigned to one of the 5 populations from 1000 genomes, i.e. AFR, AMR, EAS, EUR and SAS. For multi-ethnic GWAS, all populations included in the GWAS are listed here. For UK Biobank chohort, UKB1 or UKB2 for each release.",
 	"Nsnps": "The number of SNPs in the original summary statistics file.",
 	"Nhits": "The number of independent genomic risk loci. See documentation for details of definitioin of risk loci.",
@@ -20,7 +20,7 @@ $(document).ready(function(){
 			var temp = JSON.parse(data);
 			$('#title').html("<h3>atlas ID: "+id+" <strong>"+temp[0]["Trait"]+"</strong></h3>");
 			var header = ["id", "PMID", "Year", "File", "Website", "Consortium", "Domain", "ChapterLevel", "SubchapterLevel",
-				"Trait", "Population", "Ncase", "Ncontrol", "N", "Genome", "Nsnps", "Nhits", "SNPh2",
+				"Trait", "uniqTrait", "Population", "Ncase", "Ncontrol", "N", "Genome", "Nsnps", "Nhits", "SNPh2",
 				"SNPh2_se", "SNPh2_z", "LambdaGC", "Chi2", "Intercept", "Note"];
 			var table = '';
 			for(var i=0; i<header.length; i++){
@@ -101,12 +101,34 @@ $(document).ready(function(){
 			data = JSON.parse(data);
 			var multi_select = "";
 			data.forEach(function(d){
-				multi_select += '<option value="'+d.id+'">'+d.id+': '+d.Trait+' (published: '+d.Year+', sample size: '+d.N+')</option>';
+				// multi_select += '<option value="'+d.id+'">'+d.id+': '+d.Trait+' (published: '+d.Year+', sample size: '+d.N+')</option>';
+				multi_select += '<span class="GC_manual_trait"><input class="GC_manual_check" type="checkbox" value="'+d.id+'" onchange="GC_manual_count();">'+d.id+': '+d.Trait+' (published: '+d.Year+', sample size: '+d.N+')</br></span>';
 			});
-			$('#GC_manual_select').html(multi_select);
+			$('#GC_manual_select').append(multi_select);
+			$('#GC_manual_select').children('span').each(function(){
+				$(this).children('input').prop('disabled', true);
+			});
 		}
 	});
-	$('#GC_manual_select').prop('disabled', true);
+
+	$('#GC_manual_search').on('change keyup', function(){
+		var target = $(this).val().toLowerCase();
+		$('.GC_manual_trait').each(function(){
+			var text = $(this).text().toLowerCase();
+			if(text.indexOf(target)>-1){
+				$(this).show()
+			}else{
+				$(this).hide()
+			}
+		})
+	});
+
+	$('#GC_manual_clear').on('click', function(){
+		$('#GC_manual_select').children('span').each(function(){
+			$(this).children('input').prop('checked', false);
+			GC_manual_count();
+		});
+	});
 
 	$('#GC_update').on('click', function(){
 		d3.select("#GCplot").selectAll("svg").remove();
@@ -117,13 +139,25 @@ $(document).ready(function(){
 		var maxP = $('#GC_p').val();
 		var maxPbon = $('#GC_pbon').val();
 		var manual = $('#GC_manual').is(":checked");
-		var manualids = $('#GC_manual_select').val();
-		if(manualids != null){manualids = manualids.join(":");}
+		var manualids = [];
+		$('.GC_manual_check').each(function(){
+			if($(this).is(':checked')){manualids.push($(this).val());}
+		})
+		if(manualids.length>0){manualids = manualids.join(":");}
+		else{manualids=null;}
 		getGCdata(id, topN, excSamePhe, maxNPhe, maxP, maxPbon, manual, manualids);
 	});
 
 	$('#GC_update').trigger('click');
 });
+
+function GC_manual_count(){
+	var nTrait = 0;
+	$('.GC_manual_check').each(function(){
+		if($(this).is(':checked')){nTrait++;}
+	})
+	$('#GC_manual_n').html(nTrait);
+}
 
 function topSNPtable(id){
 	$('#topSNPtable').DataTable().destroy();
@@ -192,16 +226,22 @@ function GWplot(id){
 		x.domain([0, (chromStart[max_chr-1]+chromSize[max_chr-1])]);
 		var xAxis = d3.svg.axis().scale(x).orient("bottom");
 		var y = d3.scale.linear().range([height, 0]);
-		// y.domain([0, d3.max(data, function(d){return -Math.log10(d.p);})+1]);
-		y.domain([0, d3.max(data, function(d){return -Math.log10(d[2]);})+1]);
-
+		var minP = d3.min(data, function(d){if(d[2]>1e-300){return d[2]}})
+		var lowP = d3.min(data, function(d){return d[2]});
+		var yMax = -Math.log10(minP);
+		if(lowP < 1e-300){
+			if(yMax>=300){yMax = 360;}
+			else{yMax += yMax*0.2;}
+			yMax += 10;
+		}
+		y.domain([0, yMax]);
 		var yAxis = d3.svg.axis().scale(y).orient("left");
 
 		svg.selectAll("dot.manhattan").data(data).enter()
 			.append("circle")
 			.attr("r", 2)
 			.attr("cx", function(d){return x(d[1]+chromStart[d[0]-1])})
-			.attr("cy", function(d){return y(-Math.log10(d[2]))})
+			.attr("cy", function(d){if(d[2]<1e-300){return y(yMax)}else{return y(-Math.log10(d[2]))}})
 			.attr("fill", function(d){if(d[0]%2==0){return "steelblue"}else{return "blue"}});
 
 		svg.append("line")
@@ -212,7 +252,24 @@ function GWplot(id){
 		svg.append("g").attr("class", "x axis")
 			.attr("transform", "translate(0,"+height+")").call(xAxis).selectAll("text").remove();
 		svg.append("g").attr("class", "y axis").call(yAxis)
-			.selectAll('text').style('font-size', '11px');
+			.selectAll('text')
+			.each(function(d){
+				if(d >= -Math.log10(minP)*1.2){this.remove()}
+			})
+			.style('font-size', '11px');
+		if(lowP < 1e-300){
+			svg.append("text")
+				.attr("x", -32).attr("y", y(yMax)+2)
+				.text(">300")
+				.style("font-size", '11px')
+				.style("font-family", "sans-serif");
+			svg.append("text")
+				.attr("x", 0).attr("y", y(yMax)*1.5)
+				.text("\u2248")
+				.attr("text-anchor", "middle")
+				.style("font-size", '20px')
+				.style("font-family", "sans-serif");
+		}
 
 		//Chr label
 		for(var i=0; i<chr.length; i++){
@@ -343,7 +400,13 @@ function QQplot(id){
 		var x = d3.scale.linear().range([0, width]);
 		var y = d3.scale.linear().range([height, 0]);
 		var xMax = d3.max(data, function(d){return d.exp;});
-		var yMax = d3.max(data, function(d){return d.obs;});
+		var minP = d3.max(data, function(d){if(d.obs<300){return d.obs}})
+		var lowP = d3.max(data, function(d){return d.obs});
+		var yMax = minP;
+		if(lowP > 300){
+			if(yMax>=300){yMaxp = 360;}
+			else{yMax += yMax*0.2;}
+		}
 		x.domain([0, (xMax+xMax*0.01)]);
 		y.domain([0, (yMax+yMax*0.01)]);
 		var yAxis = d3.svg.axis().scale(y).orient("left");
@@ -355,13 +418,30 @@ function QQplot(id){
 			.append("circle")
 			.attr("r", 2)
 			.attr("cx", function(d){return x(d.exp)})
-			.attr("cy", function(d){return y(d.obs)})
+			.attr("cy", function(d){if(d.obs>300){y(yMax)}else{return y(d.obs)}})
 			.attr("fill", "grey");
 		qqSNP.append("g").attr("class", "x axis")
 			.attr("transform", "translate(0,"+height+")").call(xAxis)
 			.selectAll('text').style('font-size', '11px');
 		qqSNP.append("g").attr("class", "y axis").call(yAxis)
-			.selectAll('text').style('font-size', '11px');
+			.selectAll('text')
+			.each(function(d){
+				if(d >= minP*1.2){this.remove()}
+			})
+			.style('font-size', '11px');
+		if(lowP > 300){
+			qqSNP.append("text")
+				.attr("x", -32).attr("y", y(yMax)+2)
+				.text(">300")
+				.style("font-size", '11px')
+				.style("font-family", "sans-serif");
+			qqSNP.append("text")
+				.attr("x", 0).attr("y", y(yMax)*5)
+				.text("\u2248")
+				.attr("text-anchor", "middle")
+				.style("font-size", '20px')
+				.style("font-family", "sans-serif");
+		}
 		qqSNP.append("line")
 			.attr("x1", 0).attr("x2", x(maxP))
 			.attr("y1", y(0)).attr("y2", y(maxP))
@@ -426,9 +506,13 @@ function QQplot(id){
 
 function GCManualSelectCheck(){
 	if($('#GC_manual').is(":checked")){
-		$('#GC_manual_select').prop('disabled', false);
+		$('#GC_manual_select').children('span').each(function(){
+			$(this).children('input').prop('disabled', false);
+		});
 	}else{
-		$('#GC_manual_select').prop('disabled', true);
+		$('#GC_manual_select').children('span').each(function(){
+			$(this).children('input').prop('disabled', true);
+		});
 	}
 }
 

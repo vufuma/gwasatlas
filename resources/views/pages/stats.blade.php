@@ -19,14 +19,15 @@
 	});
 	var subdir = "{{ Config::get('app.subdir') }}";
 </script>
+<script type="text/javascript" src="{!! URL::asset('js/global.js') !!}"></script>
 <script type="text/javascript" src="{!! URL::asset('js/odometer.min.js') !!}"></script>
 <script type="text/javascript" src="{!! URL::asset('js/stats.js') !!}"></script>
 <link rel="stylesheet" href="{!! URL::asset('css/odometer-theme-default.css') !!}">
-<link rel="stylesheet" href="{!! URL::asset('css/style.css') !!}">
+
 @stop
 
 @section('content')
-<div style="padding-top: 50px; padding-right: 50px; padding-left: 50px;">
+<div style="padding-top:50px;padding-right:50px;padding-left:50px;">
 	<div class="row">
 		<div class="col-md-4 col-sm-4 col-xs-4">
 			<div class="panel panel-default">

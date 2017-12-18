@@ -1,3 +1,14 @@
+var domain_col = {"Activities":"#ffa1ba","Aging":"#bf0058","Body Functions":"#f3136f",
+"Body Structures":"#ff978f","Cardiovascular":"#8a1b22","Cell":"#ff6b63",
+"Cognitive":"#be6100","Connective tissue":"#884500","Dermatological":"#fe9617",
+"Ear, Nose, Throat":"#968900","Endocrine":"#ceca59","Environment":"#a8d538",
+"Gastrointestinal":"#5ad754","Hematological":"#75db8d","Immunological":"#00532e",
+"Infection":"#02a58b","Metabolic":"#78d7c6","Mortality":"#3ac7ff",
+"Muscular":"#009cf8","Neoplasms":"#0261dd","Neurological":"#344382",
+"Nutritional":"#9262ec","Ophthalmological":"#deb7fb","Psychiatric":"#6c179f",
+"Reproduction":"#f790ff","Respiratory":"#d73fbf","Skeletal":"#930075",
+"Social Interactions":"#772c50"};
+
 $(document).ready(function(){
   dbSum();
   yearSumPlot();
@@ -33,24 +44,37 @@ function yearSumPlot(){
 	var ipanel = 0;
 
 	d3.json(subdir+'/stats/yearSumPlot', function(data){
-		data.forEach(function(d){
-			d[0] = +d[0]; //year
+		// summary data
+		data.sum.forEach(function(d){
+			d[0] = +parseInt(d[0]); //year (string)
 			d[1] = +d[1]; //Nstudy
 			d[2] = +d[2]; //Ngwas
 			d[3] = +d[3]; //Ntrait
-			d[4] = +d[4]; //Nsample_avg
-			d[5] = +d[5]; //Nsample_min
-			d[6] = +d[6]; //Nsample_max
+		});
+		// box plot data
+		data.Nbox.data.forEach(function(d){
+			d[0] = +parseInt(d[0]); //year (string)
+			d[1] = +d[1]; //median
+			d[2] = +d[2]; //mean
+			d[3] = +d[3]; //1st q
+			d[4] = +d[4] //3rd q
+			d[5] = +d[5] //min
+			d[6] = +d[6] //max
+		});
+		// ourliers
+		data.Nbox.out.forEach(function(d){
+			d[0] = +parseInt(d[0]); //year (string)
+			d[1] = +d[1]; //N
 		});
 
-		var years = data.map(function(d){return d[0]});
+		var years = data.sum.map(function(d){return d[0]});
 		var x = d3.scale.ordinal().domain(years).rangeBands([0, width], 0.1);
 		var xAxis = d3.svg.axis().scale(x).orient("bottom");
 
 		// Nstudy
 		ipanel = 1;
 		var y = d3.scale.linear().range([height-(hist_height+hist_space)*(ipanel-1), height-hist_height*ipanel-hist_space*(ipanel-1)]);
-		var ymax = d3.max(data, function(d){return d[ipanel]});
+		var ymax = d3.max(data.sum, function(d){return d[ipanel]});
 		y.domain([0, ymax+ymax*0.05]);
 		var yAxis = d3.svg.axis().scale(y).orient("left").ticks(4);
 		var tip1 = d3.tip()
@@ -58,7 +82,7 @@ function yearSumPlot(){
 			.offset([-5,0])
 			.html(function(d){return d[1]});
 		svg.call(tip1);
-		svg.selectAll('.Nstudy').data(data.filter(function(d){if(d[ipanel]>0){return d}}))
+		svg.selectAll('.Nstudy').data(data.sum.filter(function(d){if(d[ipanel]>0){return d}}))
 			.enter()
 			.append('rect')
 			.attr("x", function(d){return x(d[0])})
@@ -82,7 +106,7 @@ function yearSumPlot(){
 		//Ngwas
 		ipanel = 2;
 		y = d3.scale.linear().range([height-(hist_height+hist_space)*(ipanel-1), height-hist_height*ipanel-hist_space*(ipanel-1)]);
-		ymax = d3.max(data, function(d){return d[ipanel]});
+		ymax = d3.max(data.sum, function(d){return d[ipanel]});
 		y.domain([0, ymax+ymax*0.05]);
 		yAxis = d3.svg.axis().scale(y).orient("left").ticks(4);
 		var tip2 = d3.tip()
@@ -90,7 +114,7 @@ function yearSumPlot(){
 			.offset([-5,0])
 			.html(function(d){return d[2]});
 		svg.call(tip2);
-		svg.selectAll('.Ngwas').data(data.filter(function(d){if(d[ipanel]>0){return d}}))
+		svg.selectAll('.Ngwas').data(data.sum.filter(function(d){if(d[ipanel]>0){return d}}))
 			.enter()
 			.append('rect')
 			.attr("x", function(d){return x(d[0])})
@@ -114,7 +138,7 @@ function yearSumPlot(){
 		//Ntrait
 		ipanel = 3;
 		y = d3.scale.linear().range([height-(hist_height+hist_space)*(ipanel-1), height-hist_height*ipanel-hist_space*(ipanel-1)]);
-		ymax = d3.max(data, function(d){return d[ipanel]});
+		ymax = d3.max(data.sum, function(d){return d[ipanel]});
 		y.domain([0, ymax+ymax*0.05]);
 		yAxis = d3.svg.axis().scale(y).orient("left").ticks(4);
 		var tip3 = d3.tip()
@@ -122,7 +146,7 @@ function yearSumPlot(){
 			.offset([-5,0])
 			.html(function(d){return d[3]});
 		svg.call(tip3);
-		svg.selectAll('.Ntrait').data(data.filter(function(d){if(d[ipanel]>0){return d}}))
+		svg.selectAll('.Ntrait').data(data.sum.filter(function(d){if(d[ipanel]>0){return d}}))
 			.enter()
 			.append('rect')
 			.attr("x", function(d){return x(d[0])})
@@ -146,48 +170,90 @@ function yearSumPlot(){
 		//Nsample
 		ipanel = 4;
 		y = d3.scale.linear().range([height-(hist_height+hist_space)*(ipanel-1), height-hist_height*ipanel-hist_space*(ipanel-1)]);
-		ymax = d3.max(data, function(d){return d[6]});
+		ymax = d3.max(data.Nbox.out, function(d){return d[1]});
 		y.domain([0, ymax+ymax*0.05]);
 		yAxis = d3.svg.axis().scale(y).orient("left").ticks(4);
 		var tip4 = d3.tip()
 			.attr('class', 'd3-tip')
 			.offset([-5,0])
-			.html(function(d){return "Max: "+d[6]+"<br/>Avg: "+d[4]+"<br/>Min: "+d[5]});
+			.html(function(d){return "Median: "+d[1]+"<br/>Avg: "+d[2]+"<br/>"});
 		svg.call(tip4);
-		svg.selectAll('.Nsample').data(data.filter(function(d){if(d[ipanel]>0){return d}}))
+		// box
+		svg.selectAll('.box').data(data.Nbox.data)
 			.enter()
 			.append('rect')
-			.attr("x", function(d){return x(d[0])})
-			.attr("width", x.rangeBand())
-			.attr("y", function(d){return y(d[ipanel])})
-			.attr("height", function(d){return height-(hist_height+hist_space)*(ipanel-1)-y(d[ipanel])})
+			.attr("x", function(d){return x(d[0])+x.rangeBand()*0.15})
+			.attr("width", x.rangeBand()*0.7)
+			.attr("y", function(d){return y(d[4])})
+			.attr("height", function(d){return y(d[3])-y(d[4])})
 			.style("fill", "skyblue")
+			.style("opacity", .8)
+			.style("stroke", "steelblue")
 			.on("mouseover", tip4.show)
 			.on("mouseout", tip4.hide);
-		svg.selectAll('.Nsamplemin').data(data.filter(function(d){if(d[ipanel]>0){return d}}))
+		// median
+		svg.selectAll('.medianline').data(data.Nbox.data)
 			.enter()
 			.append('line')
-			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.25})
-			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.75})
-			.attr("y1", function(d){return y(d[5])})
-			.attr("y2", function(d){return y(d[5])})
+			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.15})
+			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.85})
+			.attr("y1", function(d){return y(d[1])})
+			.attr("y2", function(d){return y(d[1])})
 			.style("stroke", "black");
-		svg.selectAll('.Nsamplemax').data(data.filter(function(d){if(d[ipanel]>0){return d}}))
+		// mean
+		svg.selectAll('.meanline').data(data.Nbox.data)
+			.enter()
+			.append('line')
+			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.15})
+			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.85})
+			.attr("y1", function(d){return y(d[2])})
+			.attr("y2", function(d){return y(d[2])})
+			.style("stroke", "black")
+			.style("stroke-dasharray", "2,2");
+		// upper bars
+		svg.selectAll('.upperline').data(data.Nbox.data)
+			.enter()
+			.append('line')
+			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.5})
+			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.5})
+			.attr("y1", function(d){return y(d[4])})
+			.attr("y2", function(d){return y(d[6])})
+			.style("stroke", "steelblue");
+		svg.selectAll('.topline').data(data.Nbox.data)
 			.enter()
 			.append('line')
 			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.25})
 			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.75})
 			.attr("y1", function(d){return y(d[6])})
 			.attr("y2", function(d){return y(d[6])})
-			.style("stroke", "black");
-		svg.selectAll('.Nsamplebar').data(data.filter(function(d){if(d[ipanel]>0){return d}}))
+			.style("stroke", "steelblue");
+		// lower bar
+		svg.selectAll('.lowerline').data(data.Nbox.data)
 			.enter()
 			.append('line')
-			.attr("x1", function(d){return x(d[0])+x.rangeBand()/2})
-			.attr("x2", function(d){return x(d[0])+x.rangeBand()/2})
-			.attr("y1", function(d){return y(d[6])})
+			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.5})
+			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.5})
+			.attr("y1", function(d){return y(d[3])})
 			.attr("y2", function(d){return y(d[5])})
-			.style("stroke", "black");
+			.style("stroke", "steelblue");
+		svg.selectAll('.bottomline').data(data.Nbox.data)
+			.enter()
+			.append('line')
+			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.25})
+			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.75})
+			.attr("y1", function(d){return y(d[5])})
+			.attr("y2", function(d){return y(d[5])})
+			.style("stroke", "steelblue");
+		// outlier
+		svg.selectAll('.outdot').data(data.Nbox.out)
+			.enter()
+			.append('circle')
+			.attr('r',2)
+			.attr('cx', function(d){return x(d[0])+x.rangeBand()*0.5})
+			.attr('cy', function(d){return y(d[1])})
+			.style("fill", "skyblue")
+			.style("stroke", "steelblue");
+
 		svg.append('g').attr("class", "x axis")
 			.attr("transform", "translate(0,"+(height-(hist_height+hist_space)*(ipanel-1))+")")
 			.call(xAxis).selectAll("text").remove();
@@ -204,7 +270,7 @@ function yearSumPlot(){
 function domainSumPlot(){
 	var margin = {top:20, right: 50, bottom:100, left:50},
         width = 800,
-        height = 320;
+        height = 400;
 	var svg = d3.select("#domainSumPlot").append("svg")
               .attr("width", width+margin.left+margin.right)
               .attr("height", height+margin.top+margin.bottom)
@@ -215,23 +281,45 @@ function domainSumPlot(){
 	var ipanel = 0;
 
 	d3.json(subdir+'/stats/domainSumPlot', function(data){
-		data.forEach(function(d){
+		// summary data
+		data.sum.forEach(function(d){
 			d[1] = +d[1]; //Nstudy
 			d[2] = +d[2]; //Ngwas
 			d[3] = +d[3]; //Ntrait
-			d[4] = +d[4]; //Nsample_avg
-			d[5] = +d[5]; //Nsample_min
-			d[6] = +d[6]; //Nsample_max
+		});
+		// Nsample box data
+		data.Nbox.data.forEach(function(d){
+			d[1] = +d[1]; //median
+			d[2] = +d[2]; //mean
+			d[3] = +d[3]; //1st q
+			d[4] = +d[4] //3rd q
+			d[5] = +d[5] //min
+			d[6] = +d[6] //max
+		});
+		data.Nbox.out.forEach(function(d){
+			d[1] = +d[1]; //N
+		});
+		// SNP h2 box data
+		data.Hbox.data.forEach(function(d){
+			d[1] = +d[1]; //median
+			d[2] = +d[2]; //mean
+			d[3] = +d[3]; //1st q
+			d[4] = +d[4] //3rd q
+			d[5] = +d[5] //min
+			d[6] = +d[6] //max
+		});
+		data.Hbox.out.forEach(function(d){
+			d[1] = +d[1]; //N
 		});
 
-		var years = data.map(function(d){return d[0]});
+		var years = data.sum.map(function(d){return d[0]});
 		var x = d3.scale.ordinal().domain(years).rangeBands([0, width], 0.1);
 		var xAxis = d3.svg.axis().scale(x).orient("bottom");
 
 		// Nstudy
 		ipanel = 1;
 		var y = d3.scale.linear().range([height-(hist_height+hist_space)*(ipanel-1), height-hist_height*ipanel-hist_space*(ipanel-1)]);
-		var ymax = d3.max(data, function(d){return d[ipanel]});
+		var ymax = d3.max(data.sum, function(d){return d[ipanel]});
 		y.domain([0, ymax+ymax*0.05]);
 		var yAxis = d3.svg.axis().scale(y).orient("left").ticks(4);
 		var tip1 = d3.tip()
@@ -239,14 +327,15 @@ function domainSumPlot(){
 			.offset([-5,0])
 			.html(function(d){return d[1]});
 		svg.call(tip1);
-		svg.selectAll('.Nstudy').data(data.filter(function(d){if(d[ipanel]>0){return d}}))
+		svg.selectAll('.Nstudy').data(data.sum.filter(function(d){if(d[ipanel]>0){return d}}))
 			.enter()
 			.append('rect').attr('class', 'bar')
 			.attr("x", function(d){return x(d[0])})
 			.attr("width", x.rangeBand())
 			.attr("y", function(d){return y(d[ipanel])})
 			.attr("height", function(d){return height-(hist_height+hist_space)*(ipanel-1)-y(d[ipanel])})
-			.style("fill", "pink")
+			.style("fill", function(d){return domain_col[d[0]]})
+			.style("opacity", .7)
 			.on("mouseover", tip1.show)
 			.on("mouseout", tip1.hide);
 		svg.append('g').attr("class", "x axis")
@@ -267,7 +356,7 @@ function domainSumPlot(){
 		//Ngwas
 		ipanel = 2;
 		y = d3.scale.linear().range([height-(hist_height+hist_space)*(ipanel-1), height-hist_height*ipanel-hist_space*(ipanel-1)]);
-		ymax = d3.max(data, function(d){return d[ipanel]});
+		ymax = d3.max(data.sum, function(d){return d[ipanel]});
 		y.domain([0, ymax+ymax*0.05]);
 		yAxis = d3.svg.axis().scale(y).orient("left").ticks(4);
 		var tip2 = d3.tip()
@@ -275,14 +364,15 @@ function domainSumPlot(){
 			.offset([-5,0])
 			.html(function(d){return d[2]});
 		svg.call(tip2);
-		svg.selectAll('.Ngwas').data(data.filter(function(d){if(d[ipanel]>0){return d}}))
+		svg.selectAll('.Ngwas').data(data.sum.filter(function(d){if(d[ipanel]>0){return d}}))
 			.enter()
 			.append('rect')
 			.attr("x", function(d){return x(d[0])})
 			.attr("width", x.rangeBand())
 			.attr("y", function(d){return y(d[ipanel])})
 			.attr("height", function(d){return height-(hist_height+hist_space)*(ipanel-1)-y(d[ipanel])})
-			.style("fill", "orange")
+			.style("fill", function(d){return domain_col[d[0]]})
+			.style("opacity", .7)
 			.on("mouseover", tip2.show)
 			.on("mouseout", tip2.hide);
 		svg.append('g').attr("class", "x axis")
@@ -299,7 +389,7 @@ function domainSumPlot(){
 		//Ntrait
 		ipanel = 3;
 		y = d3.scale.linear().range([height-(hist_height+hist_space)*(ipanel-1), height-hist_height*ipanel-hist_space*(ipanel-1)]);
-		ymax = d3.max(data, function(d){return d[ipanel]});
+		ymax = d3.max(data.sum, function(d){return d[ipanel]});
 		y.domain([0, ymax+ymax*0.05]);
 		yAxis = d3.svg.axis().scale(y).orient("left").ticks(4);
 		var tip3 = d3.tip()
@@ -307,14 +397,15 @@ function domainSumPlot(){
 			.offset([-5,0])
 			.html(function(d){return d[3]});
 		svg.call(tip3);
-		svg.selectAll('.Ntrait').data(data.filter(function(d){if(d[ipanel]>0){return d}}))
+		svg.selectAll('.Ntrait').data(data.sum.filter(function(d){if(d[ipanel]>0){return d}}))
 			.enter()
 			.append('rect')
 			.attr("x", function(d){return x(d[0])})
 			.attr("width", x.rangeBand())
 			.attr("y", function(d){return y(d[ipanel])})
 			.attr("height", function(d){return height-(hist_height+hist_space)*(ipanel-1)-y(d[ipanel])})
-			.style("fill", "lightgreen")
+			.style("fill", function(d){return domain_col[d[0]]})
+			.style("opacity", .7)
 			.on("mouseover", tip3.show)
 			.on("mouseout", tip3.hide);
 		svg.append('g').attr("class", "x axis")
@@ -331,48 +422,90 @@ function domainSumPlot(){
 		//Nsample
 		ipanel = 4;
 		y = d3.scale.linear().range([height-(hist_height+hist_space)*(ipanel-1), height-hist_height*ipanel-hist_space*(ipanel-1)]);
-		ymax = d3.max(data, function(d){return d[6]});
+		ymax = d3.max(data.Nbox.out, function(d){return d[1]});
 		y.domain([0, ymax+ymax*0.05]);
 		yAxis = d3.svg.axis().scale(y).orient("left").ticks(4);
 		var tip4 = d3.tip()
 			.attr('class', 'd3-tip')
 			.offset([-5,0])
-			.html(function(d){return "Max: "+d[6]+"<br/>Avg: "+d[4]+"<br/>Min: "+d[5]});
+			.html(function(d){return "Median: "+d[1]+"<br/>Avg: "+d[2]+"<br/>"});
 		svg.call(tip4);
-		svg.selectAll('.Nsample').data(data.filter(function(d){if(d[ipanel]>0){return d}}))
+		// box
+		svg.selectAll('.box').data(data.Nbox.data)
 			.enter()
 			.append('rect')
-			.attr("x", function(d){return x(d[0])})
-			.attr("width", x.rangeBand())
-			.attr("y", function(d){return y(d[ipanel])})
-			.attr("height", function(d){return height-(hist_height+hist_space)*(ipanel-1)-y(d[ipanel])})
-			.style("fill", "skyblue")
+			.attr("x", function(d){return x(d[0])+x.rangeBand()*0.15})
+			.attr("width", x.rangeBand()*0.7)
+			.attr("y", function(d){return y(d[4])})
+			.attr("height", function(d){return y(d[3])-y(d[4])})
+			.style("fill", function(d){return domain_col[d[0]]})
+			.style("opacity", .7)
+			.style("stroke", "steelblue")
 			.on("mouseover", tip4.show)
 			.on("mouseout", tip4.hide);
-		svg.selectAll('.Nsamplemin').data(data.filter(function(d){if(d[ipanel]>0){return d}}))
+		// median
+		svg.selectAll('.medianline').data(data.Nbox.data)
 			.enter()
 			.append('line')
-			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.25})
-			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.75})
-			.attr("y1", function(d){return y(d[5])})
-			.attr("y2", function(d){return y(d[5])})
+			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.15})
+			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.85})
+			.attr("y1", function(d){return y(d[1])})
+			.attr("y2", function(d){return y(d[1])})
 			.style("stroke", "black");
-		svg.selectAll('.Nsamplemax').data(data.filter(function(d){if(d[ipanel]>0){return d}}))
+		// mean
+		svg.selectAll('.meanline').data(data.Nbox.data)
+			.enter()
+			.append('line')
+			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.15})
+			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.85})
+			.attr("y1", function(d){return y(d[2])})
+			.attr("y2", function(d){return y(d[2])})
+			.style("stroke", "black")
+			.style("stroke-dasharray", "2,2");
+		// upper bars
+		svg.selectAll('.upperline').data(data.Nbox.data)
+			.enter()
+			.append('line')
+			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.5})
+			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.5})
+			.attr("y1", function(d){return y(d[4])})
+			.attr("y2", function(d){return y(d[6])})
+			.style("stroke", function(d){return domain_col[d[0]]});
+		svg.selectAll('.topline').data(data.Nbox.data)
 			.enter()
 			.append('line')
 			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.25})
 			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.75})
 			.attr("y1", function(d){return y(d[6])})
 			.attr("y2", function(d){return y(d[6])})
-			.style("stroke", "black");
-		svg.selectAll('.Nsamplebar').data(data.filter(function(d){if(d[ipanel]>0){return d}}))
+			.style("stroke", function(d){return domain_col[d[0]]});
+		// lower bar
+		svg.selectAll('.lowerline').data(data.Nbox.data)
 			.enter()
 			.append('line')
-			.attr("x1", function(d){return x(d[0])+x.rangeBand()/2})
-			.attr("x2", function(d){return x(d[0])+x.rangeBand()/2})
-			.attr("y1", function(d){return y(d[6])})
+			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.5})
+			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.5})
+			.attr("y1", function(d){return y(d[3])})
 			.attr("y2", function(d){return y(d[5])})
-			.style("stroke", "black");
+			.style("stroke", function(d){return domain_col[d[0]]});
+		svg.selectAll('.bottomline').data(data.Nbox.data)
+			.enter()
+			.append('line')
+			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.25})
+			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.75})
+			.attr("y1", function(d){return y(d[5])})
+			.attr("y2", function(d){return y(d[5])})
+			.style("stroke", function(d){return domain_col[d[0]]});
+		// outlier
+		svg.selectAll('.outdot').data(data.Nbox.out)
+			.enter()
+			.append('circle')
+			.attr('r',2)
+			.attr('cx', function(d){return x(d[0])+x.rangeBand()*0.5})
+			.attr('cy', function(d){return y(d[1])})
+			.style("fill", function(d){return domain_col[d[0]]})
+			.style("opacity", .7)
+			.style("stroke", "grey");
 
 		svg.append('g').attr("class", "x axis")
 			.attr("transform", "translate(0,"+(height-(hist_height+hist_space)*(ipanel-1))+")")
@@ -383,6 +516,105 @@ function domainSumPlot(){
 		svg.append("text").attr("text-anchor", "middle")
 			.attr("transform", "translate("+(width+10)+","+(height-(hist_height+hist_space)*(ipanel-1)+height-hist_height*ipanel-hist_space*(ipanel-1))/2+")rotate(90)")
 			.text("N samples")
+			.style("font-size", "12px");
+
+		//SNP h2
+		ipanel = 5;
+		y = d3.scale.linear().range([height-(hist_height+hist_space)*(ipanel-1), height-hist_height*ipanel-hist_space*(ipanel-1)]);
+		ymax = d3.max(data.Hbox.out, function(d){return d[1]});
+		y.domain([0, ymax+ymax*0.05]);
+		yAxis = d3.svg.axis().scale(y).orient("left").ticks(4);
+		var tip5 = d3.tip()
+			.attr('class', 'd3-tip')
+			.offset([-5,0])
+			.html(function(d){return "Median: "+d[1]+"<br/>Avg: "+d[2]+"<br/>"});
+		svg.call(tip5);
+		// box
+		svg.selectAll('.box').data(data.Hbox.data)
+			.enter()
+			.append('rect')
+			.attr("x", function(d){return x(d[0])+x.rangeBand()*0.15})
+			.attr("width", x.rangeBand()*0.7)
+			.attr("y", function(d){return y(d[4])})
+			.attr("height", function(d){return y(d[3])-y(d[4])})
+			.style("fill", function(d){return domain_col[d[0]]})
+			.style("opacity", .7)
+			.style("stroke", "steelblue")
+			.on("mouseover", tip4.show)
+			.on("mouseout", tip4.hide);
+		// median
+		svg.selectAll('.medianline').data(data.Hbox.data)
+			.enter()
+			.append('line')
+			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.15})
+			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.85})
+			.attr("y1", function(d){return y(d[1])})
+			.attr("y2", function(d){return y(d[1])})
+			.style("stroke", "black");
+		// mean
+		svg.selectAll('.meanline').data(data.Hbox.data)
+			.enter()
+			.append('line')
+			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.15})
+			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.85})
+			.attr("y1", function(d){return y(d[2])})
+			.attr("y2", function(d){return y(d[2])})
+			.style("stroke", "black")
+			.style("stroke-dasharray", "2,2");
+		// upper bars
+		svg.selectAll('.upperline').data(data.Hbox.data)
+			.enter()
+			.append('line')
+			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.5})
+			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.5})
+			.attr("y1", function(d){return y(d[4])})
+			.attr("y2", function(d){return y(d[6])})
+			.style("stroke", function(d){return domain_col[d[0]]});
+		svg.selectAll('.topline').data(data.Hbox.data)
+			.enter()
+			.append('line')
+			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.25})
+			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.75})
+			.attr("y1", function(d){return y(d[6])})
+			.attr("y2", function(d){return y(d[6])})
+			.style("stroke", function(d){return domain_col[d[0]]});
+		// lower bar
+		svg.selectAll('.lowerline').data(data.Hbox.data)
+			.enter()
+			.append('line')
+			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.5})
+			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.5})
+			.attr("y1", function(d){return y(d[3])})
+			.attr("y2", function(d){return y(d[5])})
+			.style("stroke", function(d){return domain_col[d[0]]});
+		svg.selectAll('.bottomline').data(data.Hbox.data)
+			.enter()
+			.append('line')
+			.attr("x1", function(d){return x(d[0])+x.rangeBand()*0.25})
+			.attr("x2", function(d){return x(d[0])+x.rangeBand()*0.75})
+			.attr("y1", function(d){return y(d[5])})
+			.attr("y2", function(d){return y(d[5])})
+			.style("stroke", function(d){return domain_col[d[0]]});
+		// outlier
+		svg.selectAll('.outdot').data(data.Hbox.out)
+			.enter()
+			.append('circle')
+			.attr('r',2)
+			.attr('cx', function(d){return x(d[0])+x.rangeBand()*0.5})
+			.attr('cy', function(d){return y(d[1])})
+			.style("fill", function(d){return domain_col[d[0]]})
+			.style("opacity", .7)
+			.style("stroke", "grey");
+
+		svg.append('g').attr("class", "x axis")
+			.attr("transform", "translate(0,"+(height-(hist_height+hist_space)*(ipanel-1))+")")
+			.call(xAxis).selectAll("text").remove();
+		svg.append('g').attr("class", "y axis")
+			.call(yAxis)
+			.selectAll("text");
+		svg.append("text").attr("text-anchor", "middle")
+			.attr("transform", "translate("+(width+10)+","+(height-(hist_height+hist_space)*(ipanel-1)+height-hist_height*ipanel-hist_space*(ipanel-1))/2+")rotate(90)")
+			.text("SNP h2")
 			.style("font-size", "12px");
 	});
 }
@@ -442,7 +674,8 @@ function DomainPiePlot(){
 			.data(pie(data)).enter().append("g")
 			.attr("class", "arc");
 		g.append("path").attr("d", arc)
-			.style("fill", function(d){return color(d.data.Domain)})
+			.style("fill", function(d){return domain_col[d.data.Domain]})
+			.style("opacity", .65)
 			.on("mouseover", function(d){
 				d3.select(this)
 				.attr("d", arcOver)
@@ -488,12 +721,19 @@ function DomainPiePlot(){
 			.style("font-size", "10")
 			.attr("text-anchor", "middle")
 			.attr("dy", ".25em");
+
+		// center label
 		svg.append("text").attr("text-anchor", "middle")
-			.attr("x", 0).attr("y", -5)
-			.text("Studies");
+			.attr("x", 0).attr("y", -10)
+			.text(total);
+		svg.append("text").attr("text-anchor", "middle")
+			.attr("x", 0).attr("y", 5)
+			.text("unique")
+			.style('font-size', 10);
 		svg.append("text").attr("text-anchor", "middle")
 			.attr("x", 0).attr("y", 15)
-			.text(total);
+			.text("study-domain pairs")
+			.style('font-size', 10);
 	});
 }
 
@@ -522,14 +762,15 @@ function ChapterPiePlot(domain){
 		.sort(null)
 		.value(function(d){return d.count;});
 
-	var color = d3.scale.ordinal()
-		.range(["#80ccff", "#8080ff", "#ff80df", "#e699cc", "#ff8080", "#ffb380", "#ff9980"]);
 	d3.json(subdir+"/stats/ChapterPie/"+domain, function(data){
 		var total = 0;
 		data.forEach(function(d){
 			d.count = +d.count;
 			total += d.count;
 		});
+
+		// generate color
+		var color = d3.scale.linear().domain([0, data.length/4, data.length/2, data.length*3/4, data.length]).range(["#6666ff", "#cc66ff", "#ff6699", "#ffcc66", "#00cc66"]);
 
 		// get label position without overlap
 		var label = [];
@@ -555,7 +796,8 @@ function ChapterPiePlot(domain){
 			.data(pie(data)).enter().append("g")
 			.attr("class", "arc");
 		g.append("path").attr("d", arc)
-			.style("fill", function(d){return color(d.data.ChapterLevel)})
+			.style("fill", function(d,i){return color(i)})
+			.style("opacity", .8)
 			.on("mouseover", function(d){
 				d3.select(this)
 				.attr("d", arcOver)
@@ -600,12 +842,18 @@ function ChapterPiePlot(domain){
 			.style("font-size", "10")
 			.attr("text-anchor", "middle")
 			.attr("dy", ".25em");
+		// center label
 		svg.append("text").attr("text-anchor", "middle")
-			.attr("x", 0).attr("y", -5)
-			.text("Studies");
+			.attr("x", 0).attr("y", -10)
+			.text(total);
+		svg.append("text").attr("text-anchor", "middle")
+			.attr("x", 0).attr("y", 5)
+			.text("unique")
+			.style('font-size', 10);
 		svg.append("text").attr("text-anchor", "middle")
 			.attr("x", 0).attr("y", 15)
-			.text(total);
+			.text("study-chapter pairs")
+			.style('font-size', 10);
 	});
 }
 
@@ -634,14 +882,15 @@ function SubchapterPiePlot(domain, chapter){
 		.sort(null)
 		.value(function(d){return d.count;});
 
-	var color = d3.scale.ordinal()
-		.range(["#80ccff", "#8080ff", "#ff80df", "#e699cc", "#ff8080", "#ffb380", "#ff9980"]);
 	d3.json(subdir+"/stats/SubchapterPie/"+domain+"/"+chapter, function(data){
 		var total = 0;
 		data.forEach(function(d){
 			d.count = +d.count;
 			total += d.count;
 		});
+
+		// generate color
+		var color = d3.scale.linear().domain([0, data.length/4, data.length/2, data.length*3/4, data.length]).range(["#6666ff", "#cc66ff", "#ff6699", "#ffcc66", "#00cc66"]);
 
 		// get label position without overlap
 		var label = [];
@@ -667,7 +916,8 @@ function SubchapterPiePlot(domain, chapter){
 			.data(pie(data)).enter().append("g")
 			.attr("class", "arc");
 		g.append("path").attr("d", arc)
-			.style("fill", function(d){return color(d.data.SubchapterLevel)})
+			.style("fill", function(d,i){return color(i)})
+			.style("opacity", .8)
 			.on("mouseover", function(d){
 				d3.select(this)
 					.attr("d", arcOver)
@@ -709,12 +959,18 @@ function SubchapterPiePlot(domain, chapter){
 			.style("font-size", "10")
 			.attr("text-anchor", "middle")
 			.attr("dy", ".25em");
+		// center label
 		svg.append("text").attr("text-anchor", "middle")
-			.attr("x", 0).attr("y", -5)
-			.text("Studies");
+			.attr("x", 0).attr("y", -10)
+			.text(total);
+		svg.append("text").attr("text-anchor", "middle")
+			.attr("x", 0).attr("y", 5)
+			.text("unique")
+			.style('font-size', 10);
 		svg.append("text").attr("text-anchor", "middle")
 			.attr("x", 0).attr("y", 15)
-			.text(total);
+			.text("study-subchapter pairs")
+			.style('font-size', 10);
 	});
 }
 

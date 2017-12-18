@@ -38,118 +38,25 @@ class StatsController extends Controller
 	}
 
 	public function yearSumPlot(){
-		$minYear = collect(DB::select("SELECT MIN(Year) as year from gwasDB"))->first()->year;
-		$maxYear = collect(DB::select("SELECT MAX(Year) as year from gwasDB"))->first()->year;
-		$years = [];
-		for($i=$minYear; $i<=$maxYear; $i++){
-			$years[] = $i;
-		}
+		$script = storage_path().'/scripts/DBsummary.py';
+		$host = config('database.connections.mysql.host');
+		$user = config('database.connections.mysql.username');
+		$pass = config('database.connections.mysql.password');
+		$db = config('database.connections.mysql.database');
 
-		$Nstudy = array_fill(0, count($years)-1,0);
-		$tmp = DB::select("SELECT Year, COUNT(DISTINCT PMID) AS count FROM gwasDB GROUP BY Year");
-		foreach($tmp as $row){
-			$Nstudy[array_search($row->Year, $years)] = $row->count;
-		}
-
-		$Ngwas = array_fill(0, count($years)-1,0);
-		$tmp = DB::select("SELECT Year, COUNT(*) AS count FROM gwasDB GROUP BY Year");
-		foreach($tmp as $row){
-			$Ngwas[array_search($row->Year, $years)] = $row->count;
-		}
-
-		$Ntrait = array_fill(0, count($years)-1,0);
-		for($i=0; $i<count($years); $i++){
-			$tmp = DB::select("SELECT Trait from gwasDB WHERE Year=?", [$years[$i]]);
-			$trait = [];
-			foreach($tmp as $row){
-				$t = $row->Trait;
-				$t = preg_replace("/(.+) \(.+\)/", "$1", $t);
-				if(!in_array($t, $trait)){
-					$trait[] = $t;
-				}
-			}
-			$Ntrait[$i] = count($trait);
-		}
-
-		$Nsample_avg = array_fill(0, count($years)-1,0);
-		$Nsample_min = array_fill(0, count($years)-1,0);
-		$Nsample_max = array_fill(0, count($years)-1,0);
-
-		$tmp = DB::select("SELECT Year, AVG(N) AS n FROM gwasDB GROUP BY Year");
-		foreach($tmp as $row){
-			$Nsample_avg[array_search($row->Year, $years)] = $row->n;
-		}
-		$tmp = DB::select("SELECT Year, MIN(N) AS n FROM gwasDB GROUP BY Year");
-		foreach($tmp as $row){
-			$Nsample_min[array_search($row->Year, $years)] = $row->n;
-		}
-		$tmp = DB::select("SELECT Year, MAX(N) AS n FROM gwasDB GROUP BY Year");
-		foreach($tmp as $row){
-			$Nsample_max[array_search($row->Year, $years)] = $row->n;
-		}
-
-		$results = [];
-		for($i=0; $i<count($years); $i++){
-			$results[] = [$years[$i], $Nstudy[$i], $Ngwas[$i], $Ntrait[$i], $Nsample_avg[$i], $Nsample_min[$i], $Nsample_max[$i]];
-		}
-		return json_encode($results);
+		$results = shell_exec("python $script $host $user $pass $db Year");
+		return $results;
 	}
 
 	public function domainSumPlot(){
-		$domains = [];
-		$tmp = DB::select("SELECT DISTINCT Domain from gwasDB ORDER BY Domain");
-		foreach($tmp as $d){
-			$domains[] = $d->Domain;
-		}
+		$script = storage_path().'/scripts/DBsummary.py';
+		$host = config('database.connections.mysql.host');
+		$user = config('database.connections.mysql.username');
+		$pass = config('database.connections.mysql.password');
+		$db = config('database.connections.mysql.database');
 
-		$Nstudy = array_fill(0, count($domains)-1,0);
-		$tmp = DB::select("SELECT Domain, COUNT(DISTINCT PMID) AS count FROM gwasDB GROUP BY Domain");
-		foreach($tmp as $row){
-			$Nstudy[array_search($row->Domain, $domains)] = $row->count;
-		}
-
-		$Ngwas = array_fill(0, count($domains)-1,0);
-		$tmp = DB::select("SELECT Domain, COUNT(*) AS count FROM gwasDB GROUP BY Domain");
-		foreach($tmp as $row){
-			$Ngwas[array_search($row->Domain, $domains)] = $row->count;
-		}
-
-		$Ntrait = array_fill(0, count($domains)-1,0);
-		for($i=0; $i<count($domains); $i++){
-			$tmp = DB::select("SELECT Trait from gwasDB WHERE Domain=?", [$domains[$i]]);
-			$trait = [];
-			foreach($tmp as $row){
-				$t = $row->Trait;
-				$t = preg_replace("/(.+) \(.+\)/", "$1", $t);
-				if(!in_array($t, $trait)){
-					$trait[] = $t;
-				}
-			}
-			$Ntrait[$i] = count($trait);
-		}
-
-		$Nsample_avg = array_fill(0, count($domains)-1,0);
-		$Nsample_min = array_fill(0, count($domains)-1,0);
-		$Nsample_max = array_fill(0, count($domains)-1,0);
-
-		$tmp = DB::select("SELECT Domain, AVG(N) AS n FROM gwasDB GROUP BY Domain");
-		foreach($tmp as $row){
-			$Nsample_avg[array_search($row->Domain, $domains)] = $row->n;
-		}
-		$tmp = DB::select("SELECT Domain, MIN(N) AS n FROM gwasDB GROUP BY Domain");
-		foreach($tmp as $row){
-			$Nsample_min[array_search($row->Domain, $domains)] = $row->n;
-		}
-		$tmp = DB::select("SELECT Domain, MAX(N) AS n FROM gwasDB GROUP BY Domain");
-		foreach($tmp as $row){
-			$Nsample_max[array_search($row->Domain, $domains)] = $row->n;
-		}
-
-		$results = [];
-		for($i=0; $i<count($domains); $i++){
-			$results[] = [$domains[$i], $Nstudy[$i], $Ngwas[$i], $Ntrait[$i], $Nsample_avg[$i], $Nsample_min[$i], $Nsample_max[$i]];
-		}
-		return json_encode($results);
+		$results = shell_exec("python $script $host $user $pass $db Domain");
+		return $results;
 	}
 
 	public function DomainPie(){

@@ -26,13 +26,13 @@
 	});
 	var subdir = "{{ Config::get('app.subdir') }}";
 </script>
+<script type="text/javascript" src="{!! URL::asset('js/global.js') !!}"></script>
 <script type="text/javascript" src="{!! URL::asset('js/multiGWAS.js') !!}"></script>
-<script type="text/javascript" src="{!! URL::asset('js/sidebar.js') !!}"></script>
-<link rel="stylesheet" href="{!! URL::asset('css/style.css') !!}">
+
 @stop
 
 @section('content')
-<div style="padding-top: 50px; padding-right: 50px; padding-left: 50px;">
+<div style="padding-top:50px;padding-right:50px;padding-left:50px;">
 	<!-- GWAS selectionz -->
 	<div class="panel panel-default">
 		<div class="panel-heading">
@@ -87,29 +87,24 @@
 			</div>
 
 			<div class="row" style="padding:25px;">
-				<!-- <div class="col-md-8 col-sm-8 col-xs-8"> -->
-					<!-- <span class="info" style="font-size:14px;"><i class="fa fa-info"></i>
-						Click row to select a GWAS or
-					</span>
-					<button class="btn btn-sm">select all GWAS in the table</button><br/> -->
-					<table id="selectTable" class="display compact dt-body-right dt-head-center" width="90%" cellspacing="0" style="display: block; overflow-x: auto; font-size:12px;">
-						<thead>
-							<th>ID</th>
-							<th>PMID</th>
-							<th>Year</th>
-							<th>Domain</th>
-							<th>Chapter level</th>
-							<th>Subchapter level</th>
-							<th>Trait</th>
-							<th>Population</th>
-							<th>N</th>
-						</thead>
-					</table>
-				<!-- </div> -->
-				<!-- <div class="col-md-4 col-sm-4 col-xs-4">
-					Selected GWAS<br/>
-					<textarea rows="20" cols="50"></textarea>
-				</div> -->
+				<h4><span id="manual_select_n">0</span> GWAS are selected.</h4>
+				<button class="btn btn-xs" id="manual_select_all">Select all displayed GWAS</button><tab>
+				<button class="btn btn-xs" id="manual_clear_all">Clear all selected GWAS</button><br/>
+				<table id="selectTable" class="display compact dt-body-right dt-head-center" width="90%" cellspacing="0" style="display: block; overflow-x: auto; font-size:12px;">
+					<thead>
+						<th>select</th>
+						<th>ID</th>
+						<th>PMID</th>
+						<th>Year</th>
+						<th>Domain</th>
+						<th>Chapter level</th>
+						<th>Subchapter level</th>
+						<th>Trait</th>
+						<th>uniqTrait</th>
+						<th>Population</th>
+						<th>N</th>
+					</thead>
+				</table>
 			</div>
 			<button class="btn" id="processGWAS">Compare displayed GWAS</button>
 			<div id="msg"></div>
@@ -137,9 +132,9 @@
 		<div class="col-md-4 col-sm-4 col-xs-4">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h4 class="panel-title">Number of risk loci vs Sample size</h4>
+					<h4 class="panel-title">Sample size vs Number of risk loci</h4>
 				</div>
-				<div class="panel-body col4BoxBody" id="lociVSnBody" style="text-align:center; overflow:auto;">
+				<div class="panel-body col4BoxBody" id="nVSlociBody" style="text-align:center; overflow:auto;">
 				</div>
 			</div>
 		</div>
@@ -148,18 +143,18 @@
 		<div class="col-md-4 col-sm-4 col-xs-4">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h4 class="panel-title">SNP heritability vs Sample size</h4>
+					<h4 class="panel-title">Sample size vs SNP heritability</h4>
 				</div>
-				<div class="panel-body col4BoxBody" id="h2VSnBody" style="text-align:center; overflow:auto;">
+				<div class="panel-body col4BoxBody" id="nVSh2Body" style="text-align:center; overflow:auto;">
 				</div>
 			</div>
 		</div>
 		<div class="col-md-4 col-sm-4 col-xs-4">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h4 class="panel-title">SNP heritability vs Number of risk loci</h4>
+					<h4 class="panel-title">Number of risk loci vs SNP heritability</h4>
 				</div>
-				<div class="panel-body col4BoxBody" id="h2VSlociBody" style="text-align:center; overflow:auto;">
+				<div class="panel-body col4BoxBody" id="lociVSh2Body" style="text-align:center; overflow:auto;">
 				</div>
 			</div>
 		</div>
@@ -218,7 +213,8 @@
 						<br/><br/>
 						<span class="info"><i class="fa fa-info"></i>
 							The heatmap is asymmetric.
-							The cell of <i>i</i>th column and <i>j</i>th row represents the proportion of overlapped significant genes (P-value < 2.5e-6) between two GWAS (the number of genes significant in both GWAS <i>i</i> and <i>j</i> divided by the number of significant genes in GWAS <i>i</i>).
+							The cell of <i>i</i>th column and <i>j</i>th row represents the proportion of overlapped significant genes (P-value < 2.5e-6) between two GWAS
+							based on the number of significant genes in ith GWAS (the number of genes significant in both GWAS <i>i</i> and <i>j</i> divided by the number of significant genes in GWAS <i>i</i>).
 							Rectangles next to the trait labels are colored based on the domain of the trait.
 						</span>
 					</div>
@@ -236,6 +232,7 @@
 				Each dot represents a group of risk loci (grouped physically overlapped risk loci).
 				The genome wide plot can be zoomed in and out by scroll.
 				By clicking a dot, another plot for a specific group of risk loci will be plotted (only if the number of GWAS in the grouped locus is > 1).
+				Note that P-value < 1e-300 is replaced with 1e-300 (maximum -log10 P-value is 300 in this plot).
 			</span><br/>
 			<div id="lociPlot" style="text-align:center;"></div>
 			<div id="locusPlot" style="text-align:center;"></div>

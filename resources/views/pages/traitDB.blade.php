@@ -21,7 +21,7 @@
 </script>
 <script type="text/javascript" src="{!! URL::asset('js/traitDB.js') !!}"></script>
 <script type="text/javascript" src="{!! URL::asset('js/global.js') !!}"></script>
-<link rel="stylesheet" href="{!! URL::asset('css/style.css') !!}">
+
 @stop
 
 @section('content')
@@ -90,6 +90,7 @@
 				<th>Chapter level</th>
 				<th>Subchapter level</th>
 				<th>Trait</th>
+				<th>uniqTrait</th>
 				<th>Population</th>
 				<th>Case</th>
 				<th>Control</th>

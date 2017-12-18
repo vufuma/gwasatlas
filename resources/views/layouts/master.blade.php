@@ -6,7 +6,7 @@
 </head>
 
 <body>
-	<div class="container-fluid">
+	<div class="container-fluid" >
 		<div id="header" class="row">
 			@include('includes.header')
 		</div>

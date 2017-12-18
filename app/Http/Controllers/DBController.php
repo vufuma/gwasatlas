@@ -25,12 +25,10 @@ class DBController extends Controller
 			if(strcmp($domain, "null")==0){
 				$Domain = [];
 				$Trait = [];
-				$results = DB::select('SELECT * FROM gwasDB');
+				$results = DB::select('SELECT Domain, uniqTrait FROM gwasDB');
 				foreach($results as $row){
 					$d = $row->Domain;
-					$t = $row->Trait;
-					$t = preg_replace("/(.+) \(.+\)/", "$1", $t);
-					$t = preg_replace("/(.+) - .+/", "$1", $t);
+					$t = $row->uniqTrait;
 					if(array_key_exists($d, $Domain)){
 						$Domain[$d] += 1;
 					}else{
@@ -47,16 +45,14 @@ class DBController extends Controller
 				$json = array("Domain" => $Domain, "Chapter"=>[], "Subchapter"=>[], "Trait"=>$Trait);
 				echo json_encode($json);
 			}else{
-				$results = DB::select('SELECT * FROM gwasDB WHERE Domain=?', [$domain]);
+				$results = DB::select('SELECT ChapterLevel,SubchapterLevel,uniqTrait FROM gwasDB WHERE Domain=?', [$domain]);
 				$Chapter = [];
 				$Subchapter = [];
 				$Trait = [];
 				foreach($results as $row){
 					$c = $row->ChapterLevel;
 					$s = $row->SubchapterLevel;
-					$t = $row->Trait;
-					$t = preg_replace("/(.+) \(.+\)/", "$1", $t);
-					$t = preg_replace("/(.+) - .+/", "$1", $t);
+					$t = $row->uniqTrait;
 					if(array_key_exists($c, $Chapter)){
 						$Chapter[$c] += 1;
 					}else{
@@ -81,16 +77,14 @@ class DBController extends Controller
 			}
 		}else if(strcmp($type, 'Chapter')==0){
 			if(strcmp($chapter, "null")==0){
-				$results = DB::select('SELECT * FROM gwasDB WHERE Domain=?', [$domain]);
+				$results = DB::select('SELECT ChapterLevel,SubchapterLevel,uniqTrait FROM gwasDB WHERE Domain=?', [$domain]);
 				$Chapter = [];
 				$Subchapter = [];
 				$Trait = [];
 				foreach($results as $row){
 					$c = $row->ChapterLevel;
 					$s = $row->SubchapterLevel;
-					$t = $row->Trait;
-					$t = preg_replace("/(.+) \(.+\)/", "$1", $t);
-					$t = preg_replace("/(.+) - .+/", "$1", $t);
+					$t = $row->uniqTrait;
 					if(array_key_exists($c, $Chapter)){
 						$Chapter[$c] += 1;
 					}else{
@@ -113,14 +107,12 @@ class DBController extends Controller
 				$json = array("Chapter"=>$Chapter, "Subchapter"=>$Subchapter, "Trait"=>$Trait);
 				echo json_encode($json);
 			}else{
-				$results = DB::select('SELECT * FROM gwasDB WHERE Domain=? AND ChapterLevel=?', [$domain, $chapter]);
+				$results = DB::select('SELECT SubchapterLevel,uniqTrait FROM gwasDB WHERE Domain=? AND ChapterLevel=?', [$domain, $chapter]);
 				$Subchapter = [];
 				$Trait = [];
 				foreach($results as $row){
 					$s = $row->SubchapterLevel;
-					$t = $row->Trait;
-					$t = preg_replace("/(.+) \(.+\)/", "$1", $t);
-					$t = preg_replace("/(.+) - .+/", "$1", $t);
+					$t = $row->uniqTrait;
 					if(array_key_exists($s, $Subchapter)){
 						$Subchapter[$s] += 1;
 					}else{
@@ -139,16 +131,14 @@ class DBController extends Controller
 			}
 		}else if(strcmp($type, 'Subchapter')==0){
 			if(strcmp($chapter,"null")==0 && strcmp($subchapter,"null")==0){
-				$results = DB::select('SELECT * FROM gwasDB WHERE Domain=?', [$domain]);
+				$results = DB::select('SELECT ChapterLevel,SubchapterLevel,uniqTrait FROM gwasDB WHERE Domain=?', [$domain]);
 				$Chapter = [];
 				$Subchapter = [];
 				$Trait = [];
 				foreach($results as $row){
 					$c = $row->ChapterLevel;
 					$s = $row->SubchapterLevel;
-					$t = $row->Trait;
-					$t = preg_replace("/(.+) \(.+\)/", "$1", $t);
-					$t = preg_replace("/(.+) - .+/", "$1", $t);
+					$t = $row->uniqTrait;
 					if(array_key_exists($c, $Chapter)){
 						$Chapter[$c] += 1;
 					}else{
@@ -171,14 +161,12 @@ class DBController extends Controller
 				$json = array("Chapter"=>$Chapter, "Subchapter"=>$Subchapter, "Trait"=>$Trait);
 				echo json_encode($json);
 			}else if(strcmp($subchapter,"null")==0){
-				$results = DB::select('SELECT * FROM gwasDB WHERE Domain=? AND ChapterLevel=?', [$domain, $chapter]);
+				$results = DB::select('SELECT SubchapterLevel,uniqTrait FROM gwasDB WHERE Domain=? AND ChapterLevel=?', [$domain, $chapter]);
 				$Subchapter = [];
 				$Trait = [];
 				foreach($results as $row){
 					$s = $row->SubchapterLevel;
-					$t = $row->Trait;
-					$t = preg_replace("/(.+) \(.+\)/", "$1", $t);
-					$t = preg_replace("/(.+) - .+/", "$1", $t);
+					$t = $row->uniqTrait;
 					if(array_key_exists($s, $Subchapter)){
 						$Subchapter[$s] += 1;
 					}else{
@@ -195,12 +183,10 @@ class DBController extends Controller
 				$json = array("Subchapter"=>$Subchapter, "Trait"=>$Trait);
 				echo json_encode($json);
 			}else{
-				$results = DB::select('SELECT * FROM gwasDB WHERE Domain=? AND SubchapterLevel=?', [$domain, $subchapter]);
+				$results = DB::select('SELECT uniqTrait FROM gwasDB WHERE Domain=? AND SubchapterLevel=?', [$domain, $subchapter]);
 				$Trait = [];
 				foreach($results as $row){
-					$t = $row->Trait;
-					$t = preg_replace("/(.+) \(.+\)/", "$1", $t);
-					$t = preg_replace("/(.+) - .+/", "$1", $t);
+					$t = $row->uniqTrait;
 					if(array_key_exists($t, $Trait)){
 						$Trait[$t] += 1;
 					}else{
@@ -228,11 +214,11 @@ class DBController extends Controller
 		$nMin = $request -> input('nMin');
 		$nMax = $request -> input('nMax');
 
-		$head = ['ID','PMID','Year','Consortium','Domain','ChapterLevel','SubchapterLevel','Trait', 'Population','Ncase','Ncontrol','N', 'SNPh2'];
+		$head = ['ID','PMID','Year','Consortium','Domain','ChapterLevel','SubchapterLevel','Trait','uniqTrait','Population','Ncase','Ncontrol','N', 'SNPh2'];
 		// if($domain=="null" && $chapter=="null" && $subchapter=="null" && $trait=="null" && $yearFrom=="null" && $yearTo=="null" && $nMin=="null" && $nMax=="null"){
 		if($this->NullCheck([$domain, $chapter, $subchapter, $trait, $yearFrom ,$yearTo, $nMin, $nMax])){
 			// All null
-			$query = 'SELECT id,PMID,Year,Consortium,Domain,ChapterLevel,SubchapterLevel,Trait,Population,Ncase,Ncontrol,N,SNPh2 FROM gwasDB';
+			$query = 'SELECT id,PMID,Year,Consortium,Domain,ChapterLevel,SubchapterLevel,Trait,uniqTrait,Population,Ncase,Ncontrol,N,SNPh2 FROM gwasDB';
 			$results = DB::select($query);
 			$results = json_decode(json_encode($results), true);
 			$all_row = array();
@@ -243,7 +229,7 @@ class DBController extends Controller
 			echo json_encode($json);
 			// }else if(strcmp($domain, "null")==0 || (strcmp($domain, "null")==0 && strcmp($chapter, "null")==0 && strcmp($subchapter, "null")==0 && strcmp($trait, "null")==0)){
 		}else if($this->NullCheck([$domain, $trait, $yearFrom ,$yearTo, $nMin, $nMax])){
-			$query = 'SELECT id,PMID,Year,Consortium,Domain,ChapterLevel,SubchapterLevel,Trait,Population,Ncase,Ncontrol,N,SNPh2 FROM gwasDB';
+			$query = 'SELECT id,PMID,Year,Consortium,Domain,ChapterLevel,SubchapterLevel,Trait,uniqTrait,Population,Ncase,Ncontrol,N,SNPh2 FROM gwasDB';
 			$results = DB::select($query);
 			$results = json_decode(json_encode($results), true);
 			$all_row = array();
@@ -256,7 +242,7 @@ class DBController extends Controller
 			// echo json_encode($all_row);
 			// echo json_encode($results);
 		}else{
-			$query = 'SELECT id,PMID,Year,Consortium,Domain,ChapterLevel,SubchapterLevel,Trait,Population,Ncase,Ncontrol,N,SNPh2 FROM gwasDB WHERE';
+			$query = 'SELECT id,PMID,Year,Consortium,Domain,ChapterLevel,SubchapterLevel,Trait,uniqTrait,Population,Ncase,Ncontrol,N,SNPh2 FROM gwasDB WHERE';
 			$val = [];
 			if(strcmp($domain, "null")!=0){
 				$query .= ' Domain=?';
@@ -274,8 +260,8 @@ class DBController extends Controller
 			}
 			if(strcmp($trait, "null")!=0){
 				if(count($val)!=0){$query .= " AND";}
-				$query .= ' Trait LIKE '."'$trait%'";
-				// $val[] = $trait;
+				$query .= ' uniqTrait=?';
+				$val[] = $trait;
 			}
 			if($yearFrom != "null"){
 				if(count($val)!=0){$query .= " AND";}
@@ -545,10 +531,9 @@ class DBController extends Controller
 		// Exclude same trait
 		$exc_ids = [];
 		if($excSamePhe=="true"){
-			$trait = collect(DB::select('SELECT Trait FROM gwasDB WHERE id=?', [$id]))->first();
-			$trait = $trait->Trait;
-			$trait = preg_replace("/(.+) \(.+\)/", "$1", $trait);
-			$tmp = DB::select('SELECT id FROM gwasDB WHERE Trait=? OR Trait LIKE '."'$trait (%'", [$trait]);
+			$trait = collect(DB::select('SELECT uniqTrait FROM gwasDB WHERE id=?', [$id]))->first();
+			$trait = $trait->uniqTrait;
+			$tmp = DB::select('SELECT id FROM gwasDB WHERE uniqTrait=?', [$trait]);
 			foreach($tmp as $row){
 				$exc_ids[] = $row->id;
 			}
@@ -557,13 +542,12 @@ class DBController extends Controller
 		// Get GWAS with max N per Trait
 		$maxN_ids = $all_ids;
 		if($maxNPhe=="true"){
-			$tmp = DB::select('SELECT id, Trait, N FROM gwasDB');
+			$tmp = DB::select('SELECT id, uniqTrait, N FROM gwasDB');
 			$maxN = [];
 			$maNid = [];
 			foreach($tmp as $row){
 				if(in_array($row->id, $all_ids)){
-					$t = $row->Trait;
-					$t = preg_replace("/(.+) \(.+\)/", "$1", $t);
+					$t = $row->uniqTrait;
 					if(array_key_exists($t, $maxN)){
 						if($row->N > $maxN{$t}){
 							$maxN{$t} = $row->N;
@@ -610,7 +594,7 @@ class DBController extends Controller
 	}
 
 	public function getGClist(){
-		$results = DB::select("SELECT id, Trait, Year, N from gwasDB WHERE Population LIKE 'EUR%' AND SNPh2_z>2 AND Trait NOT LIKE '%male%' ORDER BY Trait");
+		$results = DB::select("SELECT id, Trait, Year, N from gwasDB WHERE Population LIKE '%EUR%' AND SNPh2_z>2 AND Trait NOT LIKE '%male%' ORDER BY Trait");
 		return json_encode($results);
 	}
 

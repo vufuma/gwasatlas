@@ -1,19 +1,49 @@
 var selectTable;
-var ids = "";
-var domain_col;
+// var ids = "";
+var domain_col = {"Activities":"#ffa1ba","Aging":"#bf0058","Body Functions":"#f3136f",
+"Body Structures":"#ff978f","Cardiovascular":"#8a1b22","Cell":"#ff6b63",
+"Cognitive":"#be6100","Connective tissue":"#884500","Dermatological":"#fe9617",
+"Ear, Nose, Throat":"#968900","Endocrine":"#ceca59","Environment":"#a8d538",
+"Gastrointestinal":"#5ad754","Hematological":"#75db8d","Immunological":"#00532e",
+"Infection":"#02a58b","Metabolic":"#78d7c6","Mortality":"#3ac7ff",
+"Muscular":"#009cf8","Neoplasms":"#0261dd","Neurological":"#344382",
+"Nutritional":"#9262ec","Ophthalmological":"#deb7fb","Psychiatric":"#6c179f",
+"Reproduction":"#f790ff","Respiratory":"#d73fbf","Skeletal":"#930075",
+"Social Interactions":"#772c50"};
 var domains;
 $(document).ready(function(){
 	Selection("Domain");
 	$('#processGWAS').on('click', function(){
-		if(selectTable.data().count()>100){
+		var ids = [];
+		var tmp = selectTable.columns(0).nodes()[0];
+		tmp.forEach(function(d,i){
+			if($(d).children('.manual_select_check').is(':checked')){
+				ids.push(selectTable.row($(d).parents('tr')).data()["ID"]);
+			}
+		});
+		if(ids.length>100){
 			$('#msg').html('<span style="font-size:14px; color:red;"><i class="fa fa-ban"></i> Maximum 100 GWAS can be processed at once.</span>');
-		}else if(selectTable.data().count()<2){
+		}else if(ids.length<2){
 			$('#msg').html('<span style="font-size:14px; color:red;"><i class="fa fa-ban"></i> Minimum 2 GWAS need to be selected to compare.</span>');
 		}else{
 			$('#msg').html('');
-			ids = selectTable.columns(0).data().eq(0).join(":");
-			displayData(ids);
+			displayData(ids.join(":"));
 		}
+	});
+
+	$('#manual_select_all').on('click', function(){
+		$('.manual_select_check').each(function(){
+			$(this).prop('checked', true);
+		});
+		manual_select_check();
+	});
+
+	$('#manual_clear_all').on('click', function(){
+		var tmp = selectTable.columns(0).nodes()[0];
+		tmp.forEach(function(d,i){
+			$(d).children('.manual_select_check').prop('checked', false);
+		});
+		manual_select_check();
 	});
 });
 
@@ -35,17 +65,24 @@ function Selection(type){
 		chapter="null";
 		subchapter="null";
 		trait="null";
+		$('#Chapter').val("null");
+		$('#Subchapter').val("null");
+		$('#Trait').val("null");
 	}else if(type=="Chapter"){
 		subchapter="null";
 		trait="null";
+		$('#Subchapter').val("null");
+		$('#Trait').val("null");
 	}else if(type=="Subchapter"){
 		trait="null";
+		$('#Trait').val("null");
 	}
-	// $('#test').html(type+":"+domain+":"+chapter+":"+subchapter);
 	if(type!="Trait"){
 		SelectOptions(type, domain, chapter, subchapter, trait);
 	}
-	TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin, nMax);
+
+	if(selectTable!=null){selectTable.draw();}
+	else{TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin, nMax);}
 }
 
 function SelectOptions(type, domain, chapter, subchapter, trait){
@@ -94,6 +131,70 @@ function SelectOptions(type, domain, chapter, subchapter, trait){
 
 function SelectEnter(ele){
 	if(event.keyCode==13){
+		selectTable.draw();
+	}
+}
+
+function manual_select_check(){
+	var n = 0;
+	var tmp = selectTable.columns(0).nodes()[0];
+	tmp.forEach(function(d,i){
+		if($(d).children('.manual_select_check').is(':checked')){
+			n++;
+		}
+	})
+	$('#manual_select_n').html(n);
+}
+
+function TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin, nMax){
+	$('#selectTable').DataTable().destroy();
+	selectTable = $('#selectTable').DataTable({
+		processing: false,
+		serverSide: false,
+		select: false,
+		"ajax" : {
+			url: subdir+"/traitDB/dbTable",
+			type: "POST",
+			data: {
+				domain: domain,
+				chapter: chapter,
+				subchapter: subchapter,
+				trait: trait,
+				yearFrom: yearFrom,
+				yearTo: yearTo,
+				nMin: nMin,
+				nMax: nMax
+			},
+			complete: function(){
+				// getIDs(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin, nMax);
+				// loadPanel(panel);
+			},
+		},
+		error: function(){
+
+		},
+		"columns":[
+			{"data": null, defaultContent:'<input type="checkbox" class="manual_select_check" onchange="manual_select_check();">'},
+			{"data": "ID", name: "ID"},
+			{"data": "PMID", name:"PMID"},
+			{"data": "Year", name: "Year"},
+			{"data": "Domain", name: "Domain"},
+			{"data": "ChapterLevel", name: "Chapter level"},
+			{"data": "SubchapterLevel", name: "Subchapter level"},
+			{"data": "Trait", name: "Trait"},
+			{"data": "uniqTrait", name: "uniqTrait"},
+			{"data": "Population", name: "Populaion"},
+			{"data": "N", name: "N"}
+		],
+		"order": [[1, "asc"]],
+		"lengthMenue": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+		"iDisplayLength": 10,
+		"stripeClasses": []
+	});
+}
+
+$.fn.dataTable.ext.search.push(
+	function(settings, data, dataIndex){
 		var domain = $('#Domain').val();
 		var chapter = $('#Chapter').val();
 		var subchapter = $('#Subchapter').val();
@@ -102,71 +203,27 @@ function SelectEnter(ele){
 		var yearTo = $('#yearTo').val();
 		var nMin = $('#nMin').val();
 		var nMax = $('#nMax').val();
-		if(yearFrom==""){yearFrom="null"}
-		if(yearTo==""){yearTo="null"}
-		if(nMin==""){nMin="null"}
-		if(nMax==""){nMax="null"}
 
-		TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin, nMax);
+		if(domain!="null" && data[4]!=domain){return false}
+		if(chapter!="null" && data[5]!=chapter){return false}
+		if(subchapter!="null" && data[6]!=subchapter){return false}
+		if(trait!="null" && data[8]!=trait){return false}
+		if(yearFrom!="" && data[3]<parseInt(yearFrom)){return false}
+		if(yearTo!="" && data[3]>parseInt(yearTo)){return false}
+		if(nMin!="" && data[10]<parseInt(nMin)){return false}
+		if(nMax!="" && data[10]>parseInt(nMax)){return false}
+		return true;
 	}
-}
-
-function TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin, nMax){
-  $('#selectTable').DataTable().destroy();
-  selectTable = $('#selectTable').DataTable({
-    processing: false,
-    serverSide: false,
-    select: false,
-    autoWidth: false,
-    "ajax" : {
-      url: subdir+"/traitDB/dbTable",
-      type: "POST",
-      data: {
-        domain: domain,
-        chapter: chapter,
-        subchapter: subchapter,
-        trait: trait,
-        yearFrom: yearFrom,
-        yearTo: yearTo,
-        nMin: nMin,
-        nMax: nMax
-      },
-      complete: function(){
-        // getIDs(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin, nMax);
-        // loadPanel(panel);
-      },
-    },
-    error: function(){
-
-    },
-    "columns":[
-      {"data": "ID", name: "ID"},
-      {"data": "PMID", name:"PMID"},
-      {"data": "Year", name: "Year"},
-      {"data": "Domain", name: "Domain"},
-      {"data": "ChapterLevel", name: "Chapter level"},
-      {"data": "SubchapterLevel", name: "Subchapter level"},
-      {"data": "Trait", name: "Trait"},
-      {"data": "Population", name: "Populaion"},
-      {"data": "N", name: "N"}
-    ],
-    columnDefs: [
-      {width:"200px", target:4}
-    ],
-    "lengthMenue": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-    "iDisplayLength": 10,
-	"stripeClasses": []
-  });
-}
+)
 
 function displayData(ids){
 	$('.col4BoxBody').css({'height': 'auto'});
 	$('.col6BoxBody').css({'height': 'auto'});
 	$('#sumBody').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
 	$('#yearVSnBody').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
-	$('#lociVSnBody').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
-	$('#h2VSnBody').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
-	$('#h2VSlociBody').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
+	$('#nVSlociBody').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
+	$('#nVSh2Body').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
+	$('#lociVSh2Body').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
 	$('#colorBody').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
 	$('#gcPlot').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
 	$('#magmaPlot').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
@@ -215,10 +272,10 @@ function displayData(ids){
 				$(this).prop("selected", false);
 			})
 
-			// Domain color
+			// Domains
 			domains = d3.set(data.plotData.data.map(function(d){return d[2];})).values();
 			domains.sort();
-			domain_col = d3.scale.linear().domain([0, domains.length/4, domains.length/2, domains.length*3/4, domains.length]).range(["green", "yellow", "red", "purple", "blue"]);
+			// domain_col = d3.scale.linear().domain([0, domains.length/4, domains.length/2, domains.length*3/4, domains.length]).range(["green", "yellow", "red", "purple", "blue"]);
 
 			// Road results
 			summary(data.sum);
@@ -244,7 +301,7 @@ function summary(data){
 }
 
 function corPlot(data, cor){
-	$('.col4BoxBody').css({'height': '340'});
+	$('.col4BoxBody').css({'height': '360'});
 
 	//Domain color legend
 	$('#colorBody').html('<div id="domainColor"></div>');
@@ -259,7 +316,8 @@ function corPlot(data, cor){
 			.attr('cx', 30)
 			.attr('cy', cur_height)
 			.attr('r', 4)
-			.style("fill", domain_col(domains.indexOf(d)));
+			// .style("fill", domain_col(domains.indexOf(d)));
+			.style("fill", domain_col[d]);
 		svg.append('text')
 			.attr('x', 40)
 			.attr('y', cur_height+4)
@@ -280,7 +338,7 @@ function corPlot(data, cor){
 
 	// year vs sample size
 	$('#yearVSnBody').html('<div id="yearVSnPlot"></div>');
-	var margin = {top:10, right: 60, bottom:40, left:50},
+	var margin = {top:20, right: 60, bottom:40, left:50},
 		width = 250,
 		height = 250;
 	var svg = d3.select("#yearVSnPlot").append("svg")
@@ -316,6 +374,17 @@ function corPlot(data, cor){
 			.attr('transform', 'translate('+width+',15)')
 			.text("p = "+cor.yearVSn.p.toExponential(2))
 			.style('font-size', '10px');
+		svg.append('text').attr('text-anchor', 'middle')
+			.attr('transform', 'translate('+(width/2)+',-5)')
+			.text(function(){
+				var f = "y = ";
+				if(Math.abs(cor.yearVSn.slope)<0.01){f += cor.yearVSn.slope.toExponential(2)}
+				else{f += Math.round(cor.yearVSn.slope*100)/100}
+				if(cor.yearVSn.intercept<0){f += "x-"+Math.round(Math.abs(cor.yearVSn.intercept)*100)/100}
+				else{f+="x+"+Math.round(cor.yearVSn.intercept*100)/100}
+				return f;
+			})
+			.style('font-size', '10px');
 	}
 
 	svg.selectAll('.dot').data(data).enter()
@@ -323,7 +392,8 @@ function corPlot(data, cor){
 		.attr("r", 3)
 		.attr("cx", function(d){return x(d[1])})
 		.attr("cy", function(d){return y(d[4])})
-		.style("fill", function(d){return domain_col(domains.indexOf(d[2]))})
+		// .style("fill", function(d){return domain_col(domains.indexOf(d[2]))})
+		.style("fill", function(d){return domain_col[d[2]]})
 		.style("opacity", "0.6");
 	svg.append("g").attr("class", "x axis").call(xAxis)
 		.attr("transform", "translate(0,"+height+")")
@@ -338,137 +408,19 @@ function corPlot(data, cor){
 		.text("Number of samples / 10e3")
 		.attr("font-size", "10px");
 
-	// risk loci vs sample size
-	$('#lociVSnBody').html('<div id="lociVSnPlot"></div>');
-	var margin = {top:10, right: 60, bottom:40, left:50},
+	// sample size vs #risk loci
+	$('#nVSlociBody').html('<div id="nVSlociPlot"></div>');
+	var margin = {top:20, right: 60, bottom:40, left:50},
 		width = 250,
 		height = 250;
-	var svg = d3.select("#lociVSnPlot").append("svg")
+	var svg = d3.select("#nVSlociPlot").append("svg")
 		.attr("width", width+margin.left+margin.right)
 		.attr("height", height+margin.top+margin.bottom)
 		.append("g")
 		.attr("transform", "translate("+margin.left+","+margin.top+")");
 
-	var xMin = d3.min(data, function(d){return d[5]}),
-		xMax = d3.max(data, function(d){return d[5]}),
-		yMin = d3.min(data, function(d){return d[4]}),
-		yMax = d3.max(data, function(d){return d[4]});
-	var x = d3.scale.linear().range([0, width]);
-	x.domain([xMin-(xMax-xMin)*0.1, xMax+(xMax-xMin)*0.1]);
-	var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(5);
-	var y = d3.scale.linear().range([height, 0]);
-	y.domain([yMin-(yMax-yMin)*0.1, yMax+(yMax-yMin)*0.1]);
-	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
-
-	if(cor.lociVSn != null){
-		svg.append('line')
-			.attr('x1', x(cor.lociVSn.x1))
-			.attr('x2', x(cor.lociVSn.x2))
-			.attr('y1', y(cor.lociVSn.y1))
-			.attr('y2', y(cor.lociVSn.y2))
-			.style('stroke', 'red')
-			.style("stroke-dasharray", ("3,3"));
-		svg.append('text').attr('text-anchor', 'start')
-			.attr('transform', 'translate('+width+',0)')
-			.text("r = "+Math.round(cor.lociVSn.r*1000)/1000)
-			.style('font-size', '10px');
-		svg.append('text').attr('text-anchor', 'start')
-			.attr('transform', 'translate('+width+',15)')
-			.text("p = "+cor.lociVSn.p.toExponential(2))
-			.style('font-size', '10px');
-	}
-
-	svg.selectAll('.dot').data(data).enter()
-		.append('circle')
-		.attr("r", 3)
-		.attr("cx", function(d){return x(d[5])})
-		.attr("cy", function(d){return y(d[4])})
-		.style("fill", function(d){return domain_col(domains.indexOf(d[2]))})
-		.style("opacity", "0.6");
-	svg.append("g").attr("class", "x axis").call(xAxis)
-		.attr("transform", "translate(0,"+height+")");
-	svg.append("g").attr("class", "y axis").call(yAxis);
-	svg.append("text").attr("text-anchor", "middle")
-		.attr("transform", "translate("+width/2+","+(height+30)+")")
-		.text("Number of risk loci")
-		.attr("font-size", "10px");
-	svg.append("text").attr("text-anchor", "middle")
-		.attr("transform", "translate(-35,"+(height/2)+")rotate(-90)")
-		.text("Number of samples / 10e3")
-		.attr("font-size", "10px");
-
-	// h2 vs sample size
-	$('#h2VSnBody').html('<div id="h2VSnPlot"></div>');
-	var margin = {top:10, right: 60, bottom:40, left:50},
-		width = 250,
-		height = 250;
-	var svg = d3.select("#h2VSnPlot").append("svg")
-		.attr("width", width+margin.left+margin.right)
-		.attr("height", height+margin.top+margin.bottom)
-		.append("g")
-		.attr("transform", "translate("+margin.left+","+margin.top+")");
-
-	var xMin = d3.min(data, function(d){if(d[6] > -9){return d[6]}}),
-		xMax = d3.max(data, function(d){return d[6]}),
-		yMin = d3.min(data, function(d){return d[4]}),
-		yMax = d3.max(data, function(d){return d[4]});
-	var x = d3.scale.linear().range([0, width]);
-	x.domain([xMin-(xMax-xMin)*0.1, xMax+(xMax-xMin)*0.1]);
-	var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(5);
-	var y = d3.scale.linear().range([height, 0]);
-	y.domain([yMin-(yMax-yMin)*0.1, yMax+(yMax-yMin)*0.1]);
-	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
-
-	if(cor.h2VSn != null){
-		svg.append('line')
-			.attr('x1', x(cor.h2VSn.x1))
-			.attr('x2', x(cor.h2VSn.x2))
-			.attr('y1', y(cor.h2VSn.y1))
-			.attr('y2', y(cor.h2VSn.y2))
-			.style('stroke', 'red')
-			.style("stroke-dasharray", ("3,3"));
-		svg.append('text').attr('text-anchor', 'start')
-			.attr('transform', 'translate('+width+',0)')
-			.text("r = "+Math.round(cor.h2VSn.r*1000)/1000)
-			.style('font-size', '10px');
-		svg.append('text').attr('text-anchor', 'start')
-			.attr('transform', 'translate('+width+',15)')
-			.text("p = "+cor.h2VSn.p.toExponential(2))
-			.style('font-size', '10px');
-	}
-
-	svg.selectAll('.dot').data(data.filter(function(d){if(d[6] > -9){return d}})).enter()
-		.append('circle')
-		.attr("r", 3)
-		.attr("cx", function(d){return x(d[6])})
-		.attr("cy", function(d){return y(d[4])})
-		.style("fill", function(d){return domain_col(domains.indexOf(d[2]))})
-		.style("opacity", "0.6");
-	svg.append("g").attr("class", "x axis").call(xAxis)
-		.attr("transform", "translate(0,"+height+")");
-	svg.append("g").attr("class", "y axis").call(yAxis);
-	svg.append("text").attr("text-anchor", "middle")
-		.attr("transform", "translate("+width/2+","+(height+30)+")")
-		.text("SNP h2")
-		.attr("font-size", "10px");
-	svg.append("text").attr("text-anchor", "middle")
-		.attr("transform", "translate(-35,"+(height/2)+")rotate(-90)")
-		.text("Number of samples / 10e3")
-		.attr("font-size", "10px");
-
-	// h2 vs risk loci
-	$('#h2VSlociBody').html('<div id="h2VSlociPlot"></div>');
-	var margin = {top:10, right: 60, bottom:40, left:50},
-		width = 250,
-		height = 250;
-	var svg = d3.select("#h2VSlociPlot").append("svg")
-		.attr("width", width+margin.left+margin.right)
-		.attr("height", height+margin.top+margin.bottom)
-		.append("g")
-		.attr("transform", "translate("+margin.left+","+margin.top+")");
-
-	var xMin = d3.min(data, function(d){if(d[6] > -9){return d[6]}}),
-		xMax = d3.max(data, function(d){return d[6]}),
+	var xMin = d3.min(data, function(d){return d[4]}),
+		xMax = d3.max(data, function(d){return d[4]}),
 		yMin = d3.min(data, function(d){return d[5]}),
 		yMax = d3.max(data, function(d){return d[5]});
 	var x = d3.scale.linear().range([0, width]);
@@ -478,41 +430,195 @@ function corPlot(data, cor){
 	y.domain([yMin-(yMax-yMin)*0.1, yMax+(yMax-yMin)*0.1]);
 	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
 
-	if(cor.h2VSloci != null){
+	if(cor.nVSloci != null){
 		svg.append('line')
-			.attr('x1', x(cor.h2VSloci.x1))
-			.attr('x2', x(cor.h2VSloci.x2))
-			.attr('y1', y(cor.h2VSloci.y1))
-			.attr('y2', y(cor.h2VSloci.y2))
+			.attr('x1', x(cor.nVSloci.x1))
+			.attr('x2', x(cor.nVSloci.x2))
+			.attr('y1', y(cor.nVSloci.y1))
+			.attr('y2', y(cor.nVSloci.y2))
 			.style('stroke', 'red')
 			.style("stroke-dasharray", ("3,3"));
 		svg.append('text').attr('text-anchor', 'start')
 			.attr('transform', 'translate('+width+',0)')
-			.text("r = "+Math.round(cor.h2VSloci.r*1000)/1000)
+			.text("r = "+Math.round(cor.nVSloci.r*1000)/1000)
 			.style('font-size', '10px');
 		svg.append('text').attr('text-anchor', 'start')
 			.attr('transform', 'translate('+width+',15)')
-			.text("p = "+cor.h2VSloci.p.toExponential(2))
+			.text("p = "+cor.nVSloci.p.toExponential(2))
+			.style('font-size', '10px');
+		svg.append('text').attr('text-anchor', 'middle')
+			.attr('transform', 'translate('+(width/2)+',-5)')
+			.text(function(){
+				var f = "y = ";
+				if(Math.abs(cor.nVSloci.slope)<0.01){f += cor.nVSloci.slope.toExponential(2)}
+				else{f += Math.round(cor.nVSloci.slope*100)/100}
+				if(cor.nVSloci.intercept<0){f += "x-"+Math.round(Math.abs(cor.nVSloci.intercept)*100)/100}
+				else{f+="x+"+Math.round(cor.nVSloci.intercept*100)/100}
+				return f;
+			})
 			.style('font-size', '10px');
 	}
 
-	svg.selectAll('.dot').data(data.filter(function(d){if(d[6] > -9){return d}})).enter()
+	svg.selectAll('.dot').data(data).enter()
 		.append('circle')
 		.attr("r", 3)
-		.attr("cx", function(d){return x(d[6])})
+		.attr("cx", function(d){return x(d[4])})
 		.attr("cy", function(d){return y(d[5])})
-		.style("fill", function(d){return domain_col(domains.indexOf(d[2]))})
+		// .style("fill", function(d){return domain_col(domains.indexOf(d[2]))})
+		.style("fill", function(d){return domain_col[d[2]]})
 		.style("opacity", "0.6");
 	svg.append("g").attr("class", "x axis").call(xAxis)
 		.attr("transform", "translate(0,"+height+")");
 	svg.append("g").attr("class", "y axis").call(yAxis);
 	svg.append("text").attr("text-anchor", "middle")
 		.attr("transform", "translate("+width/2+","+(height+30)+")")
+		.text("Number of samples / 10e3")
+		.attr("font-size", "10px");
+	svg.append("text").attr("text-anchor", "middle")
+		.attr("transform", "translate(-38,"+(height/2)+")rotate(-90)")
+		.text("Number of risk loci")
+		.attr("font-size", "10px");
+
+	// sample size vs h2
+	$('#nVSh2Body').html('<div id="nVSh2Plot"></div>');
+	var margin = {top:20, right: 60, bottom:40, left:50},
+		width = 250,
+		height = 250;
+	var svg = d3.select("#nVSh2Plot").append("svg")
+		.attr("width", width+margin.left+margin.right)
+		.attr("height", height+margin.top+margin.bottom)
+		.append("g")
+		.attr("transform", "translate("+margin.left+","+margin.top+")");
+
+	var yMin = d3.min(data, function(d){if(d[6] > -9){return d[6]}}),
+		yMax = d3.max(data, function(d){return d[6]}),
+		xMin = d3.min(data, function(d){return d[4]}),
+		xMax = d3.max(data, function(d){return d[4]});
+	var x = d3.scale.linear().range([0, width]);
+	x.domain([xMin-(xMax-xMin)*0.1, xMax+(xMax-xMin)*0.1]);
+	var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(5);
+	var y = d3.scale.linear().range([height, 0]);
+	y.domain([yMin-(yMax-yMin)*0.1, yMax+(yMax-yMin)*0.1]);
+	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
+
+	if(cor.nVSh2 != null){
+		svg.append('line')
+			.attr('x1', x(cor.nVSh2.x1))
+			.attr('x2', x(cor.nVSh2.x2))
+			.attr('y1', y(cor.nVSh2.y1))
+			.attr('y2', y(cor.nVSh2.y2))
+			.style('stroke', 'red')
+			.style("stroke-dasharray", ("3,3"));
+		svg.append('text').attr('text-anchor', 'start')
+			.attr('transform', 'translate('+width+',0)')
+			.text("r = "+Math.round(cor.nVSh2.r*1000)/1000)
+			.style('font-size', '10px');
+		svg.append('text').attr('text-anchor', 'start')
+			.attr('transform', 'translate('+width+',15)')
+			.text("p = "+cor.nVSh2.p.toExponential(2))
+			.style('font-size', '10px');
+		svg.append('text').attr('text-anchor', 'middle')
+			.attr('transform', 'translate('+(width/2)+',-5)')
+			.text(function(){
+				var f = "y = ";
+				if(Math.abs(cor.nVSh2.slope)<0.01){f += cor.nVSh2.slope.toExponential(2)}
+				else{f += Math.round(cor.nVSh2.slope*100)/100}
+				if(cor.nVSh2.intercept<0){f += "x-"+Math.round(Math.abs(cor.nVSh2.intercept)*100)/100}
+				else{f+="x+"+Math.round(cor.nVSh2.intercept*100)/100}
+				return f;
+			})
+			.style('font-size', '10px');
+	}
+
+	svg.selectAll('.dot').data(data.filter(function(d){if(d[6] > -9){return d}})).enter()
+		.append('circle')
+		.attr("r", 3)
+		.attr("cx", function(d){return x(d[4])})
+		.attr("cy", function(d){return y(d[6])})
+		// .style("fill", function(d){return domain_col(domains.indexOf(d[2]))})
+		.style("fill", function(d){return domain_col[d[2]]})
+		.style("opacity", "0.6");
+	svg.append("g").attr("class", "x axis").call(xAxis)
+		.attr("transform", "translate(0,"+height+")");
+	svg.append("g").attr("class", "y axis").call(yAxis);
+	svg.append("text").attr("text-anchor", "middle")
+		.attr("transform", "translate("+width/2+","+(height+30)+")")
+		.text("Number of samples / 10e3")
+		.attr("font-size", "10px");
+	svg.append("text").attr("text-anchor", "middle")
+		.attr("transform", "translate(-35,"+(height/2)+")rotate(-90)")
 		.text("SNP h2")
+		.attr("font-size", "10px");
+
+	// #risk loci vs h2
+	$('#lociVSh2Body').html('<div id="lociVSh2Plot"></div>');
+	var margin = {top:20, right: 60, bottom:40, left:50},
+		width = 250,
+		height = 250;
+	var svg = d3.select("#lociVSh2Plot").append("svg")
+		.attr("width", width+margin.left+margin.right)
+		.attr("height", height+margin.top+margin.bottom)
+		.append("g")
+		.attr("transform", "translate("+margin.left+","+margin.top+")");
+
+	var yMin = d3.min(data, function(d){if(d[6] > -9){return d[6]}}),
+		yMax = d3.max(data, function(d){return d[6]}),
+		xMin = d3.min(data, function(d){return d[5]}),
+		xMax = d3.max(data, function(d){return d[5]});
+	var x = d3.scale.linear().range([0, width]);
+	x.domain([xMin-(xMax-xMin)*0.1, xMax+(xMax-xMin)*0.1]);
+	var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(5);
+	var y = d3.scale.linear().range([height, 0]);
+	y.domain([yMin-(yMax-yMin)*0.1, yMax+(yMax-yMin)*0.1]);
+	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
+
+	if(cor.lociVSh2 != null){
+		svg.append('line')
+			.attr('x1', x(cor.lociVSh2.x1))
+			.attr('x2', x(cor.lociVSh2.x2))
+			.attr('y1', y(cor.lociVSh2.y1))
+			.attr('y2', y(cor.lociVSh2.y2))
+			.style('stroke', 'red')
+			.style("stroke-dasharray", ("3,3"));
+		svg.append('text').attr('text-anchor', 'start')
+			.attr('transform', 'translate('+width+',0)')
+			.text("r = "+Math.round(cor.lociVSh2.r*1000)/1000)
+			.style('font-size', '10px');
+		svg.append('text').attr('text-anchor', 'start')
+			.attr('transform', 'translate('+width+',15)')
+			.text("p = "+cor.lociVSh2.p.toExponential(2))
+			.style('font-size', '10px');
+		svg.append('text').attr('text-anchor', 'middle')
+			.attr('transform', 'translate('+(width/2)+',-5)')
+			.text(function(){
+				var f = "y = ";
+				if(Math.abs(cor.lociVSh2.slope)<0.01){f += cor.lociVSh2.slope.toExponential(2)}
+				else{f += Math.round(cor.lociVSh2.slope*100)/100}
+				if(cor.lociVSh2.intercept<0){f += "x-"+Math.round(Math.abs(cor.lociVSh2.intercept)*100)/100}
+				else{f+="x+"+Math.round(cor.lociVSh2.intercept*100)/100}
+				return f;
+			})
+			.style('font-size', '10px');
+	}
+
+	svg.selectAll('.dot').data(data.filter(function(d){if(d[6] > -9){return d}})).enter()
+		.append('circle')
+		.attr("r", 3)
+		.attr("cx", function(d){return x(d[5])})
+		.attr("cy", function(d){return y(d[6])})
+		// .style("fill", function(d){return domain_col(domains.indexOf(d[2]))})
+		.style("fill", function(d){return domain_col[d[2]]})
+		.style("opacity", "0.6");
+	svg.append("g").attr("class", "x axis").call(xAxis)
+		.attr("transform", "translate(0,"+height+")");
+	svg.append("g").attr("class", "y axis").call(yAxis);
+	svg.append("text").attr("text-anchor", "middle")
+		.attr("transform", "translate("+width/2+","+(height+30)+")")
+		.text("Number of risk loci")
 		.attr("font-size", "11px");
 	svg.append("text").attr("text-anchor", "middle")
 		.attr("transform", "translate(-35,"+(height/2)+")rotate(-90)")
-		.text("Number of risk loci")
+		.text("SNP h2")
 		.attr("font-size", "11px");
 }
 
@@ -629,7 +735,8 @@ function gcPlot(data){
 			.attr('y', height+1)
 			.attr("width", cellsize-1)
 			.attr("height", 3)
-			.attr("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d]))});
+			// .attr("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d]))});
+			.attr("fill", function(d){return domain_col[data.data.Domain[d]]});
 		// Domain labels row
 		var rowDomain = svg.append("g").attr("class", "rowDomain")
 			.selectAll("rect.rowDomain").data(data.data.id).enter()
@@ -638,7 +745,8 @@ function gcPlot(data){
 			.attr('y', function(d){return data.data.order.alph[d]*cellsize})
 			.attr("width", 3)
 			.attr("height", cellsize-1)
-			.attr("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d]))});
+			// .attr("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d]))});
+			.attr("fill", function(d){return domain_col[data.data.Domain[d]]});
 
 		// reordering labels
 		function sortOptions(type){
@@ -811,7 +919,8 @@ function magmaPlot(data){
 			.attr('y', height+1)
 			.attr("width", cellsize-1)
 			.attr("height", 3)
-			.attr("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d]))});
+			// .attr("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d]))});
+			.attr("fill", function(d){return domain_col[data.data.Domain[d]]});
 		// Domain labels row
 		var rowDomain = svg.append("g").attr("class", "rowDomain")
 			.selectAll("rect.rowDomain").data(data.data.id).enter()
@@ -820,7 +929,8 @@ function magmaPlot(data){
 			.attr('y', function(d){return data.data.order.alph[d]*cellsize})
 			.attr("width", 3)
 			.attr("height", cellsize-1)
-			.attr("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d]))});
+			// .attr("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d]))});
+			.attr("fill", function(d){return domain_col[data.data.Domain[d]]});
 
 		// n genes bar plot
 		var x = d3.scale.linear().range([cellsize*n+space, width]);
@@ -942,7 +1052,8 @@ function lociOver(data){
 		// d[0] = +d[0] // id
 		d[3] = +d[3] // chr
 		d[4] = +d[4] // pos
-		d[5] = +d[5] // p
+		if(d[5]<1e-300){d[5] += 1e-300}
+		else{d[5] = +d[5]} // p
 		d[6] = +d[6] // start
 		d[7] = +d[7] // end
 		d[8] = +d[8] // lociid
@@ -1136,7 +1247,8 @@ function lociOver(data){
 			.attr("x2", function(d){return x(d[7])})
 			.attr("y1", function(d){return y(data.data.Trait[d[0]])+y.rangeBand()*0.5})
 			.attr("y2", function(d){return y(data.data.Trait[d[0]])+y.rangeBand()*0.5})
-			.style("stroke", function(d){return domain_col(domains.indexOf(data.data.Domain[d[0]]))});
+			// .style("stroke", function(d){return domain_col(domains.indexOf(data.data.Domain[d[0]]))});
+			.style("stroke", function(d){return domain_col[data.data.Domain[d[0]]]});
 
 		// top SNP
 		svg.selectAll(".dot").data(tmpdata).enter()
@@ -1144,7 +1256,8 @@ function lociOver(data){
 			.attr("cx", function(d){return x(d[4])})
 			.attr("cy", function(d){return y(data.data.Trait[d[0]])+y.rangeBand()*0.5})
 			.attr("r", function(d){return -Math.log10(d[5])/maxP*(cellheight*0.85/2-3)+3;})
-			.style("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d[0]]))});
+			// .style("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d[0]]))});
+			.style("fill", function(d){return domain_col[data.data.Domain[d[0]]]});
 		svg.selectAll(".rsID").data(tmpdata).enter()
 			.append("text")
 			.attr("x", function(d){return x(d[4])})

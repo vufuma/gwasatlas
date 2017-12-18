@@ -38,7 +38,7 @@ def getLinReg(x, y):
 		y1 = 0;
 		x1 = -tmp[1]/tmp[0]
 
-	return {'r': tmp[2], 'p': tmp[3], 'se':tmp[4], 'x1': x1, 'x2': x2, 'y1': y1, 'y2': y2}
+	return {'intercept': tmp[1], 'slope': tmp[0], 'r': tmp[2], 'p': tmp[3], 'se':tmp[4], 'x1': x1, 'x2': x2, 'y1': y1, 'y2': y2}
 
 out = {}
 h2_idx = getH2idx(indata[:,4].astype(str))
@@ -48,12 +48,12 @@ if max(indata[:,1].astype(int))-min(indata[:,1].astype(int)) > 0:
 	out['yearVSn'] = getLinReg(indata[:,1].astype(int), indata[:,2].astype(float))
 
 # risk loci vs sample size
-out['lociVSn'] = getLinReg(indata[:,3].astype(int), indata[:,2].astype(float))
+out['nVSloci'] = getLinReg(indata[:,2].astype(float), indata[:,3].astype(int))
 
 # h2 vs sample size
-out['h2VSn'] = getLinReg(indata[h2_idx,4].astype(float), indata[h2_idx,2].astype(float))
+out['nVSh2'] = getLinReg(indata[h2_idx,2].astype(float), indata[h2_idx,4].astype(float))
 
 # h2 vs risk loci
-out['h2VSloci'] = getLinReg(indata[h2_idx,4].astype(float), indata[h2_idx,3].astype(int))
+out['lociVSh2'] = getLinReg(indata[h2_idx,3].astype(int), indata[h2_idx,4].astype(float))
 
 print json.dumps(out)

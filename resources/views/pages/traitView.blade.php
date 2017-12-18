@@ -22,7 +22,7 @@
 </script>
 <script type="text/javascript" src="{!! URL::asset('js/global.js') !!}"></script>
 <script type="text/javascript" src="{!! URL::asset('js/traitView.js') !!}"></script>
-<link rel="stylesheet" href="{!! URL::asset('css/style.css') !!}">
+
 @stop
 
 @section('content')
@@ -112,7 +112,7 @@
 			<h4>Gene set analysis</h4>
 			<span class="info"><i class="fa fa-info"></i>
 				MAGMA gene-set analysis is performed for curated gene sets and GO terms obtained from MsigDB (total of 10894 gene sets).<br/>
-				The table displays either significant gene sets with P<sub>bon</sub> < 0.05 or the top the 10 gene sets sorted by P-value.
+				The table displays either significant gene sets with P<sub>bon</sub> < 0.05 or the top 10 gene sets sorted by P-value.
 			</span><br/><br/>
 			<table id="MAGMAtable" class="display compact nowrap" cellspacing="0" style="display: block; overflow-x: auto; font-size: 14px;">
 				<thead>
@@ -151,12 +151,23 @@
 					</div>
 					<div class="col-md-6 col-sm-6 col-xs-6">
 						<span class="form-inline"><input class="form-control" type="checkbox" id="GC_manual" name="GC_manual" onchange='GCManualSelectCheck()'> Manually select GWAS.</span>
-						<a class="infoPop" data-toggle="popover" data-content="Check this option to enable manual selection of GWAS. Note taht other filtering options defined left are also applied.">
+						<a class="infoPop" data-toggle="popover" data-content="Check this option to enable manual selection of GWAS.
+						Note taht other filtering options defined left are also applied.">
 							<i class="fa fa-question-circle-o fa-lg"></i>
 						</a>
 						<br/>
-						<select multiple class="form-control" size="10" id="GC_manual_select" style="overflow-x:auto;">
-						</select>
+						<!-- <select multiple class="form-control" size="10" id="GC_manual_select" style="overflow-x:auto;">
+						</select> -->
+						<div class="panel panel-default">
+							<div class="panel-heading" style="padding:5px;padding-left:10px;">
+								Selected trait (<span id="GC_manual_n">0</span>)
+								<a id="GC_manual_clear">Clear</a>
+							</div>
+							<div class="panel-body" style="padding:5px;padding-left:10px;">
+								<input id="GC_manual_search" type="search" placeholder="Search trait name" class="form-control" style="height:20px;width:200px;text-size:12px;"/>
+								<div id="GC_manual_select" class="GC_manual_select" style="max-height:120px;overflow:auto;font-size:12px;"></div>
+							</div>
+						</div>
 					</div>
 				</div>
 				<br/>
