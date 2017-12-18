@@ -90,6 +90,7 @@
 				<h4><span id="manual_select_n">0</span> GWAS are selected.</h4>
 				<button class="btn btn-xs" id="manual_select_all">Select all displayed GWAS</button><tab>
 				<button class="btn btn-xs" id="manual_clear_all">Clear all selected GWAS</button><br/>
+				<br/>
 				<table id="selectTable" class="display compact dt-body-right dt-head-center" width="90%" cellspacing="0" style="display: block; overflow-x: auto; font-size:12px;">
 					<thead>
 						<th>select</th>

@@ -20,15 +20,8 @@ class StatsController extends Controller
 		$val = [];
 		$val[] = DB::table('gwasDB')->count();
 
-		$tmp = DB::select("SELECT Trait FROM gwasDB");
-		$trait = [];
-		foreach($tmp as $t){
-			$tmp_t = $t->Trait;
-			$tmp_t = preg_replace("/(.+) \(.+\)/", "$1", $tmp_t);
-			$trait[] = $tmp_t;
-		}
-		$trait = array_unique($trait);
-		$val[] = count($trait);
+		$tmp = collect(DB::select("SELECT COUNT(DISTINCT uniqTrait) AS count FROM gwasDB"))->first();
+		$val[] = $tmp->count;
 
 		$tmp = collect(DB::select("SELECT COUNT(DISTINCT PMID) AS count FROM gwasDB"))->first();
 		$val[] = $tmp->count;

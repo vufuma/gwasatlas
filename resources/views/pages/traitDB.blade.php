@@ -54,7 +54,11 @@
 			</div>
 			<br/>
 			<span class="form-inline">
-				<strong>By trait</strong><br/>
+				<strong>By trait</strong>
+				<a class="infoPop" data-toggle="popover" data-content="Traits are ordered alphabetically. The number in parentheses is the number of GWAS in the database.">
+					<i class="fa fa-question-circle-o fa-lg"></i>
+				</a>
+				<br/>
 				<select class="selectpicker" data-width="75%" name="Trait" id="Trait" onchange='Selection("Trait");'>
 					<option value=null>-- Please select Domain of interest --</option>
 				</select><br/>
@@ -65,6 +69,7 @@
 				<strong>By published year</strong><br/>
 				From <input type="number" class="form-control" id="yearFrom" name="yearFrom" onkeydown="SelectEnter(this)">
 				to <input type="number" class="form-control" id="yearTo" name="yearTo" onkeydown="SelectEnter(this)">
+				(inclusive)
 				<span class="info"><i class="fa fa-info"></i> Press enter to update the table below.</span>
 			</span>
 			<br/><br/>
@@ -72,6 +77,7 @@
 				<strong>By total sample size</strong><br/>
 				Minimum: <input type="number" class="form-control" id="nMin" name="nMin" onkeydown="SelectEnter(this)">
 				Maximum: <input type="number" class="form-control" id="nMax" name="nMax" onkeydown="SelectEnter(this)">
+				(inclusive)
 				<span class="info"><i class="fa fa-info"></i> Press enter to update the table below.</span>
 			</span>
 		</div>

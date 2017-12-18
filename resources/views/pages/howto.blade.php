@@ -25,68 +25,110 @@
 	<p><h3 id="1"><strong>1. Browse individual GWAS</strong></h3>
 		<div style="padding-left:20px;">
 			<h4>1.1. Find your trait</h4>
-			Go to the "Browse GWAS" page which displays a table of full entries of GWAS in the database.
-			If you know which trait you are looking for, you can either select from the list of traits (alphabetically ordered)
-			or type keyword in the serch box.
-			If you are just looking for what kind of traits are available in the database,
-			you can also filter by domain, chapter or subchapter level.
-			Traits can also be filtered by published year and sample size in the filtering box.
-			Any keyward can be serached from the search box at the right top of the table.
-			<h4>1.2. Summary of GWAS results</h4>
-			When a row of the table is clicked, it will open a new tab with summary of
-			GWAS results.<br/>
-			(a) GWAS information table:
-			There are variety of basic information about the study.
-			Original study is accessible from PMID field.
-			Original summary staitics file can be accessed from the link.
-			If submission of webform is required to download a file, the link is to
-			the website, otherwise directly linked to the file.</br>
-			(b) Manhattan plot<br/>
-			(c) Q-Q plot<br/>
-			(d) List of top SNPs in each genomic risk locus<br/>
-			(e) Gene manhattan plot: P-value is based on MAGMA gene ananlysis.
-			Top genes can be labeled by changing the number of the box.<br/>
-			(f) Gene Q-Q plot<br/>
-			(g) Top associated gene set: Results of MAGMA gene-set ananlysis.
-			Gene sets which are significantly associated after Bonferroni correction are
-			displayed. If the number of significant gene sets are less than 10,
-			top 10 significant gene sets are displayed. <br/>
-			(h) Generic correlation: Genetic correlation of the trait with user selected traits.
-			See next section for detils.
-			<h4>1.3. Genetic correlation</h4>
-			By default, top 10 traits with the highest absolute genetic correlation are
-			shown regardless of significance.
-			Nothing is shown for traits which are not eligible for estimation of genetic correlation
-			(see <a>5.3. Genetic correlation</a> in the Documentation).
-			Several options are available to obtain genetic correlation with a custom list of traits.
-			(a) Exclude same trait: If there is any other same traits in the databse, those can be
-			excluded by activating this option.<br/>
-			(b) Select GWAS with the maximum sample size per trait: For traits with more than one GWAS
-			in the database, one with the largest sample size is selected per trait.
-			Note that this selection is performed after other filterings.<br/>
-			(c) P-value and Bonferroni corrected P-value threshold.<br/>
-			(d) The number of traits to display.</br>
-			(e) Manual selection of trait: Traits can also be manually selected.
-			Other filterings are still performed on the selected traits.<br/>
-			(f) Genetic correlation plot: Each bar is colored based on P-value;
-			grey for P-value >= 0.05, high transparency red (positive) and blue (negative) for P-value < 0.05,
-			and red or blue for P-value < P<sub>bon</sub>.
-			Bonferroni correction is performed for the number of possible pairs
-			before filtering of P-value but after other filterings.<br/>
-			(g) Genetic correlation table: same as (f) but in table format.
+			<div class="row">
+				<div class="col-md-4 col-sm-4 col-xs-4">
+					Go to the "Browse GWAS" page which displays a table of entire entries of GWAS in the database (f).
+					If you know which trait you are looking for, you can either select from the list of traits (b)
+					or type keyword in the serch box (e).
+					If you are just looking for what kind of traits are available in the database,
+					you can also filter by domain, chapter or subchapter level (a).
+					Traits can also be filtered by published year and sample size in the filtering box (c and d).
+					Any keyward can be serached from the search box (e). <br/>
+					<br/>
+					(a) Filtering by trait categories.<br/>
+					(b) Select by trait name.<br/>
+					(c) Filtering by published year.<br/>
+					(d) Filtering by total sample size.<br/>
+					(e) Search box.<br/>
+					(f) GWAS entories.<br/>
+				</div>
+				<div class="col-md-8 col-sm-8 col-xs-8">
+					<div style="padding-right:20px;">
+						<img src="{!! URL::asset('/image/howto1.png') !!}" style="width:90%;float:right;"/>
+					</div>
+				</div>
+			</div>
+
+
+			<div class="row">
+				<div class="col-md-8 col-sm-8 col-xs-8">
+					<h4>1.2. Summary of GWAS results (right image)</h4>
+					When a row of the table is clicked, it will open a new tab with summary of
+					GWAS results.<br/>
+					(a) GWAS information table:
+					There are variety of basic information about the study.
+					Original study is accessible from PMID field.
+					Original summary staitics file can be accessed from the link.
+					If submission of webform is required to download a file, the link is to
+					the website, otherwise directly linked to the file.</br>
+					(b) Manhattan plot<br/>
+					(c) Q-Q plot<br/>
+					(d) List of top SNPs in each genomic risk locus<br/>
+					(e) Gene manhattan plot: P-value is based on MAGMA gene ananlysis.
+					Top genes can be labeled by changing the number of the box.<br/>
+					(f) Gene Q-Q plot<br/>
+					(g) Top associated gene set: Results of MAGMA gene-set ananlysis.
+					Gene sets which are significantly associated after Bonferroni correction are
+					displayed. If the number of significant gene sets are less than 10,
+					top 10 significant gene sets are displayed. <br/>
+					(h) Generic correlation: Genetic correlation of the trait with user selected traits.
+					See next section for detils.
+
+					<h4>1.3. Genetic correlation (bottom image)</h4>
+					By default, top 10 traits with the highest absolute genetic correlation are
+					shown regardless of significance.
+					Nothing is shown for traits which are not eligible for estimation of genetic correlation
+					(see <a>5.3. Genetic correlation</a> in the Documentation).
+					Several options are available to obtain genetic correlation with a custom list of traits.<br/>
+					(a) Exclude same trait: If there is any other same traits in the databse, those can be
+					excluded by activating this option.<br/>
+					(b) Select GWAS with the maximum sample size per trait: For traits with more than one GWAS
+					in the database, one with the largest sample size is selected per trait.
+					Note that this selection is performed after other filterings.<br/>
+					(c) P-value and Bonferroni corrected P-value threshold.<br/>
+					(d) The number of traits to display.</br>
+					(e) Manual selection of trait: Traits can also be manually selected.
+					Other filterings are still performed on the selected traits.<br/>
+					(f) Genetic correlation plot: Each bar is colored based on P-value;
+					grey for P-value >= 0.05, high transparency red (positive) and blue (negative) for P-value < 0.05,
+					and red or blue for P-value < P<sub>bon</sub>.
+					Bonferroni correction is performed for the number of possible pairs
+					before filtering of P-value but after other filterings.<br/>
+					(g) Genetic correlation table: same as (f) but in table format.
+					<br/><br/>
+					<img src="{!! URL::asset('/image/howto3.png') !!}" style="width:90%;"/>
+				</div>
+				<div class="col-md-4 col-sm-4 col-xs-4">
+					<h4></h4><br/>
+					<div style="padding-right:20px;">
+						<img src="{!! URL::asset('/image/howto2.png') !!}" style="width:90%;float:right;"/>
+					</div>
+				</div>
+			</div>
+
 		</div>
 	</p>
 	<p><h3 id="2"><strong>2. Compare multiple GWAS</strong></h3>
 		<div style="padding-left:20px;">
 			<h4>2.1. Select GWAS to compare</h4>
-			Database entries can be filtered same as in the "Browse GWAS" page.
-			GWAS can be selected by checking the box manually.<br/>
-			(a) Number of selected GWAS: This number should be > 1 and &le; 100.<br/>
-			(b) Select all displayed GWAS: this button only checks "currently displayed"
-			GWAS, but not all the GWAS after filtering.
-			You can change the number of GWAS to display from the left top of the table.<br/>
-			(c) Clear all selected GWAS: Reset the selection of GWAS regardless of displayed or not.<br/>
-			(d) Submit selected GWAS<br/>
+			<div class="row">
+				<div class="col-md-4 col-sm-4 col-xs-4">
+					Database entries can be filtered same as in the "Browse GWAS" page.
+					GWAS can be selected by checking the box manually.<br/>
+					(a) Number of selected GWAS: This number should be > 1 and &le; 100.<br/>
+					(b) Select all displayed GWAS: this button only checks "currently displayed"
+					GWAS, but not all the GWAS after filtering.
+					You can change the number of GWAS to display from the left top of the table.<br/>
+					(c) Clear all selected GWAS: Reset the selection of GWAS regardless of displayed or not.<br/>
+					(d) Submit selected GWAS<br/>
+				</div>
+				<div class="col-md-8 col-sm-8 col-xs-8">
+					<div style="padding-right:20px;">
+						<img src="{!! URL::asset('/image/howto4.png') !!}" style="width:90%;float:right;"/>
+					</div>
+				</div>
+			</div>
+
 			<h4>2.2. Understanding results</h4>
 			When selected GWAS are submitted correctly, several plots will be displayed
 			in the page.
@@ -110,7 +152,9 @@
 			(j) Zoomed plot of a selected loci group: Each dot represents a top SNP in the locus of given GWAS
 			sized by P-value, colored by domain and labelled by rsID.
 			A horizontal line represents the region of the risk locus.
-			See <a>4.2. Risk loci<a/> in the documentation for the definition of risk loci.
+			See <a>4.2. Risk loci</a> in the documentation for the definition of risk loci.
+			<br/><br/>
+			<img src="{!! URL::asset('/image/howto5.png') !!}" style="width:90%;"/>
 		</div>
 	</p>
 </div>

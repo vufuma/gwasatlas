@@ -573,6 +573,11 @@ class DBController extends Controller
 			$gc[] = $r;
 		}
 
+		usort($gc, function($a, $b){
+			if(abs($a['rg'])==abs($b['rg'])){return 0;}
+			return (abs($a['rg']) < abs($b['rg'])) ? 1: -1;
+		});
+
 		$count = 0;
 		$gcout = [];
 		foreach($gc as $r){
