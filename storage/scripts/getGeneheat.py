@@ -86,6 +86,11 @@ for i in range(0,len(inids)):
 
 mat = np.array(mat)
 
+if len(mat)<=1:
+	data = {"data":{"id":[], "Domain":[], "Trait":[], "go":[], "ng":[], "order":{"alph":[], "domain":[], "clst":[]}}}
+	print json.dumps(data)
+	sys.exit()
+
 ## get trait and domain info
 c.execute('SELECT id,Domain,Trait,Year from gwasDB');
 rows = c.fetchall()

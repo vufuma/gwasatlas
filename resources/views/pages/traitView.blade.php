@@ -135,7 +135,7 @@
 			<div id="pheSelection" style="padding-left:50px; padding-right:50px; padding-top:20px; padding-bottom:20px; border: 2px solid grey; border-radius: 15px;">
 				<div class="row">
 					<div class="col-md-6 col-sm-6 col-xs-6">
-						<span class="form-inline"><input class="form-control" type="checkbox" id="GC_excSamePhe" name="GC_excSamePhe"> Exclude same trait (if there is any).</span>
+						<span class="form-inline"><input class="form-control" type="checkbox" id="GC_excSamePhe" name="GC_excSamePhe"> Exclude the same trait (if there is any).</span>
 						<a class="infoPop" data-toggle="popover" data-content="This option removes GWAS with exactly the same trait name (excluding texts within parentheses) are excluded. For example, 'Body Mass Index' and 'Body Mass Index (male)' are considered as the same trait.">
 							<i class="fa fa-question-circle-o fa-lg"></i>
 						</a>

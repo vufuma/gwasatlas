@@ -21,7 +21,7 @@ def unique(a):
 	return unique
 
 if len(sys.argv)<2:
-    sys.exit("ERROR: Not enought argument.\nUSAGE: ./getLociOverlap.py <ids>")
+    sys.exit("ERROR: Not enought argument.\nUSAGE: ./getLociOverlap.py <host> <user> <passwd> <db> <ids>")
 
 # Get arguments
 host = sys.argv[1]
@@ -52,6 +52,10 @@ for i in ids:
 		loci.append([int(r[0]), str(r[2]), str(r[3]), int(r[4]), int(r[5]), float(r[6]), int(r[7]), int(r[8])])
 
 loci = np.array(loci, dtype=object)
+if len(loci)==0:
+	data = {"data":{"id":[], "Domain":[], "Trait":[], "loci":[], "loci_group":[]}}
+	print json.dumps(data)
+	sys.exit()
 loci = loci[np.lexsort((loci[:,4], loci[:,3]))]
 
 

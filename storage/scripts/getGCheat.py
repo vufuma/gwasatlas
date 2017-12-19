@@ -43,9 +43,16 @@ for r in rows:
         gc.append(r)
 gc = np.array(gc)
 
+if len(gc)==0:
+	data = {"data":{"id":[], "Domain":[], "Trait":[], "rg":[], "order":{"alph":[], "domain":[], "clst": []}}}
+	print data
+	sys.exit()
+
 ## ids of GWAS which have at least one genetic correlation
 inids = np.unique(list(gc[:,0].astype(int))+list(gc[:,1].astype(int)))
 if len(inids) == 0:
+	data = {"data":{"id":[], "Domain":[], "Trait":[], "rg":[], "order":{"alph":[], "domain":[], "clst": []}}}
+	print data
 	sys.exit()
 inids.sort()
 

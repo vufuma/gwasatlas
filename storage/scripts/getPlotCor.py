@@ -46,14 +46,19 @@ h2_idx = getH2idx(indata[:,4].astype(str))
 # year vs sample size
 if max(indata[:,1].astype(int))-min(indata[:,1].astype(int)) > 0:
 	out['yearVSn'] = getLinReg(indata[:,1].astype(int), indata[:,2].astype(float))
+else:
+	out['yearVSn'] = {}
 
 # risk loci vs sample size
 out['nVSloci'] = getLinReg(indata[:,2].astype(float), indata[:,3].astype(int))
 
-# h2 vs sample size
-out['nVSh2'] = getLinReg(indata[h2_idx,2].astype(float), indata[h2_idx,4].astype(float))
-
-# h2 vs risk loci
-out['lociVSh2'] = getLinReg(indata[h2_idx,3].astype(int), indata[h2_idx,4].astype(float))
+if len(h2_idx)==0:
+	out['nVSh2'] = {}
+	out['lociVSh2'] = {}
+else:
+	# h2 vs sample size
+	out['nVSh2'] = getLinReg(indata[h2_idx,2].astype(float), indata[h2_idx,4].astype(float))
+	# h2 vs risk loci
+	out['lociVSh2'] = getLinReg(indata[h2_idx,3].astype(int), indata[h2_idx,4].astype(float))
 
 print json.dumps(out)

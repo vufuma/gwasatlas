@@ -12,7 +12,7 @@
 			<a href="#1">1. GWAS atlas project</a><br/>
 			<a href="#2">2. Curated publicly available GWAS</a><br/>
 			<div style="padding-left:20px;">
-				2.1. Conditions to be included in the GWAS atlas database<br/>
+				2.1. Conditions to be included in the database<br/>
 				2.2. UK Biobank traits<br/>
 				2.3. Pre-process of GWAS summary statistics<br/>
 			</div>
@@ -50,19 +50,22 @@
 	<p>
 		<h3 id="1"><strong>1. GWAS atlas project</strong></h3>
 		<div style="padding-left:20px;">
-			Our aim is not just to create a central hub of GWAS summary statistics but
-			to privide insignt into each human complex trait.
+			GWAS atlas is a comprehensive database of publicly available GWAS summary statistics.
+			This is not only the central hub of summary staitstics but we also aimed to
+			provide insight into human complex traits.
 			In this webside, users are able to not only access to the original summary
 			statistics but also obtain a variety of results from pre-performed ananlyses
 			such as risk loci information, LD score regression [1], MAGMA [2] and multi GWAS comparision.
 			Furthermore, each GWAS can be further annotated by a web application, <a target="_blank" href="http://fuma.ctglab.nl">FUMA</a> [3].
-			<br/>[<a href="#top">Go to top</a>]<br/>
+			To obtain global view of genetic architecture, we performed several ananlyse for
+			selected 500 traits which are available in our paper [4].
+			<br/><br/>[<a href="#top">Go to top</a>]<br/>
 		</div>
 	</p>
 	<p>
 		<h3 id="2"><strong>2. Curated publicly available GWAS</strong></h3>
 		<div style="padding-left:20px;">
-			<h4>2.1. Conditions to be included in the GWAS atlas database</h4>
+			<h4>2.1. Conditions to be included in the database</h4>
 			Publicly availabe GWAS summary statistics which include full list of tested SNPs
 			are included in the database regardless of the cohort population or sample size.
 			Publicly availabe means that full summary statistcs are available without applying for
@@ -71,15 +74,16 @@
 			We excluded GWAS based on whole exome sequencing, immune-chip sequencing and
 			GWAS of replication cohorts.
 			When there are several version of GWAS summary statistics from the same study
-			for the same traits, e.g. sex specific and pooled sex GWAS or adjusted additional variables,
+			for the same traits, e.g. sex specific and pooled sex GWAS or adjusted additional covariates,
 			we included all of summary staitistics as long as the sample size and population
 			are explicitly mentioned in the original study.
+			Details are described in the online Methods of [4].
 			<h4>2.2. UK Biobank traits</h4>
-			We performed GWAS of 600 traits from UK Biobank release 2 [4] under application ID 1640.
+			We performed GWAS of 600 traits from UK Biobank release 2 [5] under application ID 1640.
 			We selected traits with at least 50,000 individuals with non-missing phentoypes and
 			both cases and controls are at least 10,000 for binary traits.
 			Only phenotype of first visit and first run (f.xxx.0.0) was used with some exceptions
-			(please refer Supplementary Note 1-2 and Supplementary Table 1-2 of <a>our paper</a> for details).
+			(please refer Supplementary Note 1-2 and Supplementary Table 1-2 of [4] for details).
 			GWAS was performed using PLINK v2.0 with eiter linear or logistic model by correcting for
 			age, sex, array, assement center and Townsend deprivation index.
 			<h4>2.3. Pre-process of GWAS summary statistics</h4>
@@ -98,7 +102,7 @@
 				These pre-processed summary statistics were used for all the analyses available
 				on this website and can be sued as input of FUMA (server side translation).
 			</span>
-			<br/>[<a href="#top">Go to top</a>]<br/>
+			<br/><br/>[<a href="#top">Go to top</a>]<br/>
 		</div>
 	</p>
 	<p>
@@ -112,18 +116,19 @@
 				<tbody>
 					<tr>
 						<td>id</td>
-						<td>Unique ID in the databse. Ordered arbitrary.</td>
+						<td>Unique ID in the databse (arbitrary ordered).</td>
 					</tr>
 					<tr>
 						<td>PMID</td>
 						<td>Pubmed ID of the original study. If the study is not publised,
-							mentioned in this feature.
+							mentioned in this feature or dio of bioRxiv is provided.
 						</td>
 					</tr>
 					<tr>
 						<td>Year</td>
-						<td>The year of the original study is published, but the year
-							of the data was distributed unless publication is not availabe yet.
+						<td>The year of the original study is published.
+							If the study is not published, the year
+							of the data was distributed.
 						</td>
 					</tr>
 					<tr>
@@ -168,14 +173,14 @@
 					<tr>
 						<td>Population</td>
 						<td>
-							One of the five super ancestory population defined in
+							One of the five super ancestory populations defined in
 							1000 genome project, AFR (African), AMR (American), EAS (East asian),
 							EUR (European), and SAS (South asian).
 							If the GWAS is trans ethnic study, all of the population is listed but the
 							first one has the highest proportion of the total sample size of the study.
 							For example, EUR+EAS+SAS means the study cohots are mix of three populations,
 							but EUR samples occupy the highest proportion of the total sample size
-							(but does not have to be majority).
+							(does not have to be majority).
 							For UK Biobank cohort, it is "UKB1 (EUR)" for release 1 and "UKB2 (EUR)" for release 2.
 						</td>
 					</tr>
@@ -191,9 +196,9 @@
 						<td>N</td>
 						<td>Total number of sample size used for the ananlyses.
 							This number is the total sample size used to generate the summary statistics which is publicly available.
-							Therefore, in some meta-analysis studies, some cohots are restricted to distribute summary statistics.
-							In that case, publicly available summary statistics dose not include a specific cohort
-							and the sample size in this database is excluding those samples.
+							In some meta-analysis studies, some cohots are restricted to distribute summary statistics.
+							In that case, publicly available summary statistics dose not include specific cohorts
+							and the sample size in this database coresponds to the sample size excluding those chorts.
 						</td>
 					</tr>
 					<tr>
@@ -209,7 +214,7 @@
 					<tr>
 						<td>SNPh2</td>
 						<td>SNP heritability estimated by LD score regression [1].
-							This is only available for GWAS meet certain criteria, otherwise blank.
+							This is only available for GWAS that meet certain criteria, otherwise blank.
 							See section <a href="#5">5. Estimation of SNP heritability and genetic correlation with LD score regression</a> for details.
 						</td>
 					</tr>
@@ -253,27 +258,27 @@
 			which defines lead SNPs.
 			<h4>4.2. Risk loci</h4>
 			Each of the independent significant SNPs have it's own LD block defined by the SNPs (P-value < 0.05)
-			that are in LD with the independent significant SNP (r<sup>2</sup> >= 0.6).
+			that are in LD with the independent significant SNP (r<sup>2</sup> &ge; 0.6).
 			To define genomic risk loci as a region, first LD blocks of independent significant SNPs
-			belongs to a single lead SNPs are merged. Then LD blocks which are physically overlapping or
-			distance is < 250Kb are merged.
+			belongs to the same lead SNPs are merged. Then LD blocks which are physically overlapping or
+			distance is 250Kb are merged.
 			Each risk locus is represented by one of the lead SNPs with the minimum
 			P-value within the locus.
-			A risk locus can contain multiple independent significant SNPs and lead SNPs.
+			Therefore, a risk locus can contain multiple independent significant SNPs and lead SNPs.
 			<h4>4.3. Reference panel</h4>
-			We used 1000 genome phase 3 [5] as a reference panel to compute LD for most of
-			the GWAS in the database.
-			One of the five population (AFR, AMR, EAS, EUR, SAS) was used.
+			We used 1000 genome phase 3 [6] of corresponding population (AFR, AMR, EAS, EUR, SAS)
+			as a reference panel to compute LD for most of the GWAS in the database.
 			For trans-ethnic GWAS, the population with the most proportion of the
 			total sample size was used.
 			When the GWAS is based on UKB release 1 cohort, we used randomly sampled
 			unrelated 10,000 EUR subjects from UKB release 1 as reference.
 			For GWAS performed in this study or based on UKB2 cohort,
 			unrelated entire EUR subjects (N=387,105) were used as a reference.
+			For meta-analyses including UKB cohort, either UKB1 or UKB2 was used as reference.
 			Indels and non-bi-allelic SNPs were excluded.
 			For each GWAS, the population was specified in the "Population"
 			feature of the databse (descrived in the previous section <a href="#3">3. Database features</a>).
-			<br/>[<a href="#top">Go to top</a>]<br/>
+			<br/><br/>[<a href="#top">Go to top</a>]<br/>
 		</div>
 	</p>
 	<p>
@@ -290,18 +295,18 @@
 			When signed effect size or odds ratio is not available in the summary statistics file,
 			"--a1-inc” flag was used.
 			For binary traits, population prevalence was curated from literatures
-			(only for diseases whose prevalence was available, Supplementary Table 25)
+			(only for diseases whose prevalence was available, Supplementary Table 25 [4])
 			to compute SNP heritability at liability scale with “--samp-prep” and ”--pop-prep”
 			flags and specified in the "Note" feature of the database.
 			For most of personality/activity (binary) traits from UKB2 cohort,
 			we assumed that sample prevalence is equal to population prevalence since
 			UK Biobank is not designed to study a certain disease/trait as described
-			previously [6].
+			previously [7].
 			Likewise, when population prevalence was not available, sample prevalence
 			was used as population prevalence for all other binary traits.
 			<h4>5.3. Genetic correlation</h4>
 			Genetic correlation was computed only for pairwise GWAS with the folowing criteria
-			as suggested previously [7].
+			as suggested previously [8].
 			<ul>
 				<li>SNP heritability was estimated</li>
 				<li>GWAS of EUR population of more than 80% of samples are EUR.</li>
@@ -327,8 +332,8 @@
 			<h4>6.2. MAGMA gene-set ananlysis</h4>
 			MAGMA gene-set ananlysis was performe for 4,728 curated gene set
 			and 6,166 GO terms (4,653 biological processes, 584 cellular components
-			and 929 molecular functions) from MsigDB v5.2 [8].
-			<br/>[<a href="#top">Go to top</a>]<br/>
+			and 929 molecular functions) from MsigDB v5.2 [9].
+			<br/><br/>[<a href="#top">Go to top</a>]<br/>
 		</div>
 	</p>
 	<p>
@@ -344,7 +349,7 @@
 			whose SNP heritability was estimated by LD score regression.
 			See <a href="#5">5.2. SNP heritability estimation</a> for details.
 			<h4>7.2. Genetic correlation heatmap</h4>
-			The heatmap only includes GWAS which are included for analyses of genetic correlation.
+			The heatmap only includes GWAS which meet the criteria for analyses of genetic correlation.
 			See <a href=#5>5.3. Genetic correlation</a> for details.
 			The value of genetic correlation was winsolized between -1.25 and 1.25.
 			The Bonferroni correction was performed based on the number of possible pair
@@ -352,7 +357,7 @@
 			<h4>7.3. MAGMA gene overlap</h4>
 			The heatmap only includes GWAS with at least one gene at genome-wide significance
 			(P-value < 2.5e-6).
-			The cell of ith column and jth row represents the proportion of overlapped
+			The cell of <i>i</i>th column and <i>j</i>th row represents the proportion of overlapped
 			significant genes between two GWAS based on the number of significant genes in ith GWAS.
 			<h4>7.4. Risk loci overlap</h4>
 			Physically overlapping risk loci are grouped.
@@ -361,14 +366,14 @@
 			are also overlapping but locus A and locus C are not, in this case, locus
 			A, B and C are grouped into one.
 			See <a href="#4">4. Definition of lead SNPs and risk loci</a> for definition of risk loci.
-			<br/>[<a href="#top">Go to top</a>]<br/>
+			<br/><br/>[<a href="#top">Go to top</a>]<br/>
 		</div>
 	</p>
 	<p>
 		<h3 id="8"><strong>8. Link to FUMA</strong></h3>
 		<div style="padding-left:20px;">
 			Comming soon...
-			<br/>[<a href="#top">Go to top</a>]<br/>
+			<br/><br/>[<a href="#top">Go to top</a>]<br/>
 		</div>
 	</p>
 	<p>
@@ -378,7 +383,7 @@
 			<a>xxx</a><br/>
 			When you use GWAS summary statistics serched from GWAS atlas but not using any results from
 			GWAS atlas, please cite the original GWAS study rather than GWAS atlas.
-			<br/>[<a href="#top">Go to top</a>]<br/>
+			<br/><br/>[<a href="#top">Go to top</a>]<br/>
 		</div>
 	</p>
 	<p>
@@ -396,6 +401,9 @@
 				<li>Watanabe, K. <i>et al.</i> Functional mapping and annotation of genetic associations with FUMA.
 					<i>Nat. Commun.</i> <b>8</b>, 1826 (2017).
 					<a target="_blank" href="https://www.ncbi.nlm.nih.gov/pubmed/29184056">PMID: 29184056</a>
+				</li>
+				<li>Watanabe, K. <i>et al.</i> A global view of genetic architecture in human complex traits.
+					[under preparation].
 				</li>
 				<li>Bycroft, C. <i>et al.</i> Genome-wide genetic data on ~500,000 UK Biobank particiants.
 					<i>bioRxiv</i> <a target="_blank" href="https://www.biorxiv.org/content/early/2017/07/20/166298">doi:https://doi.org/10.1101/166298</a> (2017).
@@ -474,7 +482,7 @@
 			<a target="_blank" href="https://www.magicinvestigators.org/">https://www.magicinvestigators.org/</a><br/>
 			<a target="_blank" href="https://www.nhlbi.nih.gov/research/intramural/researchers/ckdgen">https://www.nhlbi.nih.gov/research/intramural/researchers/ckdgen</a><br/>
 			<a target="_blank" href="https://www.broadinstitute.org/diabetes">https://www.broadinstitute.org/diabetes</a><br/>
-			<br/>[<a href="#top">Go to top</a>]<br/>
+			<br/><br/>[<a href="#top">Go to top</a>]<br/>
 		</div>
 	</p>
 </div>

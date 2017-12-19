@@ -355,10 +355,10 @@ function corPlot(data, cor){
 	x.domain([xMin-1, xMax+1]);
 	var xAxis = d3.svg.axis().scale(x).orient("bottom").tickFormat(d3.format("d"));
 	var y = d3.scale.linear().range([height, 0]);
-	y.domain([yMin-(yMax-yMin)*0.1, yMax+(yMax-yMin)*0.1]);
+	y.domain([yMin-(yMax-yMin+1)*0.1, yMax+(yMax-yMin+1)*0.1]);
 	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
 
-	if(cor.yearVSn != null){
+	if(cor!=undefined && cor!=null && cor.yearVSn.length>0){
 		svg.append('line')
 			.attr('x1', x(cor.yearVSn.x1))
 			.attr('x2', x(cor.yearVSn.x2))
@@ -424,13 +424,13 @@ function corPlot(data, cor){
 		yMin = d3.min(data, function(d){return d[5]}),
 		yMax = d3.max(data, function(d){return d[5]});
 	var x = d3.scale.linear().range([0, width]);
-	x.domain([xMin-(xMax-xMin)*0.1, xMax+(xMax-xMin)*0.1]);
+	x.domain([xMin-(xMax-xMin+1)*0.1, xMax+(xMax-xMin+1)*0.1]);
 	var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(5);
 	var y = d3.scale.linear().range([height, 0]);
-	y.domain([yMin-(yMax-yMin)*0.1, yMax+(yMax-yMin)*0.1]);
+	y.domain([yMin-(yMax-yMin+1)*0.1, yMax+(yMax-yMin+1)*0.1]);
 	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
 
-	if(cor.nVSloci != null){
+	if(cor!=undefined && cor!=null && cor.nVSloci.length>0){
 		svg.append('line')
 			.attr('x1', x(cor.nVSloci.x1))
 			.attr('x2', x(cor.nVSloci.x2))
@@ -495,13 +495,13 @@ function corPlot(data, cor){
 		xMin = d3.min(data, function(d){return d[4]}),
 		xMax = d3.max(data, function(d){return d[4]});
 	var x = d3.scale.linear().range([0, width]);
-	x.domain([xMin-(xMax-xMin)*0.1, xMax+(xMax-xMin)*0.1]);
+	x.domain([xMin-(xMax-xMin+1)*0.1, xMax+(xMax-xMin+1)*0.1]);
 	var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(5);
 	var y = d3.scale.linear().range([height, 0]);
-	y.domain([yMin-(yMax-yMin)*0.1, yMax+(yMax-yMin)*0.1]);
+	y.domain([yMin-(yMax-yMin+0.01)*0.1, yMax+(yMax-yMin+0.01)*0.1]);
 	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
 
-	if(cor.nVSh2 != null){
+	if(cor!=undefined && cor!=null && cor.nVSh2.length>0){
 		svg.append('line')
 			.attr('x1', x(cor.nVSh2.x1))
 			.attr('x2', x(cor.nVSh2.x2))
@@ -566,13 +566,13 @@ function corPlot(data, cor){
 		xMin = d3.min(data, function(d){return d[5]}),
 		xMax = d3.max(data, function(d){return d[5]});
 	var x = d3.scale.linear().range([0, width]);
-	x.domain([xMin-(xMax-xMin)*0.1, xMax+(xMax-xMin)*0.1]);
+	x.domain([xMin-(xMax-xMin+1)*0.1, xMax+(xMax-xMin+1)*0.1]);
 	var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(5);
 	var y = d3.scale.linear().range([height, 0]);
-	y.domain([yMin-(yMax-yMin)*0.1, yMax+(yMax-yMin)*0.1]);
+	y.domain([yMin-(yMax-yMin+0.01)*0.1, yMax+(yMax-yMin+0.01)*0.1]);
 	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
 
-	if(cor.lociVSh2 != null){
+	if(cor!=undefined && cor!=null && cor.lociVSh2.length>0){
 		svg.append('line')
 			.attr('x1', x(cor.lociVSh2.x1))
 			.attr('x2', x(cor.lociVSh2.x2))
@@ -624,8 +624,8 @@ function corPlot(data, cor){
 
 function gcPlot(data){
 	$('#gcPlot').html("");
-	if(data == undefined || data == null || data.length==0){
-		$('#gcPlot').html("No genetic correlatioin is available for selected GWAS.");
+	if(data.data.id == undefined || data.data.id == null || data.data.id.length==0){
+		$('#gcPlot').html('<span style="color:red;padding-top:20px;">No genetic correlatioin is available for selected GWAS.<span>');
 	}else{
 		var ids = data.data["id"];
 		var n = ids.length;
@@ -823,8 +823,8 @@ function gcPlot(data){
 function magmaPlot(data){
 	$('#magmaPlot').html("");
 
-	if(data == undefined || data == null || data.length==0){
-		$('#magmaPlot').html("No MAGMA gene analysis is available for selcted GWAS.");
+	if(data.data.id == undefined || data.data.id == null || data.data.id.length==0){
+		$('#magmaPlot').html('<span style="color:red;padding-top:20px;">No significant genes are overlapped between selected GWAS.<span>');
 	}else{
 		var ids = data.data["id"];
 		var n = ids.length;
