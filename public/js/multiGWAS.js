@@ -358,7 +358,7 @@ function corPlot(data, cor){
 	y.domain([yMin-(yMax-yMin+1)*0.1, yMax+(yMax-yMin+1)*0.1]);
 	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
 
-	if(cor!=undefined && cor!=null && cor.yearVSn.length>0){
+	if(cor.yearVSn.x1!=undefined && cor.yearVSn.x1!=null){
 		svg.append('line')
 			.attr('x1', x(cor.yearVSn.x1))
 			.attr('x2', x(cor.yearVSn.x2))
@@ -430,7 +430,7 @@ function corPlot(data, cor){
 	y.domain([yMin-(yMax-yMin+1)*0.1, yMax+(yMax-yMin+1)*0.1]);
 	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
 
-	if(cor!=undefined && cor!=null && cor.nVSloci.length>0){
+	if(cor.nVSloci.x1!=undefined && cor.nVSloci.x1!=null){
 		svg.append('line')
 			.attr('x1', x(cor.nVSloci.x1))
 			.attr('x2', x(cor.nVSloci.x2))
@@ -501,7 +501,7 @@ function corPlot(data, cor){
 	y.domain([yMin-(yMax-yMin+0.01)*0.1, yMax+(yMax-yMin+0.01)*0.1]);
 	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
 
-	if(cor!=undefined && cor!=null && cor.nVSh2.length>0){
+	if(cor.nVSh2.x1!=undefined && cor.nVSh2.x1!=null){
 		svg.append('line')
 			.attr('x1', x(cor.nVSh2.x1))
 			.attr('x2', x(cor.nVSh2.x2))
@@ -572,7 +572,7 @@ function corPlot(data, cor){
 	y.domain([yMin-(yMax-yMin+0.01)*0.1, yMax+(yMax-yMin+0.01)*0.1]);
 	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
 
-	if(cor!=undefined && cor!=null && cor.lociVSh2.length>0){
+	if(cor.lociVSh2.x1!=undefined && cor.lociVSh2.x1!=null){
 		svg.append('line')
 			.attr('x1', x(cor.lociVSh2.x1))
 			.attr('x2', x(cor.lociVSh2.x2))
