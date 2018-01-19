@@ -36,7 +36,7 @@
 	<p>
 		GWAS atlas is a databased of publicly available GWAS summary statistics.
 		Each GWAS can be borwsed their manhattan plot, risk loci, MAGMA results, SNP heritability and genetic correlations with other GWAS in the database.
-		600 GWAS were performed in this project based on UK Biobank release 2 data under applicationID 1640.
+		600 GWAS were performed in this project based on UK Biobank release 2 data under application ID 1640.
 		Each summary statistics can be downloaded from the original source following links (not directly from thie GWAS atlas website).
 		Pre-processed summary statistics (not downloadable) can be transfered to FUMA to further annotate risk loci.
 	</p>

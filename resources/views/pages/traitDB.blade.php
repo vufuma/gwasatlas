@@ -28,7 +28,7 @@
 <div style="padding-top: 50px; padding-right: 50px; padding-left: 50px">
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<div class="panel-title">Brows summary statistics in GWAS ATLAS</div>
+			<div class="panel-title">Browse summary statistics in GWAS ATLAS</div>
 		</div>
 		<div class="panel-body container">
 			<strong>By trait categories</strong><br/>
