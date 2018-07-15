@@ -36,7 +36,7 @@ def CheckInputType(text):
 		return "Gene"
 
 ##### get SNP data #####
-def getSNP(text, ids, host, user, passwd, db, datadir):
+def getSNP(text, ids, host, user, passwd, db, datadir, maxP):
 	## connect mysql
 	conn = MySQLdb.connect(host=host, user=user, passwd=passwd, db=db)
 	c = conn.cursor()
@@ -61,22 +61,24 @@ def getSNP(text, ids, host, user, passwd, db, datadir):
 			ids.append(int(r[0]))
 
 	out = []
+	p = {}
 	for i in ids:
 		if os.path.isfile(datadir+"/"+str(i)+"/all.txt.gz"):
 			tb = tabix.open(datadir+"/"+str(i)+"/all.txt.gz")
 			snp = tb.querys(str(chrom)+":"+str(pos)+"-"+str(pos))
 			s = []
 			for l in snp:
-				s = [i, float(l[2])]
-			if len(s)>0:
-				c.execute("SELECT PMID,Year,Domain,Trait,N FROM gwasDB WHERE id="+str(i))
-				rows = c.fetchall()
-				out.append(s+list(rows[0]))
+				p[i] = float(l[2])
+	c.execute("SELECT id,PMID,Year,Domain,Trait,N FROM gwasDB")
+	rows = c.fetchall()
+	for r in rows:
+		if r[0] in p:
+			out.append([r[0], p[r[0]]]+list(r)[1:])
 
 	return out
 
 ##### get Gene data #####
-def getGene(text, ids, host, user, passwd, db, datadir, genesdir):
+def getGene(text, ids, host, user, passwd, db, datadir, genesdir, maxP):
 	text = text.upper()
 	if not re.match(r'^ENSG', text):
 		with open(genesdir, 'r') as ensg:
@@ -100,14 +102,20 @@ def getGene(text, ids, host, user, passwd, db, datadir, genesdir):
 			ids.append(int(r[0]))
 
 	out = []
-	c.execute('SELECT * FROM magmaGenes WHERE ensg='+'"'+text+'"')
+	p = {}
+	c.execute('SELECT * FROM magmaGenes WHERE ensg='+'"'+text+'" AND p<'+str(maxP))
 	rows = c.fetchall()
 	for r in rows:
 		if r[0] in ids:
-			g = [r[0], float(r[2])]
+			p[r[0]] = r[2]
+	c.execute("SELECT id,PMID,Year,Domain,Trait,N FROM gwasDB")
+	rows = c.fetchall()
+	for r in rows:
+		if r[0] in p:
+			g = [r[0], float(p[r[0]])]
 			c.execute("SELECT PMID,Year,Domain,Trait,N FROM gwasDB WHERE id="+str(r[0]))
 			rows = c.fetchall()
-			out.append(g+list(rows[0]))
+			out.append(g+list(r)[1:])
 
 	return out
 
@@ -127,7 +135,8 @@ def main():
 	else:
 		ids = [int(s) for s in ids.split(":")]
 		ids.sort()
-	datadir = sys.argv[7]
+	maxP = float(sys.argv[7])
+	datadir = sys.argv[8]
 
 	## config
 	cfg = ConfigParser.ConfigParser()
@@ -144,11 +153,11 @@ def main():
 	if input_type=="SNP_error":
 		error = "SNP_input_error"
 	elif input_type=="SNP":
-		out = getSNP(text, ids, host, user, passwd, db, datadir)
+		out = getSNP(text, ids, host, user, passwd, db, datadir, maxP)
 		if len(out)==0:
 			error = "SNP_not_found"
 	else:
-		out = getGene(text, ids, host, user, passwd, db, datadir, genedir)
+		out = getGene(text, ids, host, user, passwd, db, datadir, genedir, maxP)
 		if len(out)==0:
 			error = "Gene_not_found"
 		elif out=="Gene_id_not_match":

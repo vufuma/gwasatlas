@@ -144,6 +144,11 @@
 				<tab>
 				<a id="clearLabel">Clear text labels</a>
 			</span>
+			<br/>
+			<span class="form-inline">
+				max P-value: <input class="form-control" type="number" id="maxP" value="1e-5">
+				<button class="btn btn-xs" id="Pupdate">Update</button>
+			</span>
 			<div style="overflow-y:auto;text-align:center;">
 				<div id="PheWASplot">
 				</div>

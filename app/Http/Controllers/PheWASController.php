@@ -13,7 +13,9 @@ class PheWASController extends Controller
     public function getData(Request $request){
 		$text = $request->input('text');
 		$ids = $request->input('ids');
+		$maxP = $request->input('maxP');
 		if($ids==""){$ids="NA";}
+		if($maxP==""){$maxP="1";}
 
 		$host = config('database.connections.mysql.host');
 		$user = config('database.connections.mysql.username');
@@ -22,7 +24,7 @@ class PheWASController extends Controller
 
 		$script = storage_path().'/scripts/getPheWASdata.py';
 		$datadir = config('app.datadir');
-		$json = shell_exec("python $script $host $user $pass $db $text $ids $datadir");
+		$json = shell_exec("python $script $host $user $pass $db $text $ids $maxP $datadir");
 
 		return $json;
 	}

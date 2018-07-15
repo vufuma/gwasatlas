@@ -51,6 +51,10 @@ $(document).ready(function(){
 			$(this).removeClass("active")
 		})
 	});
+
+	$('#Pupdate').on('click', function(){
+		updatePlot();
+	})
 });
 
 function Selection(type){
@@ -246,7 +250,8 @@ function updatePlot(){
 		type: "POST",
 		data:{
 			text: text,
-			ids: ids.join(":")
+			ids: ids.join(":"),
+			maxP: $('#maxP').val()
 		},
 		error: function(){
 			alert("getData error");
@@ -280,21 +285,21 @@ function plotPheWAS(data){
 			$('#errorms').append("Input value is not valid.")
 		}
 	}else{
-		var maxTrait = 0;
+		// var maxTrait = 0;
 		data.data.forEach(function(d){
 			d[0] = +d[0] //id
 			if(d[1]<1e-300){d[1] = 1e-300}
 			else{d[1] = +d[1]} //P-value
-			if(d[5].length>maxTrait){maxTrait = d[5].length}
+			// if(d[5].length>maxTrait){maxTrait = d[5].length}
 		})
 
 		var nData = data.data.length;
 		var minP = d3.min(data.data, function(d){return d[1]});
-		var margin = {top:30, right:120, bottom:maxTrait*4.5, left:80},
+		var margin = {top:30, right:120, bottom:20, left:80},
 			width = nData*5,
 			height = 300;
 		if(width<150){width=150}
-		if(width>1500){width=1500}
+		if(width>1000){width=1000}
 		var cellsize = width/(nData+1);
 		var labelFont = 10;
 
@@ -371,22 +376,22 @@ function plotPheWAS(data){
 				}
 			});
 
-		var traitLabel = svg.append("g").selectAll(".traitLabel")
-			.data(data.data).enter().append("text")
-			.text(function(d){return d[5]})
-			.style("text-anchor", "end")
-			.style("font-size", labelFont+"px")
-			.attr("transform", function(d){
-				return "translate("+((data.order[order_idx].indexOf(d[0])+1)*cellsize)+","+(height+8)+")rotate(-80)";
-			})
-			.on("mouseover", function(d){
-				d3.select(this)
-				.style("font-size", "10px")
-			})
-			.on("mouseout", function(d){
-				d3.select(this)
-				.style("font-size", "5px")
-			});
+		// var traitLabel = svg.append("g").selectAll(".traitLabel")
+		// 	.data(data.data).enter().append("text")
+		// 	.text(function(d){return d[5]})
+		// 	.style("text-anchor", "end")
+		// 	.style("font-size", labelFont+"px")
+		// 	.attr("transform", function(d){
+		// 		return "translate("+((data.order[order_idx].indexOf(d[0])+1)*cellsize)+","+(height+8)+")rotate(-80)";
+		// 	})
+		// 	.on("mouseover", function(d){
+		// 		d3.select(this)
+		// 		.style("font-size", "10px")
+		// 	})
+		// 	.on("mouseout", function(d){
+		// 		d3.select(this)
+		// 		.style("font-size", "5px")
+		// 	});
 
 		svg.append("g").attr("class", "x axis").call(xAxis)
 			.attr("transform", "translate(0,"+height+")")
@@ -400,10 +405,10 @@ function plotPheWAS(data){
 			order_idx = order[type];
 			dot.transition().duration(1000)
 				.attr('cx', function(d){return x(data.order[order_idx].indexOf(d[0])+1)});
-			traitLabel.transition().duration(1000)
-				.attr("transform", function(d){
-					return "translate("+((data.order[order_idx].indexOf(d[0])+1)*cellsize)+","+(height+8)+")rotate(-80)";
-				});
+			// traitLabel.transition().duration(1000)
+			// 	.attr("transform", function(d){
+			// 		return "translate("+((data.order[order_idx].indexOf(d[0])+1)*cellsize)+","+(height+8)+")rotate(-80)";
+			// 	});
 			svg.selectAll(".inLabel").remove();
 			$('#PheWASplot .active').each(function(){
 				$(this).removeClass("active")
