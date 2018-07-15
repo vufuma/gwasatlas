@@ -171,7 +171,7 @@
 					</div>
 				</div>
 				<br/>
-				<button class="btn btn-md" id="GC_update" name="GC_update">Update</button>
+				<button class="btn btn-default btn-md" id="GC_update" name="GC_update">Update</button>
 			</div>
 			<br/>
 			<div class="row">

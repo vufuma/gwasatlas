@@ -6,12 +6,6 @@ use Illuminate\Http\Request;
 use atlas\Http\Requests;
 use Illuminate\Support\Facades\DB;
 use atlas\Http\Controllers\Controller;
-use Symfony\Component\Process\Process;
-use View;
-use Auth;
-use Storage;
-use File;
-use JavaScript;
 
 class MultiController extends Controller
 {

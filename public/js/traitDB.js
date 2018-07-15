@@ -85,8 +85,9 @@ function SelectOptions(type, domain, chapter, subchapter, trait){
 	});
 }
 
-function SelectEnter(ele){
-	if(event.keyCode==13){
+function SelectEnter(e){
+	var code = e.keyCode ? e.keyCode : e.which;
+	if(code==13){
 		var domain = $('#Domain').val();
 		var chapter = $('#Chapter').val();
 		var subchapter = $('#Subchapter').val();

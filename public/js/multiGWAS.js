@@ -1,5 +1,4 @@
 var selectTable;
-// var ids = "";
 var domain_col = {"Activities":"#ffa1ba","Aging":"#bf0058","Body Functions":"#f3136f",
 "Body Structures":"#ff978f","Cardiovascular":"#8a1b22","Cell":"#ff6b63",
 "Cognitive":"#be6100","Connective tissue":"#884500","Dermatological":"#fe9617",
@@ -32,6 +31,17 @@ $(document).ready(function(){
 	});
 
 	$('#manual_select_all').on('click', function(){
+		var row_idx = selectTable.rows({filter:"applied"})[0];
+		var tmp = selectTable.rows({filter:"applied"}).columns(0).nodes()[0];
+		tmp.forEach(function(d,i){
+			if(row_idx.indexOf(i)>=0){
+				$(d).children('.manual_select_check').prop('checked', true);
+			}
+		});
+		manual_select_check();
+	});
+
+	$('#manual_select_all_displayed').on('click', function(){
 		$('.manual_select_check').each(function(){
 			$(this).prop('checked', true);
 		});
@@ -129,8 +139,9 @@ function SelectOptions(type, domain, chapter, subchapter, trait){
 	});
 }
 
-function SelectEnter(ele){
-	if(event.keyCode==13){
+function SelectEnter(e){
+	var code = e.keyCode ? e.keyCode : e.which;
+	if(code==13){
 		selectTable.draw();
 	}
 }
@@ -336,6 +347,12 @@ function corPlot(data, cor){
 		d[7] = +d[7]; // h2_z
 	});
 
+	// tip
+	var tip = d3.tip()
+		.attr('class', 'd3-tip')
+		.offset([-5,0])
+		.html(function(d){return d[0]+': '+d[3]+' ('+d[1]+')'});
+
 	// year vs sample size
 	$('#yearVSnBody').html('<div id="yearVSnPlot"></div>');
 	var margin = {top:20, right: 60, bottom:40, left:50},
@@ -346,6 +363,7 @@ function corPlot(data, cor){
 		.attr("height", height+margin.top+margin.bottom)
 		.append("g")
 		.attr("transform", "translate("+margin.left+","+margin.top+")");
+	svg.call(tip)
 
 	var xMin = d3.min(data, function(d){return d[1]}),
 		xMax = d3.max(data, function(d){return d[1]}),
@@ -357,8 +375,7 @@ function corPlot(data, cor){
 	var y = d3.scale.linear().range([height, 0]);
 	y.domain([yMin-(yMax-yMin+1)*0.1, yMax+(yMax-yMin+1)*0.1]);
 	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
-
-	if(cor.yearVSn.x1!=undefined && cor.yearVSn.x1!=null){
+	if(cor!=null && cor.yearVSn.x1!=undefined && cor.yearVSn.x1!=null){
 		svg.append('line')
 			.attr('x1', x(cor.yearVSn.x1))
 			.attr('x2', x(cor.yearVSn.x2))
@@ -392,9 +409,10 @@ function corPlot(data, cor){
 		.attr("r", 3)
 		.attr("cx", function(d){return x(d[1])})
 		.attr("cy", function(d){return y(d[4])})
-		// .style("fill", function(d){return domain_col(domains.indexOf(d[2]))})
 		.style("fill", function(d){return domain_col[d[2]]})
-		.style("opacity", "0.6");
+		.style("opacity", "0.6")
+		.on("mouseover", tip.show)
+		.on("mouseout", tip.hide);
 	svg.append("g").attr("class", "x axis").call(xAxis)
 		.attr("transform", "translate(0,"+height+")")
 		.selectAll('text')
@@ -418,6 +436,7 @@ function corPlot(data, cor){
 		.attr("height", height+margin.top+margin.bottom)
 		.append("g")
 		.attr("transform", "translate("+margin.left+","+margin.top+")");
+	svg.call(tip);
 
 	var xMin = d3.min(data, function(d){return d[4]}),
 		xMax = d3.max(data, function(d){return d[4]}),
@@ -430,7 +449,7 @@ function corPlot(data, cor){
 	y.domain([yMin-(yMax-yMin+1)*0.1, yMax+(yMax-yMin+1)*0.1]);
 	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
 
-	if(cor.nVSloci.x1!=undefined && cor.nVSloci.x1!=null){
+	if(cor!=null && cor.nVSloci.x1!=undefined && cor.nVSloci.x1!=null){
 		svg.append('line')
 			.attr('x1', x(cor.nVSloci.x1))
 			.attr('x2', x(cor.nVSloci.x2))
@@ -464,9 +483,10 @@ function corPlot(data, cor){
 		.attr("r", 3)
 		.attr("cx", function(d){return x(d[4])})
 		.attr("cy", function(d){return y(d[5])})
-		// .style("fill", function(d){return domain_col(domains.indexOf(d[2]))})
 		.style("fill", function(d){return domain_col[d[2]]})
-		.style("opacity", "0.6");
+		.style("opacity", "0.6")
+		.on("mouseover", tip.show)
+		.on("mouseout", tip.hide);
 	svg.append("g").attr("class", "x axis").call(xAxis)
 		.attr("transform", "translate(0,"+height+")");
 	svg.append("g").attr("class", "y axis").call(yAxis);
@@ -489,6 +509,7 @@ function corPlot(data, cor){
 		.attr("height", height+margin.top+margin.bottom)
 		.append("g")
 		.attr("transform", "translate("+margin.left+","+margin.top+")");
+	svg.call(tip);
 
 	var yMin = d3.min(data, function(d){if(d[6] > -9){return d[6]}}),
 		yMax = d3.max(data, function(d){return d[6]}),
@@ -501,7 +522,7 @@ function corPlot(data, cor){
 	y.domain([yMin-(yMax-yMin+0.01)*0.1, yMax+(yMax-yMin+0.01)*0.1]);
 	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
 
-	if(cor.nVSh2.x1!=undefined && cor.nVSh2.x1!=null){
+	if(cor!=null && cor.nVSh2.x1!=undefined && cor.nVSh2.x1!=null){
 		svg.append('line')
 			.attr('x1', x(cor.nVSh2.x1))
 			.attr('x2', x(cor.nVSh2.x2))
@@ -535,9 +556,10 @@ function corPlot(data, cor){
 		.attr("r", 3)
 		.attr("cx", function(d){return x(d[4])})
 		.attr("cy", function(d){return y(d[6])})
-		// .style("fill", function(d){return domain_col(domains.indexOf(d[2]))})
 		.style("fill", function(d){return domain_col[d[2]]})
-		.style("opacity", "0.6");
+		.style("opacity", "0.6")
+		.on("mouseover", tip.show)
+		.on("mouseout", tip.hide);
 	svg.append("g").attr("class", "x axis").call(xAxis)
 		.attr("transform", "translate(0,"+height+")");
 	svg.append("g").attr("class", "y axis").call(yAxis);
@@ -560,6 +582,7 @@ function corPlot(data, cor){
 		.attr("height", height+margin.top+margin.bottom)
 		.append("g")
 		.attr("transform", "translate("+margin.left+","+margin.top+")");
+	svg.call(tip);
 
 	var yMin = d3.min(data, function(d){if(d[6] > -9){return d[6]}}),
 		yMax = d3.max(data, function(d){return d[6]}),
@@ -572,7 +595,7 @@ function corPlot(data, cor){
 	y.domain([yMin-(yMax-yMin+0.01)*0.1, yMax+(yMax-yMin+0.01)*0.1]);
 	var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
 
-	if(cor.lociVSh2.x1!=undefined && cor.lociVSh2.x1!=null){
+	if(cor!=null && cor.lociVSh2.x1!=undefined && cor.lociVSh2.x1!=null){
 		svg.append('line')
 			.attr('x1', x(cor.lociVSh2.x1))
 			.attr('x2', x(cor.lociVSh2.x2))
@@ -606,9 +629,10 @@ function corPlot(data, cor){
 		.attr("r", 3)
 		.attr("cx", function(d){return x(d[5])})
 		.attr("cy", function(d){return y(d[6])})
-		// .style("fill", function(d){return domain_col(domains.indexOf(d[2]))})
 		.style("fill", function(d){return domain_col[d[2]]})
-		.style("opacity", "0.6");
+		.style("opacity", "0.6")
+		.on("mouseover", tip.show)
+		.on("mouseout", tip.hide);
 	svg.append("g").attr("class", "x axis").call(xAxis)
 		.attr("transform", "translate(0,"+height+")");
 	svg.append("g").attr("class", "y axis").call(yAxis);

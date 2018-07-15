@@ -62,21 +62,21 @@
 				<select class="selectpicker" data-width="75%" name="Trait" id="Trait" onchange='Selection("Trait");'>
 					<option value=null>-- Please select Domain of interest --</option>
 				</select><br/>
-				<!-- Trait keyword: <input type="text" class="form-control" id="TraitKey" name="TraitKey" onkeydown="SelectEnter(this)"></input> -->
+				<!-- Trait keyword: <input type="text" class="form-control" id="TraitKey" name="TraitKey" onkeydown="SelectEnter(event)"></input> -->
 			</span>
 			<br/>
 			<span class="form-inline">
 				<strong>By published year</strong><br/>
-				From <input type="number" class="form-control" id="yearFrom" name="yearFrom" onkeydown="SelectEnter(this)">
-				to <input type="number" class="form-control" id="yearTo" name="yearTo" onkeydown="SelectEnter(this)">
+				From <input type="number" class="form-control" id="yearFrom" name="yearFrom" onkeydown="SelectEnter(event)">
+				to <input type="number" class="form-control" id="yearTo" name="yearTo" onkeydown="SelectEnter(event)">
 				(inclusive)
 				<span class="info"><i class="fa fa-info"></i> Press enter to update the table below.</span>
 			</span>
 			<br/><br/>
 			<span class="form-inline">
 				<strong>By total sample size</strong><br/>
-				Minimum: <input type="number" class="form-control" id="nMin" name="nMin" onkeydown="SelectEnter(this)">
-				Maximum: <input type="number" class="form-control" id="nMax" name="nMax" onkeydown="SelectEnter(this)">
+				Minimum: <input type="number" class="form-control" id="nMin" name="nMin" onkeydown="SelectEnter(event)">
+				Maximum: <input type="number" class="form-control" id="nMax" name="nMax" onkeydown="SelectEnter(event)">
 				(inclusive)
 				<span class="info"><i class="fa fa-info"></i> Press enter to update the table below.</span>
 			</span>

@@ -47,13 +47,12 @@ Route::get('/multiGWAS', function(){
 
 Route::post('/multiGWAS/getData', 'MultiController@getData');
 
-// Route::post('/multiGWAS/getIDs', 'DBController@getIDs');
-//
-// Route::get('/multiGWAS/GCheat/{ids}', 'DBController@GCheat');
-//
-// Route::get('/multiGWAS/MagmaGeneheat/{ids}', 'DBController@MagmaGeneheat');
-//
-// Route::get('/multiGWAS/MagmaGSheat/{ids}', 'DBController@MagmaGSheat');
+// ************** Multi GWAS Comparison page ***************
+Route::get('/PheWAS', function(){
+  return view('pages.PheWAS');
+});
+
+Route::post('/PheWAS/getData', 'PheWASController@getData');
 
 // ************** Stats Page ***************
 Route::get('/stats', function(){
