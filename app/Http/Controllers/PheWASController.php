@@ -22,8 +22,8 @@ class PheWASController extends Controller
 		$pass = config('database.connections.mysql.password');
 		$db = config('database.connections.mysql.database');
 
+		$datadir = config('app.ssh_datadir');
 		$script = storage_path().'/scripts/getPheWASdata.py';
-		$datadir = config('app.datadir');
 		$json = shell_exec("python $script $host $user $pass $db $text $ids $maxP $datadir");
 
 		return $json;

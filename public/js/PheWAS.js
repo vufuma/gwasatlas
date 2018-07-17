@@ -296,7 +296,7 @@ function plotPheWAS(data){
 		var nData = data.data.length;
 		var minP = d3.min(data.data, function(d){return d[1]});
 		var margin = {top:30, right:120, bottom:20, left:80},
-			width = nData*5,
+			width = nData*3,
 			height = 300;
 		if(width<150){width=150}
 		if(width>1000){width=1000}
@@ -335,25 +335,25 @@ function plotPheWAS(data){
 		var cur_height = 20;
 		domains.forEach(function(d){
 			svg.append('circle')
-				.attr('cx', width+10)
+				.attr('cx', width+20)
 				.attr('cy', cur_height)
-				.attr('r', 3.5)
+				.attr('r', 3)
 				.style("fill", domain_col[d])
 				.style("opacity", "0.8");
 			svg.append('text')
-				.attr('x', width+18)
+				.attr('x', width+28)
 				.attr('y', cur_height+4)
 				.text(d)
 				.attr('text-anchor', 'start')
-				.style("font-size", "12px");
-			cur_height += 15;
+				.style("font-size", "11px");
+			cur_height += 12;
 		});
 
 		// plot
 		var dot = svg.selectAll('.dot').data(data.data).enter()
 			.append('circle')
 			.attr('class', 'dot')
-			.attr('r', 3.5)
+			.attr('r', 3)
 			.attr('cx', function(d){return x(data.order[order_idx].indexOf(d[0])+1)})
 			.attr('cy', function(d){return y(-Math.log10(d[1]))})
 			.style("fill", function(d){return domain_col[d[4]]})
@@ -376,23 +376,6 @@ function plotPheWAS(data){
 				}
 			});
 
-		// var traitLabel = svg.append("g").selectAll(".traitLabel")
-		// 	.data(data.data).enter().append("text")
-		// 	.text(function(d){return d[5]})
-		// 	.style("text-anchor", "end")
-		// 	.style("font-size", labelFont+"px")
-		// 	.attr("transform", function(d){
-		// 		return "translate("+((data.order[order_idx].indexOf(d[0])+1)*cellsize)+","+(height+8)+")rotate(-80)";
-		// 	})
-		// 	.on("mouseover", function(d){
-		// 		d3.select(this)
-		// 		.style("font-size", "10px")
-		// 	})
-		// 	.on("mouseout", function(d){
-		// 		d3.select(this)
-		// 		.style("font-size", "5px")
-		// 	});
-
 		svg.append("g").attr("class", "x axis").call(xAxis)
 			.attr("transform", "translate(0,"+height+")")
 			.selectAll('text').remove();
@@ -405,10 +388,6 @@ function plotPheWAS(data){
 			order_idx = order[type];
 			dot.transition().duration(1000)
 				.attr('cx', function(d){return x(data.order[order_idx].indexOf(d[0])+1)});
-			// traitLabel.transition().duration(1000)
-			// 	.attr("transform", function(d){
-			// 		return "translate("+((data.order[order_idx].indexOf(d[0])+1)*cellsize)+","+(height+8)+")rotate(-80)";
-			// 	});
 			svg.selectAll(".inLabel").remove();
 			$('#PheWASplot .active').each(function(){
 				$(this).removeClass("active")

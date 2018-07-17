@@ -10,6 +10,7 @@ import os
 import ConfigParser
 import MySQLdb
 import numpy as np
+import pandas as pd
 import json
 import re
 import tabix
@@ -24,7 +25,7 @@ def is_int(s):
 
 ##### define input type (SNP or Gene) ####
 def CheckInputType(text):
-	if re.match(r'^rs', text, re.IGNORECASE):
+	if re.match(r'^rs\d+', text, re.IGNORECASE):
 		return "SNP"
 	elif ":" in text:
 		chrom,pos = text.split(":")
@@ -62,13 +63,11 @@ def getSNP(text, ids, host, user, passwd, db, datadir, maxP):
 
 	out = []
 	p = {}
-	for i in ids:
-		if os.path.isfile(datadir+"/"+str(i)+"/all.txt.gz"):
-			tb = tabix.open(datadir+"/"+str(i)+"/all.txt.gz")
-			snp = tb.querys(str(chrom)+":"+str(pos)+"-"+str(pos))
-			s = []
-			for l in snp:
-				p[i] = float(l[2])
+	tb = tabix.open(datadir+"/snps_P_lt_0_05_chr"+str(chrom)+".txt.gz")
+	snps = tb.querys(str(chrom)+":"+str(pos)+"-"+str(pos))
+	for l in snps:
+		if int(l[3]) in ids and float(l[2])<maxP:
+			p[int(l[3])] = float(l[2])
 	c.execute("SELECT id,PMID,Year,Domain,Trait,N FROM gwasDB")
 	rows = c.fetchall()
 	for r in rows:
@@ -103,11 +102,16 @@ def getGene(text, ids, host, user, passwd, db, datadir, genesdir, maxP):
 
 	out = []
 	p = {}
-	c.execute('SELECT * FROM magmaGenes WHERE ensg='+'"'+text+'" AND p<'+str(maxP))
-	rows = c.fetchall()
-	for r in rows:
-		if r[0] in ids:
-			p[r[0]] = r[2]
+	genes = pd.read_table(datadir+"/magma.P.txt", header=0, dtype=str, usecols=["GENE"])
+	genes = np.array(genes)[:,0]
+	if text in genes:
+		idx = list(genes).index(text)
+		tmp = pd.read_table(datadir+"/magma.P.txt", header=None, dtype=str, skiprows=idx+1, nrows=1)
+		tmp = np.array(tmp)[0,:]
+		for i in range(1, len(tmp)):
+			if i in ids and tmp[i]!="NA" and float(tmp[i])<maxP:
+				p[i] = tmp[i]
+
 	c.execute("SELECT id,PMID,Year,Domain,Trait,N FROM gwasDB")
 	rows = c.fetchall()
 	for r in rows:
@@ -120,8 +124,8 @@ def getGene(text, ids, host, user, passwd, db, datadir, genesdir, maxP):
 	return out
 
 def main():
-	if len(sys.argv)<7:
-	    sys.exit("ERROR: Not enought argument.\nUSAGE: ./getPheWASdata.py <host> <user> <passwd> <database> <text> <ids> <datadir>")
+	if len(sys.argv)<8:
+	    sys.exit("ERROR: Not enought argument.\nUSAGE: ./getPheWASdata.py <host> <user> <passwd> <database> <text> <ids> <maxP> <datadir>")
 
 	## Get arguments
 	host = sys.argv[1]
@@ -142,7 +146,7 @@ def main():
 	cfg = ConfigParser.ConfigParser()
 	cfg.read(os.path.dirname(os.path.realpath(__file__))+'/app.config')
  	genedir = cfg.get('path', 'ENSG')
-
+	datadir = cfg.get('path', 'data')
 
 	## check type of text
 	input_type = CheckInputType(text)

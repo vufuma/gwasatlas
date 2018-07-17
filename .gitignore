@@ -7,3 +7,4 @@ Homestead.json
 .env
 /storage/scripts/app.config
 .DS_Store
+/storage/data
