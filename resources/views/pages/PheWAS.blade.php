@@ -27,6 +27,7 @@
 	var subdir = "{{ Config::get('app.subdir') }}";
 </script>
 <script type="text/javascript" src="{!! URL::asset('js/global.js') !!}"></script>
+<script type="text/javascript" src="{!! URL::asset('js/jquery.tabletoCSV.js') !!}"></script>
 <script type="text/javascript" src="{!! URL::asset('js/PheWAS.js') !!}"></script>
 @stop
 
@@ -132,6 +133,14 @@
 			<h4 class="panel-title">PheWAS plot</h4>
 		</div>
 		<div class="panel-body">
+			<form method="post" target="_blank" action="{{ Config::get('app.subdir') }}/PheWAS/imgdown">
+				<input type="hidden" name="_token" value="{{ csrf_token() }}">
+				<input type="hidden" name="data" id="traitData" val=""/>
+				<input type="hidden" name="type" id="traitType" val=""/>
+				<input type="hidden" name="fileName" id="traitFileName" val=""/>
+				<input type="submit" id="imgdownSubmit" class="ImgDownSubmit"/>
+			</form>
+
 			<span class="form-inline">
 				Sort traits by:
 				<select id="traitOrder" class="forn-control">
@@ -149,6 +158,13 @@
 				max P-value: <input class="form-control" type="number" id="maxP" value="1e-5">
 				<button class="btn btn-xs" id="Pupdate">Update</button>
 			</span>
+			<br/>
+			Download the plot as
+			<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("PheWASplot","png");'>PNG</button>
+			<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("PheWASplot","jpeg");'>JPG</button>
+			<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("PheWASplot","svg");'>SVG</button>
+			<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("PheWASplot","pdf");'>PDF</button>
+			<br/>
 			<div style="overflow-y:auto;text-align:center;">
 				<div id="PheWASplot">
 				</div>
@@ -160,6 +176,9 @@
 			<h4 class="panel-title">PheWAS table</h4>
 		</div>
 		<div class="panel-body">
+			Download the table as
+			<button class="btn btn-xs" onclick='CSVdown("PheWAStable");'>csv</button>
+			<br/>
 			<div style="overflow-x:auto;">
 				<table id="PheWAStable" class="display compact dt-body-right dt-head-center" width="90%" cellspacing="0" style="font-size:12px;">
 					<thead>

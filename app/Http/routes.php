@@ -40,6 +40,10 @@ Route::post('/traitDB/getGCdata', 'DBController@getGCdata');
 
 Route::post('/traitDB/getGClist', 'DBController@getGClist');
 
+Route::post('/traitDB/imgdown', 'DBController@imgdown');
+
+Route::post('/traitDB/imgdown2', 'DBController@imgdown2');
+
 // ************** Multi GWAS Comparison page ***************
 Route::get('/multiGWAS', function(){
   return view('pages.multiGWAS');
@@ -47,12 +51,17 @@ Route::get('/multiGWAS', function(){
 
 Route::post('/multiGWAS/getData', 'MultiController@getData');
 
+Route::post('/multiGWAS/imgdown', 'MultiController@imgdown');
+
 // ************** Multi GWAS Comparison page ***************
 Route::get('/PheWAS', function(){
   return view('pages.PheWAS');
 });
 
 Route::post('/PheWAS/getData', 'PheWASController@getData');
+
+Route::post('/PheWAS/imgdown', 'PheWASController@imgdown');
+
 
 // ************** Stats Page ***************
 Route::get('/stats', function(){

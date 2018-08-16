@@ -115,6 +115,13 @@
 
 	<!-- Result panels -->
 	<div class="row">
+		<form method="post" target="_blank" action="{{ Config::get('app.subdir') }}/multiGWAS/imgdown">
+			<input type="hidden" name="_token" value="{{ csrf_token() }}">
+			<input type="hidden" name="data" id="traitData" val=""/>
+			<input type="hidden" name="type" id="traitType" val=""/>
+			<input type="hidden" name="fileName" id="traitFileName" val=""/>
+			<input type="submit" id="imgdownSubmit" class="ImgDownSubmit"/>
+		</form>
 		<div class="col-md-4 col-sm-4 col-xs-4">
 			<div class="panel panel-default">
 				<div class="panel-heading">
@@ -129,7 +136,14 @@
 				<div class="panel-heading">
 					<h4 class="panel-title">Year vs Sample size</h4>
 				</div>
-				<div class="panel-body col4BoxBody" id="yearVSnBody" style="text-align:center; overflow:auto;">
+				<div class="panel-body col4BoxBody" style="text-align:center; overflow:auto;">
+					Download the plot as
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("yearVSnPlot","png");'>PNG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("yearVSnPlot","jpeg");'>JPG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("yearVSnPlot","svg");'>SVG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("yearVSnPlot","pdf");'>PDF</button>
+					<br/>
+					<div id="yearVSnBody"></div>
 				</div>
 			</div>
 		</div>
@@ -138,7 +152,14 @@
 				<div class="panel-heading">
 					<h4 class="panel-title">Sample size vs Number of risk loci</h4>
 				</div>
-				<div class="panel-body col4BoxBody" id="nVSlociBody" style="text-align:center; overflow:auto;">
+				<div class="panel-body col4BoxBody" style="text-align:center; overflow:auto;">
+					Download the plot as
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("nVSlociPlot","png");'>PNG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("nVSlociPlot","jpeg");'>JPG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("nVSlociPlot","svg");'>SVG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("nVSlociPlot","pdf");'>PDF</button>
+					<br/>
+					<div id="nVSlociBody"></div>
 				</div>
 			</div>
 		</div>
@@ -149,7 +170,14 @@
 				<div class="panel-heading">
 					<h4 class="panel-title">Sample size vs SNP heritability</h4>
 				</div>
-				<div class="panel-body col4BoxBody" id="nVSh2Body" style="text-align:center; overflow:auto;">
+				<div class="panel-body col4BoxBody" style="text-align:center; overflow:auto;">
+					Download the plot as
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("nVSh2Plot","png");'>PNG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("nVSh2Plot","jpeg");'>JPG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("nVSh2Plot","svg");'>SVG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("nVSh2Plot","pdf");'>PDF</button>
+					<br/>
+					<div id="nVSh2Body"></div>
 				</div>
 			</div>
 		</div>
@@ -158,7 +186,14 @@
 				<div class="panel-heading">
 					<h4 class="panel-title">Number of risk loci vs SNP heritability</h4>
 				</div>
-				<div class="panel-body col4BoxBody" id="lociVSh2Body" style="text-align:center; overflow:auto;">
+				<div class="panel-body col4BoxBody" style="text-align:center; overflow:auto;">
+					Download the plot as
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("lociVSh2Plot","png");'>PNG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("lociVSh2Plot","jpeg");'>JPG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("lociVSh2Plot","svg");'>SVG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("lociVSh2Plot","pdf");'>PDF</button>
+					<br/>
+					<div id="lociVSh2Body"></div>
 				</div>
 			</div>
 		</div>
@@ -187,6 +222,13 @@
 								<option value="clst">Cluster</option>
 							</select>
 						</span>
+						<br/>
+						Download the plot as
+						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("gcPlot","png");'>PNG</button>
+						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("gcPlot","jpeg");'>JPG</button>
+						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("gcPlot","svg");'>SVG</button>
+						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("gcPlot","pdf");'>PDF</button>
+						<br/>
 						<br/><br/>
 						<span class="info"><i class="fa fa-info"></i>
 							The heatmap is symmetric.
@@ -214,6 +256,13 @@
 							<!-- P-value threshold:
 							<input type="number" class="form-contorl" id="magmaP" value="2.5e-6"> -->
 						</span>
+						<br/>
+						Download the plot as
+						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("magmaPlot","png");'>PNG</button>
+						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("magmaPlot","jpeg");'>JPG</button>
+						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("magmaPlot","svg");'>SVG</button>
+						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("magmaPlot","pdf");'>PDF</button>
+						<br/>
 						<br/><br/>
 						<span class="info"><i class="fa fa-info"></i>
 							The heatmap is asymmetric.

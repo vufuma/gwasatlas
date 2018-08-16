@@ -11,6 +11,7 @@ var domain_col = {"Activities":"#ffa1ba","Aging":"#bf0058","Body Functions":"#f3
 "Social Interactions":"#772c50"};
 var domains;
 $(document).ready(function(){
+	$('.ImgDownSubmit').hide();
 	Selection("Domain");
 	$('#processGWAS').on('click', function(){
 		var ids = [];
@@ -425,6 +426,9 @@ function corPlot(data, cor){
 		.attr("transform", "translate(-35,"+(height/2)+")rotate(-90)")
 		.text("Number of samples / 10e3")
 		.attr("font-size", "10px");
+	svg.selectAll('path').style('fill', 'none').style('stroke', 'grey');
+	svg.selectAll('.axis').selectAll('line').style('fill', 'none').style('stroke', 'grey');
+	svg.selectAll("text").style("font-family", "sans-serif");
 
 	// sample size vs #risk loci
 	$('#nVSlociBody').html('<div id="nVSlociPlot"></div>');
@@ -498,6 +502,9 @@ function corPlot(data, cor){
 		.attr("transform", "translate(-38,"+(height/2)+")rotate(-90)")
 		.text("Number of risk loci")
 		.attr("font-size", "10px");
+	svg.selectAll('path').style('fill', 'none').style('stroke', 'grey');
+	svg.selectAll('.axis').selectAll('line').style('fill', 'none').style('stroke', 'grey');
+	svg.selectAll("text").style("font-family", "sans-serif");
 
 	// sample size vs h2
 	$('#nVSh2Body').html('<div id="nVSh2Plot"></div>');
@@ -571,6 +578,9 @@ function corPlot(data, cor){
 		.attr("transform", "translate(-35,"+(height/2)+")rotate(-90)")
 		.text("SNP h2")
 		.attr("font-size", "10px");
+	svg.selectAll('path').style('fill', 'none').style('stroke', 'grey');
+	svg.selectAll('.axis').selectAll('line').style('fill', 'none').style('stroke', 'grey');
+	svg.selectAll("text").style("font-family", "sans-serif");
 
 	// #risk loci vs h2
 	$('#lociVSh2Body').html('<div id="lociVSh2Plot"></div>');
@@ -644,6 +654,9 @@ function corPlot(data, cor){
 		.attr("transform", "translate(-35,"+(height/2)+")rotate(-90)")
 		.text("SNP h2")
 		.attr("font-size", "11px");
+	svg.selectAll('path').style('fill', 'none').style('stroke', 'grey');
+	svg.selectAll('.axis').selectAll('line').style('fill', 'none').style('stroke', 'grey');
+	svg.selectAll("text").style("font-family", "sans-serif");
 }
 
 function gcPlot(data){
@@ -771,6 +784,7 @@ function gcPlot(data){
 			.attr("height", cellsize-1)
 			// .attr("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d]))});
 			.attr("fill", function(d){return domain_col[data.data.Domain[d]]});
+		svg.selectAll("text").style("font-family", "sans-serif");
 
 		// reordering labels
 		function sortOptions(type){
@@ -985,6 +999,7 @@ function magmaPlot(data){
 			.attr("transform", "translate(-12, 3)rotate(-60)")
 			.style("text-anchor", "end")
 			.style("font-size", "10px");
+		svg.selectAll("text").style("font-family", "sans-serif");
 
 
 		// reordering labels
@@ -1298,4 +1313,11 @@ function lociOver(data){
 			.attr("transform", "translate("+width/2+","+(height+35)+")")
 			.text("Chromosome "+tmpdata[0][3]);
 	}
+}
+
+function ImgDown(name, type){
+	$('#traitData').val($('#'+name).html());
+	$('#traitType').val(type);
+	$('#traitFileName').val(name);
+	$('#imgdownSubmit').trigger('click');
 }

@@ -7,6 +7,7 @@ var table_desriptions = {
 }
 
 $(document).ready(function(){
+	$('.ImgDownSubmit').hide();
 	$.ajax({
 		url: subdir+"/traitDB/getData",
 		type: "POST",
@@ -568,7 +569,7 @@ function GCplot(data){
 			table += "</tr>";
 		})
 		$('#GCtableBody').html(table);
-		var margin = {top:30, right: 30, bottom:50, left:6*maxLabel},
+		var margin = {top:30, right: 30, bottom:50, left:6.3*maxLabel},
 			width = 250,
 			height = 20*data.GC.length;
 		var svg = d3.select("#GCplot").append("svg")
@@ -634,5 +635,28 @@ function GCplot(data){
 			.call(xAxis);
 		svg.append('g').attr("class", "y axis")
 			.call(yAxis);
+		svg.selectAll('path').style('fill', 'none').style('stroke', 'grey');
+		svg.selectAll('.axis').selectAll('line').style('fill', 'none').style('stroke', 'grey');
+		svg.selectAll("text").style("font-family", "sans-serif");
 	}
+}
+
+function ImgDown(name, type){
+	$('#traitData').val($('#'+name).html());
+	$('#traitType').val(type);
+	$('#traitID').val(id);
+	$('#traitFileName').val(name);
+	$('#imgdownSubmit').trigger('click');
+}
+
+function ImgDown2(name, type){
+	$('#traitData2').val($('#'+name).html());
+	$('#traitType2').val(type);
+	$('#traitID2').val(id);
+	$('#traitFileName2').val(name);
+	$('#imgdownSubmit2').trigger('click');
+}
+
+function CSVdown(name){
+	$('#'+name).tableToCSV("atlasID_"+id);
 }

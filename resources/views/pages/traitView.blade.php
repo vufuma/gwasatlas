@@ -22,11 +22,30 @@
 </script>
 <script type="text/javascript" src="{!! URL::asset('js/global.js') !!}"></script>
 <script type="text/javascript" src="{!! URL::asset('js/traitView.js') !!}"></script>
+<script type="text/javascript" src="{!! URL::asset('js/jquery.tabletoCSV.js') !!}"></script>
 
 @stop
 
 @section('content')
 <div style="padding-top: 50px; padding-right: 50px; padding-left: 50px;">
+
+	<form method="post" target="_blank" action="{{ Config::get('app.subdir') }}/traitDB/imgdown">
+		<input type="hidden" name="_token" value="{{ csrf_token() }}">
+		<input type="hidden" name="id" id="traitID" val=""/>
+		<input type="hidden" name="data" id="traitData" val=""/>
+		<input type="hidden" name="type" id="traitType" val=""/>
+		<input type="hidden" name="fileName" id="traitFileName" val=""/>
+		<input type="submit" id="imgdownSubmit" class="ImgDownSubmit"/>
+	</form>
+	<form method="post" target="_blank" action="{{ Config::get('app.subdir') }}/traitDB/imgdown2">
+		<input type="hidden" name="_token" value="{{ csrf_token() }}">
+		<input type="hidden" name="id" id="traitID2" val=""/>
+		<input type="hidden" name="data" id="traitData2" val=""/>
+		<input type="hidden" name="type" id="traitType2" val=""/>
+		<input type="hidden" name="fileName" id="traitFileName2" val=""/>
+		<input type="submit" id="imgdownSubmit2" class="ImgDownSubmit"/>
+	</form>
+
 	<div id="title"></div>
 
 	<div class="row">
@@ -58,6 +77,12 @@
 					<span class="info"><i class="fa fa-info"></i>
 						For plotting, overlapping data points are not drawn (filtering was performed only for SNPs with P-value &ge; 1e-5, see documentation for more details of filtering).
 					</span><br/>
+					Download the plot as
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("manhattan","png");'>PNG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("manhattan","jpeg");'>JPG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("manhattan","svg");'>SVG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("manhattan","pdf");'>PDF</button>
+					<br/>
 					<div style="overflow:auto;">
 						<div id="manhattan" style="text-align: center;"></div>
 					</div>
@@ -67,6 +92,12 @@
 							<span class="info"><i class="fa fa-info"></i>
 								For plotting purposes, overlapping data points are not drawn (filtering was performed only for SNPs with P-value &ge; 1e-5, see documentation for details of filtering).
 							</span><br/>
+							Download the plot as
+							<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("QQplot","png");'>PNG</button>
+							<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("QQplot","jpeg");'>JPG</button>
+							<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("QQplot","svg");'>SVG</button>
+							<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("QQplot","pdf");'>PDF</button>
+							<br/>
 							<div id="QQplot" style="text-align:"></div>
 						</div>
 						<div class="col-md-7 col-sm-7 col-xs-7" style="overflow-x: auto;">
@@ -74,6 +105,9 @@
 							<span class="info"><i class="fa fa-info"></i>
 								Top SNPs are defined as the most significant SNP in a genomic risk locus. See documentation for details of definition of the genomic risk loci.
 							</span><br/><br/>
+							Download the table as 
+							<button class="btn btn-xs" onclick='CSVdown("topSNPtable");'>csv</button>
+							<br>
 							<table id="topSNPtable" class="display compact nowrap row-border dt-body-right dt-head-center" cellspacing="0" style="display: block; overflow-x: auto; font-size: 14px;">
 								<thead>
 									<th>CHR</th>
@@ -101,11 +135,23 @@
 					<span class="form-inline">
 					Label top <input class="form-control" type="number" id="topGenes" style="width: 80px;"> genes.<br/>
 					</span>
+					Download the plot as
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown2("geneManhattan","png");'>PNG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown2("geneManhattan","jpeg");'>JPG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown2("geneManhattan","svg");'>SVG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown2("geneManhattan","pdf");'>PDF</button>
+					<br/>
 					<div id="geneManhattanDesc"></div>
 					<div id="geneManhattan" style="text-align: center;"></div>
 				</div>
 				<div class="col-md-4 col-sm-4 col-xs-4" style="overflow-x: auto;">
 					<h4>Q-Q plot</h4>
+					Download the plot as
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("geneQQplot","png");'>PNG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("geneQQplot","jpeg");'>JPG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("geneQQplot","svg");'>SVG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("geneQQplot","pdf");'>PDF</button>
+					<br/>
 					<div id="geneQQplot" style="text-align: center;"></div>
 				</div>
 			</div>
@@ -114,6 +160,9 @@
 				MAGMA gene-set analysis is performed for curated gene sets and GO terms obtained from MsigDB (total of 10894 gene sets).<br/>
 				The table displays either significant gene sets with P<sub>bon</sub> < 0.05 or the top 10 gene sets sorted by P-value.
 			</span><br/><br/>
+			Download the table as
+			<button class="btn btn-xs" onclick='CSVdown("MAGMAtable");'>csv</button>
+			<br/>
 			<table id="MAGMAtable" class="display compact nowrap" cellspacing="0" style="display: block; overflow-x: auto; font-size: 14px;">
 				<thead>
 					<th>Gene Set</th><th>N genes</th><th>Beta</th><th>Beta STD</th><th>SE</th><th>P</th><th>P<sub>bon</sub></th>
@@ -178,10 +227,18 @@
 				<div class="col-md-5 col-sm-5 col-xs-5" style="overflow-x:auto;">
 					<h4>GC plot</h4>
 					<div id="GCtotalN"></div>
+					Download the plot as
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown2("GCplot","png");'>PNG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown2("GCplot","jpeg");'>JPG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown2("GCplot","svg");'>SVG</button>
+					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown2("GCplot","pdf");'>PDF</button>
+					<br/>
 					<div id="GCplot" style="text-align: center;"></div>
 				</div>
 				<div class="col-md-7 col-sm-7 col-xs-7" style="overflow-x:auto;">
-					<h4>GC table</h4>
+					Download the table as
+					<button class="btn btn-xs" onclick='CSVdown("GCtable");'>csv</button>
+					<br/>
 					<table class="table table-sm table-bordered" id="GCtable" style="width:80%; margin:auto; font-size:12px;">
 						<thead>
 							<th>ID</th><th>Trait</th><th>rg</th><th>se</th><th>z</th><th>P</th><th>P-bon</th>

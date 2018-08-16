@@ -12,6 +12,7 @@ var domain_col = {"Activities":"#ffa1ba","Aging":"#bf0058","Body Functions":"#f3
 
 var domains;
 $(document).ready(function(){
+	$('.ImgDownSubmit').hide();
 	Selection("Domain");
 	updatePlot();
 
@@ -295,7 +296,7 @@ function plotPheWAS(data){
 
 		var nData = data.data.length;
 		var minP = d3.min(data.data, function(d){return d[1]});
-		var margin = {top:30, right:120, bottom:20, left:80},
+		var margin = {top:30, right:150, bottom:20, left:80},
 			width = nData*3,
 			height = 300;
 		if(width<150){width=150}
@@ -383,6 +384,9 @@ function plotPheWAS(data){
 		svg.append("text").attr("text-anchor", "middle")
 			.attr("transform", "translate("+(-35)+","+(height/2)+")rotate(-90)")
 			.text("-log10 P-value");
+		svg.selectAll('path').style('fill', 'none').style('stroke', 'grey');
+		svg.selectAll('.axis').selectAll('line').style('fill', 'none').style('stroke', 'grey');
+		svg.selectAll("text").style("font-family", "sans-serif");
 
 		function sortOptions(type){
 			order_idx = order[type];
@@ -410,7 +414,22 @@ function tablePheWAS(data){
 		+'</td><td>'+d[1]+'</td><td>'+d[6]+'</td></tr>');
 	});
 	$('#PheWAStable').DataTable({
-		dom: 'Bfrtip',
-		buttons: ['pageLength', 'csvHtml5']
+		// dom: 'Bfrtip',
+		// buttons: ['pageLength', 'csvHtml5'],
+		"lengthMenue": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+		"iDisplayLength": 10,
+		"stripeClasses": []
 	});
+}
+
+function CSVdown(name){
+	var dt = getDate();
+	$('#'+name).tableToCSV(dt);
+}
+
+function ImgDown(name, type){
+	$('#traitData').val($('#'+name).html());
+	$('#traitType').val(type);
+	$('#traitFileName').val(name);
+	$('#imgdownSubmit').trigger('click');
 }
