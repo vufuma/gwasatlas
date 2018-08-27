@@ -9,14 +9,13 @@
 import sys
 import MySQLdb
 import numpy as np
+import pandas as pd
 import json
 from scipy.cluster.hierarchy import linkage, leaves_list
 import time
 
 if len(sys.argv)<6:
     sys.exit("ERROR: Not enought argument.\nUSAGE: ./getGCheat.py <host> <user> <passwd> <database> <ids>")
-
-#start = time.time()
 
 ## Get arguments
 host = sys.argv[1]
@@ -40,8 +39,9 @@ for r in rows:
         r = np.array(r)
         r[0] = int(r[0])
         r[1] = int(r[1])
-        gc.append(r)
-gc = np.array(gc)
+        gc.append([int(r[0]), int(r[1])]+list(r[2:]))
+gc = np.array(gc, dtype=object)
+
 
 if len(gc)==0:
 	data = {"data":{"id":[], "Domain":[], "Trait":[], "rg":[], "order":{"alph":[], "domain":[], "clst": []}}}
@@ -56,6 +56,14 @@ if len(inids) == 0:
 	sys.exit()
 inids.sort()
 
+## for mat gc
+n = len(inids)*(len(inids)-1)/2 # number of test to correct for
+pbon = gc[:,5]*n
+pbon[pbon>1] = 1.0
+gc = np.c_[gc[:,[0,1,2,5]], pbon, gc[:,[3,4,6,7]]]
+gc = np.r_[gc, gc[:,[1,0,2,3,4,5,6,7,8]]]
+gc = np.r_[gc, np.c_[inids,inids,[1]*len(inids),[0]*len(inids),[0]*len(inids),[1]*len(inids),[1]*len(inids),[1]*len(inids),[1]*len(inids)]]
+
 ## get trait and domain info
 c.execute('SELECT id,Domain,Trait,Year from gwasDB');
 rows = c.fetchall()
@@ -67,41 +75,15 @@ for r in rows:
 traits = np.array(traits)
 
 ## create matrix for hierarchical clustering
-n = len(inids)*(len(inids)-1)/2 # number of test to correct for
-rg = []
-mat = []
-for i in inids:
-    row = []
-    for j in inids:
-        if i == j:
-            rg.append([i,j,1,0,0,1])
-            row += [1]
-            continue
-        elif i<j:
-            tmp = gc[gc[:,0].astype(int)==j]
-            if i not in tmp[:,1].astype(int):
-                row += [0]
-                continue
-            tmp = tmp[tmp[:,1].astype(int)==i][0]
-        else:
-            tmp = gc[gc[:,0].astype(int)==i]
-            if j not in tmp[:,1].astype(int):
-                row += [0]
-                continue
-            tmp = tmp[tmp[:,1].astype(int)==j][0]
-
-        if len(tmp)==0:
-            row += [0]
-            continue
-        else:
-            row += [float(tmp[2])]
-            rg.append([i,j,float(tmp[2]), float(tmp[5]), float(tmp[5])*n, float(tmp[3])])
-    mat.append(row)
-
-mat = np.array(mat)
+rg = gc[:,0:3]
+rg = pd.DataFrame(rg, columns=["id1", "id2", "rg"])
+rg[['id1', 'id2']] = rg[['id1', 'id2']].astype(int)
+rg['rg'] = rg['rg'].astype(float)
+rg = rg.pivot_table(index='id1', columns='id2', values='rg', fill_value=0)
+rg = np.matrix(rg)
 
 ## clustering order
-clst = list(leaves_list(linkage(mat, "single")))
+clst = list(leaves_list(linkage(rg, "single")))
 oclst = {}
 
 ## Domain order
@@ -126,5 +108,5 @@ for l in traits:
 
 ## return nested json
 inids = list(inids)
-data = {"data":{"id":inids, "Domain":domain, "Trait":trait, "rg":rg, "order":{"alph":otrait, "domain":odomain, "clst": oclst}}}
+data = {"data":{"id":inids, "Domain":domain, "Trait":trait, "rg":gc.tolist(), "order":{"alph":otrait, "domain":odomain, "clst": oclst}}}
 print json.dumps(data)

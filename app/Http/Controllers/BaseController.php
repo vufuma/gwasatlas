@@ -68,4 +68,42 @@ class BaseController extends Controller
 		}
 		return response() -> download($outfile);
     }
+
+	public function DTfile(Request $request){
+		$id = $request -> input('id');
+		$fin = $request -> input('infile');
+		$cols = $request -> input('header');
+		$cols = explode(":", $cols);
+		$filedir = config('app.datadir').'/'.$id.'/';
+		$f = $filedir.$fin;
+		if(file_exists($f)){
+			$file = fopen($f, 'r');
+			$all_rows = array();
+			$head = fgetcsv($file, 0, "\t");
+			$index = array();
+			foreach($cols as $c){
+				if(in_array($c, $head)){
+					$index[] = array_search($c, $head);
+				}else{
+					$index[] = -1;
+				}
+			}
+			while($row = fgetcsv($file, 0, "\t")){
+				$temp = [];
+				foreach($index as $i){
+					if($i==-1){
+						$temp[] = "NA";
+					}else{
+						$temp[] = $row[$i];
+					}
+				}
+				$all_rows[] = $temp;
+			}
+			$json = (array('data'=> $all_rows));
+
+			echo json_encode($json);
+		}else{
+			echo '{"data":[]}';
+		}
+    }
 }

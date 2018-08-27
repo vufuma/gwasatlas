@@ -31,7 +31,7 @@ function dbSum(){
 }
 
 function yearSumPlot(){
-	var margin = {top:10, right: 50, bottom:30, left:50},
+	var margin = {top:10, right: 50, bottom:30, left:65},
         width = 600,
         height = 280;
 	var svg = d3.select("#yearSumPlot").append("svg")
@@ -268,7 +268,7 @@ function yearSumPlot(){
 }
 
 function domainSumPlot(){
-	var margin = {top:20, right: 50, bottom:100, left:50},
+	var margin = {top:20, right: 50, bottom:100, left:65},
         width = 800,
         height = 400;
 	var svg = d3.select("#domainSumPlot").append("svg")

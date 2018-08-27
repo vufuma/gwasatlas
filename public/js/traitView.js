@@ -68,12 +68,35 @@ $(document).ready(function(){
 		}
 	});
 
-	var file = "magma.sets.top";
-	$('#MAGMAtable').DataTable({
-		"processing": true,
+	var file = "GenomicRiskLoci.txt";
+	$('#topSNPtable').DataTable({
+		processing: true,
 		serverSide: false,
-		select: true,
-		"ajax" : {
+		select: false,
+		ajax : {
+			url: subdir+"/traitDB/DTfile",
+			type: "POST",
+			data: {
+				id: id,
+				infile: file,
+				header: "chr:pos:rsID:p"
+			}
+		},
+		error: function(){
+			alert("top SNP table error");
+		},
+		"order": [[0, 'asc']],
+		"lengthMenue": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+		"iDisplayLength": 10,
+		"stripeClasses": []
+	});
+
+	file = "magma.sets.top";
+	$('#MAGMAtable').DataTable({
+		processing: true,
+		serverSide: false,
+		select: false,
+		ajax : {
 			url: subdir+"/traitDB/DTfile",
 			type: "POST",
 			data: {
@@ -83,7 +106,7 @@ $(document).ready(function(){
 			}
 		},
 		error: function(){
-			alert("leadSNPs table error");
+			alert("MAGMA gene set table error");
 		},
 		"order": [[6, 'asc']],
 		"lengthMenue": [[10, 25, 50, -1], [10, 25, 50, "All"]],
@@ -93,7 +116,6 @@ $(document).ready(function(){
 
 	GWplot(id);
 	QQplot(id);
-	topSNPtable(id);
 
 	$.ajax({
 		url: subdir+"/traitDB/getGClist",
@@ -158,37 +180,6 @@ function GC_manual_count(){
 		if($(this).is(':checked')){nTrait++;}
 	})
 	$('#GC_manual_n').html(nTrait);
-}
-
-function topSNPtable(id){
-	$('#topSNPtable').DataTable().destroy();
-	$('#topSNPtable').DataTable({
-      "processing": true,
-      serverSide: false,
-      select: true,
-	  searching: false,
-      "ajax" : {
-        url: subdir+"/traitDB/topSNPs",
-        type: "POST",
-        data: {
-          id: id,
-          header: "chr:pos:rsID:p"
-        }
-      },
-      error: function(){
-        alert("topSNPtable table error");
-      },
-	  "columns":[
-		{"data": "chr", name: "CHR"},
-		{"data": "pos", name: "POS"},
-		{"data": "rsID", name: "rsID"},
-		{"data": "p", name: "P"},
-	  ],
-      "lengthMenue": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-      "iDisplayLength": 10,
-	  "pagingType": "simple",
-	  "stripeClasses": []
-  });
 }
 
 function GWplot(id){

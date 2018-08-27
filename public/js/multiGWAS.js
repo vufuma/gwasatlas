@@ -12,6 +12,13 @@ var domain_col = {"Activities":"#ffa1ba","Aging":"#bf0058","Body Functions":"#f3
 var domains;
 $(document).ready(function(){
 	$('.ImgDownSubmit').hide();
+	$('#locusPlotImgDown').hide();
+	$('#genePlotOpt').hide();
+	$('#yearFrom').val("");
+	$('#yearTo').val("");
+	$('#nMin').val("");
+	$('#nMax').val("");
+	$('#Domain').val("null");
 	Selection("Domain");
 	$('#processGWAS').on('click', function(){
 		var ids = [];
@@ -21,8 +28,8 @@ $(document).ready(function(){
 				ids.push(selectTable.row($(d).parents('tr')).data()["ID"]);
 			}
 		});
-		if(ids.length>100){
-			$('#msg').html('<span style="font-size:14px; color:red;"><i class="fa fa-ban"></i> Maximum 100 GWAS can be processed at once.</span>');
+		if(ids.length>1000){
+			$('#msg').html('<span style="font-size:14px; color:red;"><i class="fa fa-ban"></i> Maximum 1000 GWAS can be processed at once.</span>');
 		}else if(ids.length<2){
 			$('#msg').html('<span style="font-size:14px; color:red;"><i class="fa fa-ban"></i> Minimum 2 GWAS need to be selected to compare.</span>');
 		}else{
@@ -55,6 +62,13 @@ $(document).ready(function(){
 			$(d).children('.manual_select_check').prop('checked', false);
 		});
 		manual_select_check();
+	});
+
+	$('#clearLabel').on('click', function(){
+		$('#genePlot .inLabel').remove();
+		$('#genePlot .active').each(function(){
+			$(this).removeClass("active")
+		})
 	});
 });
 
@@ -241,9 +255,11 @@ function displayData(ids){
 	$('#magmaPlot').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
 	$('#lociPlot').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
 	$('#lousPlot').html("");
+	$('#genesPlot').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
+	$('#geneTable').html("");
 
 	$.ajax({
-		url: subdir+"/multiGWAS/getData",
+		url: subdir+"/multiGWAS/getSummary",
 		type: "POST",
 		data: {
 			ids: ids
@@ -254,47 +270,103 @@ function displayData(ids){
 		success: function(data){
 			data = JSON.parse(data);
 
-			// GC and MAGMA row
-			if(data.gc.data.id.length>20 || data.magma.data.id.length>20){
-				$('#gc_magma_row').removeClass();
-				$('#gcCol').removeClass();
-				$('#magmaCol').removeClass();
-			}else{
-				$('#gc_magma_row').addClass('row');
-				$('#gcCol').addClass("col-md-6 col-sm-6 col-xs-6");
-				$('#magmaCol').addClass("col-md-6 col-sm-6 col-xs-6");
-				// GC and MAGMA max height
-				var maxTrait = 0;
-				data.gc.data.id.forEach(function(d){
-					if(data.gc.data.Trait[d].length > maxTrait){maxTrait = data.gc.data.Trait[d].length}
-				});
-				data.magma.data.id.forEach(function(d){
-					if(data.magma.data.Trait[d].length > maxTrait){maxTrait = data.magma.data.Trait[d].length}
-				});
-				var maxIDs = Math.max(data.gc.data.id.length, data.magma.data.id.length);
-				var height = 20 * maxIDs + maxTrait * 5 + 180;
-				$('.col6BoxBody').css({'height': height+"px"});
-			}
-
-			// heatmatp order select reset
-			$('#gcOrder option').each(function(){
-				$(this).prop("selected", false);
-			})
-			$('#magmaOrder option').each(function(){
-				$(this).prop("selected", false);
-			})
-
 			// Domains
 			domains = d3.set(data.plotData.data.map(function(d){return d[2];})).values();
 			domains.sort();
 			// domain_col = d3.scale.linear().domain([0, domains.length/4, domains.length/2, domains.length*3/4, domains.length]).range(["green", "yellow", "red", "purple", "blue"]);
 
-			// Road results
 			summary(data.sum);
 			corPlot(data.plotData.data, data.plotData.cor);
-			gcPlot(data.gc);
-			magmaPlot(data.magma);
-			lociOver(data.lociOver);
+		},
+		complete: function(){
+			$.ajax({
+				url: subdir+"/multiGWAS/getGC",
+				type: "POST",
+				data: {
+					ids: ids
+				},
+				error: function(){
+					alert("getGC error.")
+				},
+				success: function(gc){
+					gc = JSON.parse(gc);
+					$.ajax({
+						url: subdir+"/multiGWAS/getGenes",
+						type: "POST",
+						data: {
+							ids: ids
+						},
+						error: function(){
+							alert("getGenes error.")
+						},
+						success: function(magma){
+							magma = JSON.parse(magma);
+							// GC and MAGMA row size
+							if(gc.data.id.length>20 || magma.data.id.length>20){
+								$('#gc_magma_row').removeClass();
+								$('#gcCol').removeClass();
+								$('#magmaCol').removeClass();
+							}else{
+								$('#gc_magma_row').addClass('row');
+								$('#gcCol').addClass("col-md-6 col-sm-6 col-xs-6");
+								$('#magmaCol').addClass("col-md-6 col-sm-6 col-xs-6");
+								// GC and MAGMA max height
+								var maxTrait = 0;
+								gc.data.id.forEach(function(d){
+									if(gc.data.Trait[d].length > maxTrait){maxTrait = gc.data.Trait[d].length}
+								});
+								magma.data.id.forEach(function(d){
+									if(magma.data.Trait[d].length > maxTrait){maxTrait = magma.data.Trait[d].length}
+								});
+								var maxIDs = Math.max(gc.data.id.length, magma.data.id.length);
+								var height = 20 * maxIDs + maxTrait * 5 + 180;
+								$('.col6BoxBody').css({'height': height+"px"});
+							}
+
+							// heatmatp order select reset
+							$('#gcOrder option').each(function(){
+								$(this).prop("selected", false);
+							})
+							$('#magmaOrder option').each(function(){
+								$(this).prop("selected", false);
+							})
+
+							gcPlot(gc);
+							magmaPlot(magma);
+						}
+					})
+				}
+			})
+
+			$.ajax({
+				url: subdir+"/multiGWAS/getLociOverlap",
+				type: "POST",
+				data: {
+					ids: ids
+				},
+				error: function(){
+					alert("getLociOverlap error.")
+				},
+				success: function(data){
+					data = JSON.parse(data);
+					LociOverPlot(data);
+				}
+			})
+
+			$.ajax({
+				url: subdir+"/multiGWAS/getGenesPleiotropy",
+				type: "POST",
+				data: {
+					ids: ids
+				},
+				error: function(){
+					alert("getGenesPleiotropy error.")
+				},
+				success: function(data){
+					data = JSON.parse(data);
+					GenesPleiotropyPlot(data);
+				}
+			})
 		}
 	})
 }
@@ -663,6 +735,8 @@ function gcPlot(data){
 	$('#gcPlot').html("");
 	if(data.data.id == undefined || data.data.id == null || data.data.id.length==0){
 		$('#gcPlot').html('<span style="color:red;padding-top:20px;">No genetic correlatioin is available for selected GWAS.<span>');
+	}else if(data.data.id.length > 100){
+		$('#gcPlot').html('<span style="color:red;padding-top:20px;">The heatmap is too large to display. Please download data in json format and create the plot on your local server.<span>');
 	}else{
 		var ids = data.data["id"];
 		var n = ids.length;
@@ -684,7 +758,7 @@ function gcPlot(data){
 			}
 		});
 
-		var margin = {bottom: maxTrait*5+5, right: 100, top: 20, left: maxTrait*5+5},
+		var margin = {bottom: maxTrait*5.5+5, right: 100, top: 20, left: maxTrait*5.5+5},
 			width = cellsize*n,
 			height = cellsize*n;
 		var svg = d3.select('#gcPlot').append('svg')
@@ -856,6 +930,16 @@ function gcPlot(data){
 			sortOptions(type);
 		});
 	}
+
+	$('#downGCjson').on('click', function(){
+		$("<a />", {
+			"download": "GC.json",
+			"href": "data:text/json, "+encodeURIComponent(JSON.stringify(data)),
+		}).appendTo("body")
+		.click(function(){
+			$(this).remove()
+		})[0].click()
+	})
 }
 
 function magmaPlot(data){
@@ -863,6 +947,8 @@ function magmaPlot(data){
 
 	if(data.data.id == undefined || data.data.id == null || data.data.id.length==0){
 		$('#magmaPlot').html('<span style="color:red;padding-top:20px;">No significant genes are overlapped between selected GWAS.<span>');
+	}else if(data.data.id.length > 100){
+		$('#magmaPlot').html('<span style="color:red;padding-top:20px;">The heatmap is too large to display. Please download data in json format and create the plot on your local server.<span>');
 	}else{
 		var ids = data.data["id"];
 		var n = ids.length;
@@ -890,7 +976,7 @@ function magmaPlot(data){
 
 		var barWidth = 50;
 		var space = 5;
-		var margin = {bottom: maxTrait*5+5, right: 100, top: 20, left: maxTrait*5+5},
+		var margin = {bottom: maxTrait*5.5+5, right: 100, top: 20, left: maxTrait*5.5+5},
 			width = cellsize*n+space+barWidth,
 			height = cellsize*n;
 		var svg = d3.select('#magmaPlot').append('svg')
@@ -1061,16 +1147,28 @@ function magmaPlot(data){
 			}
 		}
 
-		d3.select('#magmaOrder').on("change", function(){
+		$('#magmaOrder').on("change", function(){
 			var type = $('#magmaOrder').val();
 			sortOptions(type);
 		})
 	}
+
+	$('#downMAGMAjson').on('click', function(){
+		$("<a />", {
+			"download": "MAGMA_genes_overlap.json",
+			"href": "data:text/json, "+encodeURIComponent(JSON.stringify(data)),
+		}).appendTo("body")
+		.click(function(){
+			$(this).remove()
+		})[0].click()
+	})
 }
 
-function lociOver(data){
+function LociOverPlot(data){
 	$('#lociPlot').html("");
 	$('#locusPlot').html("");
+	$('#locusPlotImgDown').hide();
+	$('#lociYaxis').val("domain");
 	var chromSize = [249250621, 243199373, 198022430, 191154276, 180915260, 171115067,
 		159138663, 146364022, 141213431, 135534747, 135006516, 133851895, 115169878, 107349540,
 		102531392, 90354753, 81195210, 78077248, 63025520, 59128983, 48129895, 51304566, 155270560];
@@ -1080,14 +1178,15 @@ function lociOver(data){
 		chromStart.push(chromStart[i-1]+chromSize[i-1]);
 	}
 
-	data.data.loci_group.forEach(function(d){
+	data.loci_group.forEach(function(d){
 		d[0] = +d[0] // id
 		d[1] = +d[1] // chr
 		d[2] = +d[2] // start
 		d[3] = +d[3] // end
-		d[4] = +d[4] // N
+		d[4] = +d[4] // nTrait
+		d[5] = +d[5] // nDomain
 	});
-	data.data.loci.forEach(function(d){
+	data.loci.forEach(function(d){
 		// d[0] = +d[0] // id
 		d[3] = +d[3] // chr
 		d[4] = +d[4] // pos
@@ -1108,20 +1207,20 @@ function lociOver(data){
 		.attr("transform", "translate("+margin.left+","+margin.top+")");
 
 	var chr = [];
-	var max_chr = d3.max(data.data.loci_group, function(d){return d[1]});
+	var max_chr = d3.max(data.loci_group, function(d){return d[1]});
 	for(var i=1; i<=22; i++){
 		chr.push(i);
 	}
 	if(max_chr==23){chr.push(23)}
 	max_chr = Math.max(...chr);
 
-	var max_n = d3.max(data.data.loci_group, function(d){return d[4]});
-
+	var max_nTrait = d3.max(data.loci_group, function(d){return d[4]});
+	var max_nDomain = d3.max(data.loci_group, function(d){return d[5]});
 	var x = d3.scale.linear().range([0, width]);
 	x.domain([0, (chromStart[max_chr-1]+chromSize[max_chr-1])]);
 	var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(0);
 	var y = d3.scale.linear().range([height, 0]);
-	y.domain([1, max_n+1]);
+	y.domain([1, max_nDomain+1]);
 	var yAxis = d3.svg.axis().scale(y).orient("left").tickFormat(d3.format("d"));
 
 	// tip
@@ -1139,12 +1238,12 @@ function lociOver(data){
 		.style("fill", "transparent")
 		.style("shape-rendering", "crispEdges");
 
-	svg.selectAll(".dot").data(data.data.loci_group).enter()
+	svg.selectAll(".dot").data(data.loci_group).enter()
 		.append("circle")
 		.attr('class', 'locidot')
-		.attr("r", function(d){return d[4]/max_n*7+3;})
+		.attr("r", function(d){return d[4]/max_nTrait*7+3;})
 		.attr("cx", function(d){return x((d[2]+d[3])/2+chromStart[d[1]-1])})
-		.attr("cy", function(d){return y(d[4])})
+		.attr("cy", function(d){return y(d[5])})
 		.attr("fill", function(d){
 			if(d[1]%2==0){return "steelblue"}
 			else{return "blue"}
@@ -1155,7 +1254,8 @@ function lociOver(data){
 			if(d[4]>1){
 				locusPlot(d[0]);
 			}
-		});
+		})
+		.style("opacity", 0.6);
 
 	svg.append("g").attr("class", "x axis")
 		.attr("transform", "translate(0,"+height+")").call(xAxis).selectAll("text").remove();
@@ -1174,8 +1274,12 @@ function lociOver(data){
 		.attr("transform", "translate("+width/2+","+(height+35)+")")
 		.text("Chromosome");
 	svg.append("text").attr("text-anchor", "middle")
+		.attr("class", "ytitle")
 		.attr("transform", "translate("+(-35)+","+(height/2)+")rotate(-90)")
-		.text("Number of GWAS");
+		.text("Number of Domains");
+	svg.selectAll('path').style('fill', 'none').style('stroke', 'grey');
+	svg.selectAll('.axis').selectAll('line').style('fill', 'none').style('stroke', 'grey');
+	svg.selectAll("text").style("font-family", "sans-serif");
 
 	function zoomed(){
 		svg.selectAll(".chrtext")
@@ -1195,17 +1299,41 @@ function lociOver(data){
 			});
 	}
 
+	function Yaxis(type){
+		if(type=="GWAS"){
+			y.domain([1, max_nTrait+1]);
+			svg.selectAll(".y.axis").call(yAxis);
+			svg.selectAll(".locidot").transition().duration(1000)
+				.attr("r", function(d){return d[5]/max_nDomain*7+3;})
+				.attr("cy", function(d){return y(d[4])});
+			svg.selectAll(".ytitle").text("Number of GWAS");
+		}else{
+			y.domain([1, max_nDomain+1]);
+			svg.selectAll(".y.axis").call(yAxis);
+			svg.selectAll(".locidot").transition().duration(1000)
+				.attr("r", function(d){return d[4]/max_nTrait*7+3;})
+				.attr("cy", function(d){return y(d[5])});
+			svg.selectAll(".ytitle").text("Number of Domains");
+		}
+	}
+
+	$('#lociYaxis').on("change", function(){
+		var type = $('#lociYaxis').val();
+		Yaxis(type);
+	})
+
 	function locusPlot(lociid){
+		$('#locusPlotImgDown').show();
 		$('#locusPlot').html("");
-		var tmpdata = data.data.loci.filter(function(d){if(d[8]==lociid){return d}});
+		var tmpdata = data.loci.filter(function(d){if(d[8]==lociid){return d}});
 		var ids = d3.set(tmpdata.map(function(d){return d[0];})).values();
 
 		var traits = [];
 		var maxTrait = 0;
 		ids.forEach(function(d){
-			if(traits.indexOf(data.data.Trait[d])<0){
-				if(data.data.Trait[d].length > maxTrait){maxTrait = data.data.Trait[d].length}
-				traits.push(data.data.Trait[d]);
+			if(traits.indexOf(data.Trait[d])<0){
+				if(data.Trait[d].length > maxTrait){maxTrait = data.Trait[d].length}
+				traits.push(data.Trait[d]);
 			}
 		})
 
@@ -1214,7 +1342,7 @@ function lociOver(data){
 			cellheight = 15;
 		}
 
-		var margin = {top:30, right: 50, bottom:50, left:maxTrait*5.5},
+		var margin = {top:30, right: 50, bottom:50, left:maxTrait*6},
 			width = 500,
 			height = (cellheight)*ids.length;
 		if(height < 100){height = 100}
@@ -1284,23 +1412,23 @@ function lociOver(data){
 			.append("line")
 			.attr("x1", function(d){return x(d[6])})
 			.attr("x2", function(d){return x(d[7])})
-			.attr("y1", function(d){return y(data.data.Trait[d[0]])+y.rangeBand()*0.5})
-			.attr("y2", function(d){return y(data.data.Trait[d[0]])+y.rangeBand()*0.5})
-			// .style("stroke", function(d){return domain_col(domains.indexOf(data.data.Domain[d[0]]))});
-			.style("stroke", function(d){return domain_col[data.data.Domain[d[0]]]});
+			.attr("y1", function(d){return y(data.Trait[d[0]])+y.rangeBand()*0.5})
+			.attr("y2", function(d){return y(data.Trait[d[0]])+y.rangeBand()*0.5})
+			// .style("stroke", function(d){return domain_col(domains.indexOf(data.Domain[d[0]]))});
+			.style("stroke", function(d){return domain_col[data.Domain[d[0]]]});
 
 		// top SNP
 		svg.selectAll(".dot").data(tmpdata).enter()
 			.append("circle")
 			.attr("cx", function(d){return x(d[4])})
-			.attr("cy", function(d){return y(data.data.Trait[d[0]])+y.rangeBand()*0.5})
+			.attr("cy", function(d){return y(data.Trait[d[0]])+y.rangeBand()*0.5})
 			.attr("r", function(d){return -Math.log10(d[5])/maxP*(cellheight*0.85/2-3)+3;})
-			// .style("fill", function(d){return domain_col(domains.indexOf(data.data.Domain[d[0]]))});
-			.style("fill", function(d){return domain_col[data.data.Domain[d[0]]]});
+			// .style("fill", function(d){return domain_col(domains.indexOf(data.Domain[d[0]]))});
+			.style("fill", function(d){return domain_col[data.Domain[d[0]]]});
 		svg.selectAll(".rsID").data(tmpdata).enter()
 			.append("text")
 			.attr("x", function(d){return x(d[4])})
-			.attr("y", function(d){return y(data.data.Trait[d[0]])+3})
+			.attr("y", function(d){return y(data.Trait[d[0]])+3})
 			.text(function(d){return d[2]})
 			.attr("text-anchor", "start")
 			.attr("font-size", "9.5px");
@@ -1312,6 +1440,312 @@ function lociOver(data){
 		svg.append("text").attr("text-anchor", "middle")
 			.attr("transform", "translate("+width/2+","+(height+35)+")")
 			.text("Chromosome "+tmpdata[0][3]);
+		svg.selectAll('path').style('fill', 'none').style('stroke', 'grey');
+		svg.selectAll('.axis').selectAll('line').style('fill', 'none').style('stroke', 'grey');
+		svg.selectAll("text").style("font-family", "sans-serif");
+	}
+}
+
+function GenesPleiotropyPlot(data){
+	$('#genesPlot').html("");
+	$('#genePlot').html("");
+	$('#genePlotOpt').hide();
+	$('#genePlotTitle').html("");
+	$('#geneYaxis').val("domain");
+	var chromSize = [249250621, 243199373, 198022430, 191154276, 180915260, 171115067,
+		159138663, 146364022, 141213431, 135534747, 135006516, 133851895, 115169878, 107349540,
+		102531392, 90354753, 81195210, 78077248, 63025520, 59128983, 48129895, 51304566, 155270560];
+	var chromStart = [];
+	chromStart.push(0);
+	for(var i=1; i<chromSize.length; i++){
+		chromStart.push(chromStart[i-1]+chromSize[i-1]);
+	}
+
+	data.genes.forEach(function(d){
+		d[2] = +d[2] // chr
+		d[3] = +d[3] // start
+		d[4] = +d[4] // end
+		d[5] = +d[5] // nTrait
+		d[6] = +d[6] // nDomain
+	});
+
+	var margin = {top:30, right: 30, bottom:50, left:50},
+		width = 800,
+		height = 250;
+	var svg = d3.select("#genesPlot").append("svg")
+		.attr("width", width+margin.left+margin.right)
+		.attr("height", height+margin.top+margin.bottom)
+		.append("g")
+		.attr("transform", "translate("+margin.left+","+margin.top+")");
+
+	var chr = [];
+	var max_chr = d3.max(data.genes, function(d){return d[2]});
+	for(var i=1; i<=22; i++){
+		chr.push(i);
+	}
+	if(max_chr==23){chr.push(23)}
+	max_chr = Math.max(...chr);
+
+	var max_nTrait = d3.max(data.genes, function(d){return d[5]});
+	var max_nDomain = d3.max(data.genes, function(d){return d[6]});
+
+	var x = d3.scale.linear().range([0, width]);
+	x.domain([0, (chromStart[max_chr-1]+chromSize[max_chr-1])]);
+	var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(0);
+	var y = d3.scale.linear().range([height, 0]);
+	y.domain([1, max_nDomain+1]);
+	var yAxis = d3.svg.axis().scale(y).orient("left").tickFormat(d3.format("d"));
+
+	// tip
+	var tip = d3.tip()
+		.attr('class', 'd3-tip')
+		.offset([-5,0])
+		.html(function(d){return 'ENSG ID: '+d[0]+'<br/>Symbol: '+d[1]+'<br/>Chr: '+d[2]+'</br>Start: '+d[3]+'</br>End: '+d[4]+'</br>#Traits: '+d[5]+'<br/>#Domains: '+d[6]});
+	svg.call(tip);
+
+	// zoom
+	var zoom = d3.behavior.zoom().x(x).scaleExtent([1,10]).on("zoom", zoomed);
+	svg.call(zoom);
+	// add rect
+	svg.append("rect").attr("width", width).attr("height", height)
+		.style("fill", "transparent")
+		.style("shape-rendering", "crispEdges");
+
+	svg.selectAll(".dot").data(data.genes).enter()
+		.append("circle")
+		.attr('class', 'genedot')
+		.attr("r", function(d){return d[5]/max_nTrait*7+3;})
+		.attr("cx", function(d){return x((d[3]+d[4])/2+chromStart[d[2]-1])})
+		.attr("cy", function(d){return y(d[6])})
+		.attr("fill", function(d){
+			if(d[2]%2==0){return "steelblue"}
+			else{return "blue"}
+		})
+		.on("mouseover", tip.show)
+		.on("mouseout", tip.hide)
+		.on("click", function(d){
+			genePlot(d[0], d[1], data.id.join(":"));
+		})
+		.style("opacity", 0.6);
+
+	svg.append("g").attr("class", "x axis")
+		.attr("transform", "translate(0,"+height+")").call(xAxis).selectAll("text").remove();
+	svg.append("g").attr("class", "y axis").call(yAxis)
+		.selectAll('text').style('font-size', '11px');
+
+	//Chr label
+	svg.selectAll('.chr').data(chr).enter()
+		.append('text')
+		.attr('class', 'chrtext')
+		.attr('x', function(d){return x((chromStart[d-1]*2+chromSize[d-1])/2)})
+		.attr('y', height+20)
+		.text(function(d){return d})
+		.style("font-size", "10px");
+	svg.append("text").attr("text-anchor", "middle")
+		.attr("transform", "translate("+width/2+","+(height+35)+")")
+		.text("Chromosome");
+	svg.append("text").attr("text-anchor", "middle")
+		.attr("class", "ytitle")
+		.attr("transform", "translate("+(-35)+","+(height/2)+")rotate(-90)")
+		.text("Number of Domains");
+	svg.selectAll('path').style('fill', 'none').style('stroke', 'grey');
+	svg.selectAll('.axis').selectAll('line').style('fill', 'none').style('stroke', 'grey');
+	svg.selectAll("text").style("font-family", "sans-serif");
+
+	function zoomed(){
+		svg.selectAll(".chrtext")
+			.attr('x', function(d){return x((chromStart[d-1]*2+chromSize[d-1])/2)})
+			.style('fill', function(d){
+					var x_tmp = x((chromStart[d-1]*2+chromSize[d-1])/2);
+					if(x_tmp<0 || x_tmp>width){return "none"}
+					else{return "black"}
+			});
+		svg.selectAll(".genedot")
+			.attr("cx", function(d){return x((d[3]+d[4])/2+chromStart[d[2]-1])})
+			.style("fill", function(d){
+				var x_tmp = x((d[3]+d[4])/2+chromStart[d[2]-1]);
+				if(x_tmp<0 || x_tmp>width){return "transparent";}
+				else if(d[2]%2==0){return "steelblue"}
+				else{return "blue"}
+			});
+	}
+
+	function Yaxis(type){
+		if(type=="GWAS"){
+			y.domain([1, max_nTrait+1]);
+			svg.selectAll(".y.axis").call(yAxis);
+			svg.selectAll(".genedot").transition().duration(1000)
+				.attr("r", function(d){return d[6]/max_nDomain*7+3;})
+				.attr("cy", function(d){return y(d[5])});
+			svg.selectAll(".ytitle").text("Number of GWAS");
+		}else{
+			y.domain([1, max_nDomain+1]);
+			svg.selectAll(".y.axis").call(yAxis);
+			svg.selectAll(".genedot").transition().duration(1000)
+				.attr("r", function(d){return d[5]/max_nTrait*7+3;})
+				.attr("cy", function(d){return y(d[6])});
+			svg.selectAll(".ytitle").text("Number of Domains");
+		}
+	}
+
+	$('#geneYaxis').on("change", function(){
+		var type = $('#geneYaxis').val();
+		Yaxis(type);
+	})
+
+	function genePlot(ensg, symbol, ids){
+		$('#genePlotTitle').html('<h4>PheWAS plot of '+ensg+' ('+symbol+')</h4>')
+		$('#genePlot').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
+		$.ajax({
+			url: subdir+"/multiGWAS/getPheData",
+			type: "POST",
+			data:{
+				text: ensg,
+				ids: ids,
+				maxP: 1
+			},
+			error: function(){
+				alert("getData error");
+			},
+			success: function(data){
+				if(data.length>0){
+					data = JSON.parse(data);
+					genePheWAS(data);
+					// tablePheWAS(data.data);
+				}
+			}
+		})
+	}
+}
+
+function genePheWAS(data){
+	$('#genePlot').html("");
+	$('#genePlotOpt').show();
+	if(data.error.length>0){
+		$('#PheWASplot').append('<div id="errorms" style="height:200px;color:red;font-size:24px;text-align:center;padding-top:50px;"></div>')
+		if(data.error=="Gene_not_found"){
+			$('#errorms').append("Searched gene was not found in the selected GWAS.")
+		}else if(data.error=="Gene_id_not_match"){
+			$('#errorms').append("Searched gene did not match with existing ID.")
+		}else{
+			$('#errorms').append("Input value is not valid.")
+		}
+	}else{
+		// var maxTrait = 0;
+		data.data.forEach(function(d){
+			d[0] = +d[0] //id
+			if(d[1]<1e-300){d[1] = 1e-300}
+			else{d[1] = +d[1]} //P-value
+		})
+
+		var nData = data.data.length;
+		var minP = d3.min(data.data, function(d){return d[1]});
+		var margin = {top:30, right:150, bottom:20, left:80},
+			width = nData*3,
+			height = 300;
+		if(width<150){width=150}
+		if(width>1000){width=1000}
+		var cellsize = width/(nData+1);
+		var labelFont = 10;
+
+		if(nData>100){labelFont=5;}
+		else if(nData>50){labelFont=6;}
+		else if(nData>10){labelFont=8;}
+
+		var order={"alph":0, "p":1, "n":2, "domain_alph":3, "domain_p":4};
+		var order_idx = order[$('#genePlotOrder').val()];
+
+		var svg = d3.select("#genePlot").append("svg")
+			.attr("width", width+margin.left+margin.right)
+			.attr("height", height+margin.top+margin.bottom)
+			.append("g")
+			.attr("transform", "translate("+margin.left+","+margin.top+")");
+
+		// tip
+		var tip = d3.tip()
+			.attr('class', 'd3-tip')
+			.offset([-5,0])
+			.html(function(d){return 'P-value: '+d[1]+'<br/>PMID: '+d[2]+'</br>Year: '+d[3]+'</br>Domain: '+d[4]+'</br>Trait: '+d[5]+'</br>Total N: '+d[6]});
+		svg.call(tip);
+
+		var x = d3.scale.linear().range([0,width])
+		x.domain([0,nData+1]);
+		var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(0);
+		var y = d3.scale.linear().range([height, 0]);
+		y.domain([0, -Math.log10(minP)*1.05]);
+		var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
+
+		// legend
+		var domains = d3.set(data.data.map(function(d){return d[4];})).values().sort();
+		var cur_height = 20;
+		domains.forEach(function(d){
+			svg.append('circle')
+				.attr('cx', width+20)
+				.attr('cy', cur_height)
+				.attr('r', 3)
+				.style("fill", domain_col[d])
+				.style("opacity", "0.8");
+			svg.append('text')
+				.attr('x', width+28)
+				.attr('y', cur_height+4)
+				.text(d)
+				.attr('text-anchor', 'start')
+				.style("font-size", "11px");
+			cur_height += 12;
+		});
+
+		// plot
+		var dot = svg.selectAll('.dot').data(data.data).enter()
+			.append('circle')
+			.attr('class', 'dot')
+			.attr('r', 3)
+			.attr('cx', function(d){return x(data.order[order_idx].indexOf(d[0])+1)})
+			.attr('cy', function(d){return y(-Math.log10(d[1]))})
+			.style("fill", function(d){return domain_col[d[4]]})
+			.style("opacity", "0.8")
+			.on("mouseover", tip.show)
+			.on("mouseout", tip.hide)
+			.on("click", function(d){
+				if(!d3.select(this).classed("active")){
+					d3.select(this).attr("class", "active");
+					svg.append("text")
+						.attr("class", "inLabel")
+						.text(d[5])
+						.attr('x', x(data.order[order_idx].indexOf(d[0])+1))
+						.attr('y', y(-Math.log10(d[1])))
+						.style('font-size', '10px')
+						.style('text-anchor', function(){
+							if((data.order[order_idx].indexOf(d[0])+1)/nData>0.8){return "end";}
+							else{return "start";}
+						});
+				}
+			});
+
+		svg.append("g").attr("class", "x axis").call(xAxis)
+			.attr("transform", "translate(0,"+height+")")
+			.selectAll('text').remove();
+		svg.append("g").attr("class", "y axis").call(yAxis);
+		svg.append("text").attr("text-anchor", "middle")
+			.attr("transform", "translate("+(-35)+","+(height/2)+")rotate(-90)")
+			.text("-log10 P-value");
+		svg.selectAll('path').style('fill', 'none').style('stroke', 'grey');
+		svg.selectAll('.axis').selectAll('line').style('fill', 'none').style('stroke', 'grey');
+		svg.selectAll("text").style("font-family", "sans-serif");
+
+		function sortOptions(type){
+			order_idx = order[type];
+			dot.transition().duration(1000)
+				.attr('cx', function(d){return x(data.order[order_idx].indexOf(d[0])+1)});
+			svg.selectAll(".inLabel").remove();
+			$('#PheWASplot .active').each(function(){
+				$(this).removeClass("active")
+			})
+
+		}
+		$('#genePlotOrder').on("change", function(){
+			var type = $('#genePlotOrder').val();
+			sortOptions(type);
+		});
 	}
 }
 

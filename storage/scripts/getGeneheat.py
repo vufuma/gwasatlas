@@ -10,8 +10,11 @@ import os
 import ConfigParser
 import MySQLdb
 import numpy as np
+import pandas as pd
 import json
+import math
 from scipy.cluster.hierarchy import linkage, leaves_list
+import time
 
 if len(sys.argv)<6:
     sys.exit("ERROR: Not enought argument.\nUSAGE: ./getGeneheat.py <host> <user> <passwd> <database> <ids> <p-value>")
@@ -44,47 +47,49 @@ conn = MySQLdb.connect(host=host, user=user, passwd=passwd, db=db)
 c = conn.cursor()
 
 ## get sig genes
-genes = []
-inids = []
-for i in ids:
-	c.execute('SELECT * FROM magmaGenes WHERE p<'+str(p)+' AND id='+str(i))
-	rows = c.fetchall()
-	g = []
-	for r in rows:
-		g.append(r[1])
-	if len(g)>0:
-		genes.append(g)
-		inids.append(i)
+magma = pd.read_table(datadir+"/magma.P.txt", header=0, index_col=0, usecols=["GENE"]+ids)
+magma = magma.dropna()
+genes = np.array(list(magma.index.values))
+magma = np.array(magma)
+minP = np.min(magma, axis=1)
+idx = np.where(minP<p)
+genes = genes[idx]
+magma = magma[idx]
+magma = -1*np.log10(magma)
+np.place(magma, magma<-1*math.log10(p), 0)
+np.place(magma, magma>-1*math.log10(p), 1)
 
-## n genes
-ng = []
-for i in range(0, len(inids)):
-    ng.append([inids[i], len(genes[i])])
+## number of sig genes
+ng = np.sum(magma, axis=0)
+inids = np.array(ids)[np.where(ng>0)].astype(int)
+magma = magma[:,np.where(ng>0)[0]]
+ng = np.c_[inids, np.sum(magma, axis=0, dtype=int)]
 
-## create matrix for hierarchical clustering
 go = []
-mat = []
-for i in range(0,len(inids)):
-    row = []
-    if len(genes[i]) == 0:
-        row = [0]*len(inids)
-        for j in range(0,len(inids)):
-            go.append([inids[i], inids[j], -1])
-    else:
-        for j in range(0,len(inids)):
-            if i==j:
-                row.append(1)
-                go.append([inids[i], inids[j], 1])
-            elif len(genes[j])==0:
-                row.append(0)
-                go.append([inids[i], inids[j], -1])
-            else:
-                n = len(ArrayIn(np.array(genes[i]), np.array(genes[j])))
-                go.append([inids[i], inids[j], float(n)/float(len(genes[j]))])
-                row.append(float(n)/float(len(genes[j])))
-    mat.append(row)
+for i in range(len(inids)):
+	tmp = np.sum(np.multiply(magma[:,i].reshape(len(magma),1),magma[:,(i+1):]), axis=0, dtype=float)/float(ng[i,1])
+	if len(go)==0:
+		go = np.c_[[inids[i]]*len(tmp), inids[(i+1):], tmp]
+	else:
+		tmp = np.c_[[inids[i]]*len(tmp), inids[(i+1):], tmp]
+		go = np.r_[go, tmp]
+tmp = np.c_[inids, inids, [1.0]*len(inids)]
+go = np.r_[go, tmp]
+inids = np.flip(inids, axis=0)
+magma = np.flip(magma, axis=1)
+for i in range(len(inids)):
+	tmp = np.sum(np.multiply(magma[:,i].reshape(len(magma),1),magma[:,(i+1):]), axis=0, dtype=float)/float(ng[len(ng)-i-1,1])
+	tmp = np.c_[[inids[i]]*len(tmp), inids[(i+1):], tmp]
+	go = np.r_[go, tmp]
+inids = list(np.flip(inids, axis=0))
 
-mat = np.array(mat)
+## create overlap matrix
+go = pd.DataFrame(go, columns=["id1", "id2", "p"])
+go[['id1', 'id2']] = go[['id1', 'id2']].astype(int)
+mat = go.pivot_table(index='id1', columns='id2', values='p')
+mat = np.matrix(mat)
+go = np.array(go, dtype=object)
+go = [[int(l[0]), int(l[1]), l[2]] for l in go if l[2]>0]
 
 if len(mat)<=1:
 	data = {"data":{"id":[], "Domain":[], "Trait":[], "go":[], "ng":[], "order":{"alph":[], "domain":[], "clst":[]}}}
@@ -126,5 +131,5 @@ for l in traits:
     trait[str(int(l[0]))]=l[3]
 
 ## return nested json
-data = {"data":{"id":inids, "Domain":domain, "Trait":trait, "go":go, "ng":ng, "order":{"alph":otrait, "domain":odomain, "clst": oclst}}}
+data = {"data":{"id":inids, "Domain":domain, "Trait":trait, "go":go, "ng":ng.tolist(), "order":{"alph":otrait, "domain":odomain, "clst": oclst}}}
 print json.dumps(data)

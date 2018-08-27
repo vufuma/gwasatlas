@@ -229,6 +229,8 @@
 						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("gcPlot","svg");'>SVG</button>
 						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("gcPlot","pdf");'>PDF</button>
 						<br/>
+						Download data as
+						<button class="btn btn-default btn-xs" id="downGCjson">json</button>
 						<br/><br/>
 						<span class="info"><i class="fa fa-info"></i>
 							The heatmap is symmetric.
@@ -263,6 +265,8 @@
 						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("magmaPlot","svg");'>SVG</button>
 						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("magmaPlot","pdf");'>PDF</button>
 						<br/>
+						Download data as
+						<button class="btn btn-default btn-xs" id="downMAGMAjson">json</button>
 						<br/><br/>
 						<span class="info"><i class="fa fa-info"></i>
 							The heatmap is asymmetric.
@@ -278,17 +282,96 @@
 	</div>
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h4 class="panel-title">Genomic risk loci</h4>
+			<h4 class="panel-title">Pleiotropic risk loci</h4>
 		</div>
-		<div class="panel-body" id="riskLociOverBody">
+		<div class="panel-body" id="LociOverBody">
 			<span class="info"><i class="fa fa-info"></i>
-				Each dot represents a group of risk loci (grouped physically overlapped risk loci).
+				Each dot represents a group of physically overlapping risk loci.
+				See <a href="{{ Config::get('app.subdir') }}/documentation#7">Documentation</a> for details.
 				The genome wide plot can be zoomed in and out by scroll.
+				When Y-axis is the number of associated domains, the dots are sized by the number of associated GWAS and vice versa.
+				Note that the number of associated GWAS is the number of associated unique summary statistics which does not necessary reflect the number of associated unique traits
+				when multiple summary statistics for a single trait are selected.
 				By clicking a dot, another plot for a specific group of risk loci will be plotted (only if the number of GWAS in the grouped locus is > 1).
 				Note that P-value < 1e-300 is replaced with 1e-300 (maximum -log10 P-value is 300 in this plot).
 			</span><br/>
+			<span class="form-inline">Y-axis:
+				<select id="lociYaxis" class="forn-control">
+					<option value="domain">Number of associated domains</option>
+					<option value="GWAS">number of associated GWAS</option>
+				</select>
+			</span>
+			<br/>
+			Download the plot as
+			<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("lociPlot","png");'>PNG</button>
+			<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("lociPlot","jpeg");'>JPG</button>
+			<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("lociPlot","svg");'>SVG</button>
+			<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("lociPlot","pdf");'>PDF</button>
+			<br/>
 			<div id="lociPlot" style="text-align:center;"></div>
+			<br/>
+			<div id="locusPlotImgDown">
+				Download the plot as
+				<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("locusPlot","png");'>PNG</button>
+				<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("locusPlot","jpeg");'>JPG</button>
+				<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("locusPlot","svg");'>SVG</button>
+				<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("locusPlot","pdf");'>PDF</button>
+			</div>
 			<div id="locusPlot" style="text-align:center;"></div>
+		</div>
+	</div>
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4 class="panel-title">Pleiotropic genes</h4>
+		</div>
+		<div class="panel-body" id="genesBody">
+			<span class="info"><i class="fa fa-info"></i>
+				Each dot represents a single gene.
+				The genome wide plot can be zoomed in and out by scroll.
+				When Y-axis is the number of associated domains, the dots are sized by the number of associated GWAS and vice versa.
+				Note that the number of associated GWAS is the number of associated unique summary statistics which does not necessary reflect the number of associated unique traits
+				when multiple summary statistics for a single trait are selected.
+				By clicking a dot, PheWAS plot of the selected gene for selected GWAS will be displayed below.
+				Note that P-value < 1e-300 is replaced with 1e-300 (maximum -log10 P-value is 300 in this plot).
+			</span><br/>
+			<span class="form-inline">Y-axis:
+				<select id="geneYaxis" class="forn-control">
+					<option value="domain">Number of associated domains</option>
+					<option value="GWAS">number of associated GWAS</option>
+				</select>
+			</span>
+			<br/>
+			Download the plot as
+			<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("genesPlot","png");'>PNG</button>
+			<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("genesPlot","jpeg");'>JPG</button>
+			<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("genesPlot","svg");'>SVG</button>
+			<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("genesPlot","pdf");'>PDF</button>
+			<br/>
+			<div id="genesPlot" style="text-align:center;"></div>
+			<br/>
+			<div id="genePlotTitle"></div>
+			<div id="genePlotOpt">
+				<span class="form-inline">
+					Sort traits by:
+					<select id="genePlotOrder" class="forn-control">
+						<option value="alph" selected>Alphabetically</option>
+						<option value="p">P-value</option>
+						<option value="n">Total sample size</option>
+						<option value="domain_alph">Domain</option>
+						<option value="domain_p">Domain and P-value</option>
+					</select>
+					<tab>
+					<a id="clearLabel">Clear text labels</a>
+				</span>
+				<br/>
+				Download the plot as
+				<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("genePlot","png");'>PNG</button>
+				<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("genePlot","jpeg");'>JPG</button>
+				<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("genePlot","svg");'>SVG</button>
+				<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("genePlot","pdf");'>PDF</button>
+				<br/>
+			</div>
+			<div id="genePlot" style="text-align:center;"></div>
 		</div>
 	</div>
 </div>

@@ -44,22 +44,16 @@ conn = MySQLdb.connect(host=host, user=user, passwd=passwd, db=db)
 c = conn.cursor()
 
 ## get risk loci
-loci = []
-for i in ids:
-	c.execute('SELECT * FROM RiskLoci WHERE id='+str(i))
-	rows = c.fetchall()
-	for r in rows:
-		loci.append([int(r[0]), str(r[2]), str(r[3]), int(r[4]), int(r[5]), float(r[6]), int(r[7]), int(r[8])])
-
-loci = np.array(loci, dtype=object)
+loci = pd.read_table(datadir+"/RiskLoci.txt", header=0)
+loci = np.array(loci)
+loci = loci[ArrayIn(loci[:,0], ids)]
 if len(loci)==0:
-	data = {"data":{"id":[], "Domain":[], "Trait":[], "loci":[], "loci_group":[]}}
+	data = {"id":[], "Domain":[], "Trait":[], "loci":[], "loci_group":[]}
 	print json.dumps(data)
 	sys.exit()
-loci = loci[np.lexsort((loci[:,4], loci[:,3]))]
-
 
 ## identify overlapped loci
+loci = loci[np.lexsort((loci[:,4], loci[:,3]))]
 lociid = []
 cur_id = 1
 cur_end = loci[0,7]
@@ -83,17 +77,6 @@ for i in range(1,len(loci)):
 
 loci = np.c_[loci, lociid]
 
-## summary of overlapped loci
-loci_group = []
-lociid = unique(lociid)
-
-for i in lociid:
-	tmp = loci[loci[:,8]==i]
-	chrom = tmp[0,3]
-	start = min(tmp[:,6])
-	end = max(tmp[:,7])
-	loci_group.append([i, chrom, start, end, len(unique(tmp[:,0]))])
-
 ## get trait and domain info
 ids = unique(loci[:,0])
 c.execute('SELECT id,Domain,Trait,Year from gwasDB');
@@ -104,6 +87,18 @@ for r in rows:
         traits.append([r[0], r[1], r[2], str(r[0])+": "+r[2]+" ("+str(r[3])+")"])
 
 traits = np.array(traits)
+domains = traits[:,1]
+
+## summary of overlapped loci
+loci_group = []
+lociid = unique(lociid)
+
+for i in lociid:
+	tmp = loci[loci[:,8]==i]
+	chrom = tmp[0,3]
+	start = min(tmp[:,6])
+	end = max(tmp[:,7])
+	loci_group.append([i, chrom, start, end, len(unique(tmp[:,0])), len(unique(domains[ArrayIn(traits[:,0].astype(int),tmp[:,0])]))])
 
 ## domain and trait name
 domain = {}
@@ -114,5 +109,5 @@ for l in traits:
 
 ## return nested json
 loci = [list(l) for l in loci]
-data = {"data":{"id":ids, "Domain":domain, "Trait":trait, "loci": loci, "loci_group": loci_group}}
+data = {"id":ids, "Domain":domain, "Trait":trait, "loci": loci, "loci_group": loci_group}
 print json.dumps(data)

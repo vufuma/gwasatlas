@@ -155,8 +155,13 @@
 			</span>
 			<br/>
 			<span class="form-inline">
-				max P-value: <input class="form-control" type="number" id="maxP" value="1e-5">
+				max P-value: <input class="form-control" type="number" id="maxP" value="0.05">
 				<button class="btn btn-xs" id="Pupdate">Update</button>
+			</span>
+			<br/>
+			<span class="info"><i class="fa fa-info"></i>
+				For SNPs, 0.05 is the maximum P-value.
+				SNPs with P-value > 0.05 are not displayed regardless of this option due to low performance of the website.
 			</span>
 			<br/>
 			Download the plot as
@@ -167,6 +172,7 @@
 			<br/>
 			<div style="overflow-y:auto;text-align:center;">
 				<div id="PheWASplot">
+					<h4>Please search either SNP or gene from the search box</h4>
 				</div>
 			</div>
 		</div>

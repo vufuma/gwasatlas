@@ -13,8 +13,13 @@ var domain_col = {"Activities":"#ffa1ba","Aging":"#bf0058","Body Functions":"#f3
 var domains;
 $(document).ready(function(){
 	$('.ImgDownSubmit').hide();
+	$('#yearFrom').val("");
+	$('#yearTo').val("");
+	$('#nMin').val("");
+	$('#nMax').val("");
+	$('#Domain').val("null");
 	Selection("Domain");
-	updatePlot();
+	// updatePlot();
 
 	$('#plotPheWAS').on('click', function(){
 		updatePlot();
@@ -238,7 +243,7 @@ function SearchEnter(e){
 function updatePlot(){
 	$('#PheWASplot').html('<span style="color:grey;"><i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i><br/>Processing ...</span><br/>');
 	var text = $('#searchText').val();
-	if(text==undefined || text.length==0){text="APOE"}
+	if(text==undefined || text.length==0){text=""}
 	var ids = [];
 	var tmp = selectTable.columns(0).nodes()[0];
 	tmp.forEach(function(d,i){
@@ -333,7 +338,7 @@ function plotPheWAS(data){
 
 		// legend
 		var domains = d3.set(data.data.map(function(d){return d[4];})).values().sort();
-		var cur_height = 20;
+		var cur_height = 5;
 		domains.forEach(function(d){
 			svg.append('circle')
 				.attr('cx', width+20)

@@ -2,7 +2,11 @@ var selectTable;
 var selectedTable;
 var maxSelect = 5;
 $(document).ready(function(){
-	// selectTable = $('#dbTable').DataTable();
+	$('#yearFrom').val("");
+	$('#yearTo').val("");
+	$('#nMin').val("");
+	$('#nMax').val("");
+	$('#Domain').val("null");
 	Selection("Domain");
 
 	$('#dbTable').on('click', 'tr', function(){

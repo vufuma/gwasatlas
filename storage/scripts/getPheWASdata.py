@@ -14,6 +14,7 @@ import pandas as pd
 import json
 import re
 import tabix
+import subprocess
 
 ##### check integer #####
 def is_int(s):
@@ -80,11 +81,15 @@ def getSNP(text, ids, host, user, passwd, db, datadir, maxP):
 def getGene(text, ids, host, user, passwd, db, datadir, genesdir, maxP):
 	text = text.upper()
 	if not re.match(r'^ENSG', text):
-		with open(genesdir, 'r') as ensg:
-			ensg.readline()
-			for l in ensg:
-				l = l.strip().split()
-				if l[1]==text or l[8]==text or l[9]==text:
+		stdo = subprocess.Popen("grep "+text+" "+genesdir, stdout=subprocess.PIPE, shell=True)
+		stdo = stdo.communicate()[0]
+		stdo = stdo.strip().split("\n")
+		if len(stdo)>0:
+			with open(genesdir, 'r') as ensg:
+				header = ensg.readline().strip().split()
+			for l in stdo:
+				l = l.split()
+				if l[header.index("external_gene_name")]==text or l[header.index("hgnc_symbol")]==text or l[header.index("entrezID")]==text or '|'+text+'|' in l[header.index("alias")]:
 					text = l[0]
 					break;
 		if not re.match(r'^ENSG', text):

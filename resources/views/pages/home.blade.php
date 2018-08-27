@@ -30,18 +30,18 @@
 @section('content')
 <div class="container" style="padding-top:50px;">
 	<div style="text-align: center;">
-		<h2>Welcome to GWAS ATLAS</h2>
+		<h2>Welcome to an ATLAS of GWAS Summary Statistics</h2>
 	</div>
 	<br/>
 	<p>
-		GWAS atlas is a databased of publicly available GWAS summary statistics.
-		Each GWAS can be borwsed their manhattan plot, risk loci, MAGMA results, SNP heritability and genetic correlations with other GWAS in the database.
-		600 GWAS were performed in this project based on UK Biobank release 2 data under application ID 1640.
-		Each summary statistics can be downloaded from the original source following links (not directly from thie GWAS atlas website).
-		Pre-processed summary statistics (not downloadable) can be transfered to FUMA to further annotate risk loci.
+		This atlas is a databased of publicly available GWAS summary statistics.
+		Each GWAS can be browsed their manhattan plot, risk loci, MAGMA results, SNP heritability and genetic correlations with other GWAS in the database.
+		600 GWAS were performed in this project based on UK Biobank release 2 data under application ID 16406.
+		Each summary statistics can be downloaded from the original source following links (not directly from this website).
 	</p>
 	<p>
-		If you have/find GWAS summary statistics which is publicly avaialble and not included in this database, please let us know by contacting Kyoko Watanabe (k.watanabe@vu.nl).
+		If you have/find GWAS summary statistics which is publicly available
+		and not included in this database, please let us know by contacting Kyoko Watanabe (k.watanabe@vu.nl).
 	</p>
 	<p>
 		<strong>Citation:</strong><br/>
@@ -78,11 +78,11 @@
 		</div>
 		<div class="col-md-4 col-sm-4 col-xs-4">
 			<div class="panel panel-info">
-				<div class="panel-heading" style="padding-top:5px; padding-bottom:5px;"><h4>Summary of database</h4></div>
+				<div class="panel-heading" style="padding-top:5px; padding-bottom:5px;"><h4>PheWAS</h4></div>
 				<div class="panel-body" style="height:160px;">
-					Overview of the database such as number of GWAS, traits, study and sample size per domain.<br/>
+					PheWAS plot for a SNP or gene can be created across GWAS in the database.<br/>
 					<br/><br/><br/>
-					<button class="btn btn-info" style="opacity:0.8;"><a href="{{ Config::get('app.subdir') }}/stats" style="color:black;">Stats</a></button>
+					<button class="btn btn-info" style="opacity:0.8;"><a href="{{ Config::get('app.subdir') }}/PheWAS" style="color:black;">PheWAS</a></button>
 				</div>
 			</div>
 		</div>
@@ -92,27 +92,16 @@
 		<div class="panel panel-default">
 			<div class="panel-heading"><h4>What's new</h4></div>
 			<div class="panel-body" style="max-height:200px; overflow-y:auto;">
-				<strong>2017-12-xx</strong><br/>
+				<strong>2018-09-xx</strong><br/>
 				<span style="padding-left:20px">
-					First release of GWAS atlas with 3795 GWAS summary statistics.
+					First release of atlas database with 3798 GWAS summary statistics.
+					The last database curation was done in Aug 2017.
+					We will update summary statistics published later that time point in near future.
 					Publication is under preparation.
 				</span>
 			</div>
 		</div>
 	</div>
-
-	<!-- <div style="padding-top:20ox; padding-bottom:20px;">
-		<div class="panel panel-default">
-			<div class="panel-heading"><h4>Project contributers</h4></div>
-			<div class="panel-body">
-				Ordered by first name.
-				<ul>
-					<li>Danielle Posthuma (VU University Amssterdam, Complex Trait Genetics)</li>
-					<li>Kyoko Watanabe (VU University Amsterdam, Complex Trait Genetics)</li>
-				</ul>
-			</div>
-		</div>
-	</div> -->
 
 </div>
 </br>

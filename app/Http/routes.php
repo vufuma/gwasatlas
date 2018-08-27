@@ -26,7 +26,7 @@ Route::get('/traitDB/{id}', function($id){
 
 Route::post('/traitDB/getData', 'DBController@getData');
 
-Route::post('/traitDB/topSNPs', 'DBController@topSNPs');
+Route::post('/traitDB/topSNPs', 'BaseController@DTfile');
 
 Route::post('/traitDB/DTfile', 'DBController@DTfile');
 
@@ -49,9 +49,19 @@ Route::get('/multiGWAS', function(){
   return view('pages.multiGWAS');
 });
 
-Route::post('/multiGWAS/getData', 'MultiController@getData');
+Route::post('/multiGWAS/getSummary', 'MultiController@getSummary');
+
+Route::post('/multiGWAS/getGC', 'MultiController@getGC');
+
+Route::post('/multiGWAS/getGenes', 'MultiController@getGenes');
+
+Route::post('/multiGWAS/getLociOverlap', 'MultiController@getLociOverlap');
+
+Route::post('/multiGWAS/getGenesPleiotropy', 'MultiController@getGenesPleiotropy');
 
 Route::post('/multiGWAS/imgdown', 'MultiController@imgdown');
+
+Route::post('/multiGWAS/getPheData', 'PheWASController@getData');
 
 // ************** Multi GWAS Comparison page ***************
 Route::get('/PheWAS', function(){
