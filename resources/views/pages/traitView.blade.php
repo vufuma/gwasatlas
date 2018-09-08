@@ -105,7 +105,7 @@
 							<span class="info"><i class="fa fa-info"></i>
 								Top SNPs are defined as the most significant SNP in a genomic risk locus. See documentation for details of definition of the genomic risk loci.
 							</span><br/><br/>
-							Download the table as 
+							Download the table as
 							<button class="btn btn-xs" onclick='CSVdown("topSNPtable");'>csv</button>
 							<br>
 							<table id="topSNPtable" class="display compact nowrap row-border dt-body-right dt-head-center" cellspacing="0" style="display: block; overflow-x: auto; font-size: 14px;">
@@ -171,7 +171,6 @@
 		</div>
 	</div>
 
-
 	<div id="GC" class="panel panel-default">
 		<div class="panel-heading">
 			<h4 class="panel-title">Genetic Correlations</h4>
@@ -184,13 +183,15 @@
 			<div id="pheSelection" style="padding-left:50px; padding-right:50px; padding-top:20px; padding-bottom:20px; border: 2px solid grey; border-radius: 15px;">
 				<div class="row">
 					<div class="col-md-6 col-sm-6 col-xs-6">
-						<span class="form-inline"><input class="form-control" type="checkbox" id="GC_excSamePhe" name="GC_excSamePhe"> Exclude the same trait (if there is any).</span>
-						<a class="infoPop" data-toggle="popover" data-content="This option removes GWAS with exactly the same trait name (excluding texts within parentheses) are excluded. For example, 'Body Mass Index' and 'Body Mass Index (male)' are considered as the same trait.">
+						<span class="form-inline"><input class="form-control" type="checkbox" id="GC_excSamePhe" name="GC_excSamePhe"> Exclude traits with the same name (if there is any).</span>
+						<a class="infoPop" data-toggle="popover" data-content="This option exclude GWAS with exactly the same trait name as the currently selected trait.
+						For example, if current results is GWAS of 'Body Mass Index', all other GWAS summary statistics with trait name 'Body Mass Index' are excluded.">
 							<i class="fa fa-question-circle-o fa-lg"></i>
 						</a>
 						<br/>
 						<span class="form-inline"><input class="form-control" type="checkbox" id="GC_maxNPhe" name="GC_maxNPhe"> Select GWAS with the maximum sample size per trait.</span>
-						<a class="infoPop" data-toggle="popover" data-content="This option takes the GWAS with the maximum number of samples size per trait (sxact same name excluding texts within parenthese) after excluding GWAS which do not meet the criteia to perform LD score regression. See documentation for details.">
+						<a class="infoPop" data-toggle="popover" data-content="This option selects GWAS with the maximum samples size per trait after excluding GWAS which
+						do not meet the criteria to perform LD score regression. See documentation for details.">
 							<i class="fa fa-question-circle-o fa-lg"></i>
 						</a>
 						<br/>
@@ -201,7 +202,7 @@
 					<div class="col-md-6 col-sm-6 col-xs-6">
 						<span class="form-inline"><input class="form-control" type="checkbox" id="GC_manual" name="GC_manual" onchange='GCManualSelectCheck()'> Manually select GWAS.</span>
 						<a class="infoPop" data-toggle="popover" data-content="Check this option to enable manual selection of GWAS.
-						Note taht other filtering options defined left are also applied.">
+						Note that other filtering options are applied to filter GWAS.">
 							<i class="fa fa-question-circle-o fa-lg"></i>
 						</a>
 						<br/>
@@ -213,7 +214,7 @@
 								<a id="GC_manual_clear">Clear</a>
 							</div>
 							<div class="panel-body" style="padding:5px;padding-left:10px;">
-								<input id="GC_manual_search" type="search" placeholder="Search trait name" class="form-control" style="height:20px;width:200px;text-size:12px;"/>
+								<input id="GC_manual_search" type="search" placeholder="Search trait name" class="form-control" style="height:20px;width:200px;font-size:12px;"/>
 								<div id="GC_manual_select" class="GC_manual_select" style="max-height:120px;overflow:auto;font-size:12px;"></div>
 							</div>
 						</div>
@@ -227,6 +228,11 @@
 				<div class="col-md-5 col-sm-5 col-xs-5" style="overflow-x:auto;">
 					<h4>GC plot</h4>
 					<div id="GCtotalN"></div>
+					<span class="info"><i class="fa fa-info"></i>
+						The number of tested traits are based on after filtering of 'Exclude traits with the same name',
+						'Select GWAS with the maximum sample size per trail' and the manual selection if any of them is selected,
+						but before the filtering of P-value or Bonferroni corrected P-value.
+					</span>
 					Download the plot as
 					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown2("GCplot","png");'>PNG</button>
 					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown2("GCplot","jpeg");'>JPG</button>
@@ -236,6 +242,7 @@
 					<div id="GCplot" style="text-align: center;"></div>
 				</div>
 				<div class="col-md-7 col-sm-7 col-xs-7" style="overflow-x:auto;">
+					<h4>GC table</h4>
 					Download the table as
 					<button class="btn btn-xs" onclick='CSVdown("GCtable");'>csv</button>
 					<br/>

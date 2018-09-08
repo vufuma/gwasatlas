@@ -214,11 +214,11 @@ class DBController extends Controller
 		$nMin = $request -> input('nMin');
 		$nMax = $request -> input('nMax');
 
-		$head = ['ID','PMID','Year','Consortium','Domain','ChapterLevel','SubchapterLevel','Trait','uniqTrait','Population','Ncase','Ncontrol','N', 'SNPh2'];
+		$head = ['ID','PMID','Year','Consortium','Domain','ChapterLevel','SubchapterLevel','Trait','uniqTrait','Population','Ncase','Ncontrol','N', 'SNPh2', 'File'];
 		// if($domain=="null" && $chapter=="null" && $subchapter=="null" && $trait=="null" && $yearFrom=="null" && $yearTo=="null" && $nMin=="null" && $nMax=="null"){
 		if($this->NullCheck([$domain, $chapter, $subchapter, $trait, $yearFrom ,$yearTo, $nMin, $nMax])){
 			// All null
-			$query = 'SELECT id,PMID,Year,Consortium,Domain,ChapterLevel,SubchapterLevel,Trait,uniqTrait,Population,Ncase,Ncontrol,N,SNPh2 FROM gwasDB';
+			$query = 'SELECT id,PMID,Year,Consortium,Domain,ChapterLevel,SubchapterLevel,Trait,uniqTrait,Population,Ncase,Ncontrol,N,SNPh2,File FROM gwasDB';
 			$results = DB::select($query);
 			$results = json_decode(json_encode($results), true);
 			$all_row = array();
@@ -229,7 +229,7 @@ class DBController extends Controller
 			echo json_encode($json);
 			// }else if(strcmp($domain, "null")==0 || (strcmp($domain, "null")==0 && strcmp($chapter, "null")==0 && strcmp($subchapter, "null")==0 && strcmp($trait, "null")==0)){
 		}else if($this->NullCheck([$domain, $trait, $yearFrom ,$yearTo, $nMin, $nMax])){
-			$query = 'SELECT id,PMID,Year,Consortium,Domain,ChapterLevel,SubchapterLevel,Trait,uniqTrait,Population,Ncase,Ncontrol,N,SNPh2 FROM gwasDB';
+			$query = 'SELECT id,PMID,Year,Consortium,Domain,ChapterLevel,SubchapterLevel,Trait,uniqTrait,Population,Ncase,Ncontrol,N,SNPh2,File FROM gwasDB';
 			$results = DB::select($query);
 			$results = json_decode(json_encode($results), true);
 			$all_row = array();
@@ -242,7 +242,7 @@ class DBController extends Controller
 			// echo json_encode($all_row);
 			// echo json_encode($results);
 		}else{
-			$query = 'SELECT id,PMID,Year,Consortium,Domain,ChapterLevel,SubchapterLevel,Trait,uniqTrait,Population,Ncase,Ncontrol,N,SNPh2 FROM gwasDB WHERE';
+			$query = 'SELECT id,PMID,Year,Consortium,Domain,ChapterLevel,SubchapterLevel,Trait,uniqTrait,Population,Ncase,Ncontrol,N,SNPh2,File FROM gwasDB WHERE';
 			$val = [];
 			if(strcmp($domain, "null")!=0){
 				$query .= ' Domain=?';

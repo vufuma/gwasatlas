@@ -13,12 +13,13 @@
       <ul class="nav navbar-nav navbar-right">
         <!-- local_start -->
         <li class="{{ Request::is('/') ? 'active' : ''}}"><a href="{{ Config::get('app.subdir') }}/">Home</a></li>
-        <li class="{{ Request::is('howto') ? 'active' : ''}}"><a href="{{ Config::get('app.subdir') }}/howto">How to use</a></li>
+        <!-- <li class="{{ Request::is('howto') ? 'active' : ''}}"><a href="{{ Config::get('app.subdir') }}/howto">How to use</a></li> -->
         <li class="{{ Request::is('traitDB*') ? 'active' : ''}}"><a href="{{ Config::get('app.subdir') }}/traitDB">Browse GWAS</a></li>
         <li class="{{ Request::is('multiGWAS*') ? 'active' : ''}}"><a href="{{ Config::get('app.subdir') }}/multiGWAS">Multiple GWAS comparison</a></li>
 		<li class="{{ Request::is('PheWAS*') ? 'active' : ''}}"><a href="{{ Config::get('app.subdir') }}/PheWAS">PheWAS</a></li>
 		<li class="{{ Request::is('stats*') ? 'active' : ''}}"><a href="{{ Config::get('app.subdir') }}/stats">Stats</a></li>
         <li class="{{ Request::is('documentation*') ? 'active' : ''}}"><a href="{{ Config::get('app.subdir') }}/documentation">Documentation</a></li>
+		<li class="{{ Request::is('howto') ? 'active' : ''}}"><a href="{{ Config::get('app.subdir') }}/faq">FAQ</a></li>
       </ul>
     </div>
   </div>

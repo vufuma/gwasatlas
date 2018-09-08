@@ -144,7 +144,8 @@ function TableUpdate(domain, chapter, subchapter, trait, yearFrom, yearTo, nMin,
 			{"data": "Ncase", name: "Case"},
 			{"data": "Ncontrol", name: "Control"},
 			{"data": "N", name: "N"},
-			{"data": "SNPh2", name: "SNP h2"}
+			{"data": "SNPh2", name: "SNP h2"},
+			{"data": "File", name: "File"}
 		],
 		columnDefs: [
 			{width:"200px", target:4}

@@ -102,6 +102,7 @@
 				<th>Control</th>
 				<th>N</th>
 				<th>SNP h2</th>
+				<th>File</th>
 			</thead>
 			<tbody id="dbTableBody">
 			</tbody>

@@ -15,9 +15,9 @@ Route::get('/traitDB', function(){
   return view('pages.traitDB');
 });
 
-Route::post('traitDB/SelectOption', 'DBController@SelectOption');
+Route::post('/traitDB/SelectOption', 'DBController@SelectOption');
 
-Route::post('traitDB/dbTable', 'DBController@dbTable');
+Route::post('/traitDB/dbTable', 'DBController@dbTable');
 
 // ************** Trait DB View Page ***************
 Route::get('/traitDB/{id}', function($id){
@@ -43,6 +43,9 @@ Route::post('/traitDB/getGClist', 'DBController@getGClist');
 Route::post('/traitDB/imgdown', 'DBController@imgdown');
 
 Route::post('/traitDB/imgdown2', 'DBController@imgdown2');
+
+// ************** Download sumstats ***************
+Route::get('/ukb2_sumstats/{file}', 'BaseController@sumstats');
 
 // ************** Multi GWAS Comparison page ***************
 Route::get('/multiGWAS', function(){
@@ -72,6 +75,9 @@ Route::post('/PheWAS/getData', 'PheWASController@getData');
 
 Route::post('/PheWAS/imgdown', 'PheWASController@imgdown');
 
+Route::get('/faq', function(){
+  return view('pages.faq');
+});
 
 // ************** Stats Page ***************
 Route::get('/stats', function(){

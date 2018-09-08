@@ -69,6 +69,11 @@ class BaseController extends Controller
 		return response() -> download($outfile);
     }
 
+	public function sumstats($file){
+		$dir = config('app.sumstatsdir');
+		return response() -> download($dir.'/'.$file);
+	}
+
 	public function DTfile(Request $request){
 		$id = $request -> input('id');
 		$fin = $request -> input('infile');

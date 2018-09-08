@@ -273,7 +273,6 @@ function displayData(ids){
 			// Domains
 			domains = d3.set(data.plotData.data.map(function(d){return d[2];})).values();
 			domains.sort();
-			// domain_col = d3.scale.linear().domain([0, domains.length/4, domains.length/2, domains.length*3/4, domains.length]).range(["green", "yellow", "red", "purple", "blue"]);
 
 			summary(data.sum);
 			corPlot(data.plotData.data, data.plotData.cor);
@@ -1155,7 +1154,7 @@ function magmaPlot(data){
 
 	$('#downMAGMAjson').on('click', function(){
 		$("<a />", {
-			"download": "MAGMA_genes_overlap.json",
+			"download": "MAGMA_genes.json",
 			"href": "data:text/json, "+encodeURIComponent(JSON.stringify(data)),
 		}).appendTo("body")
 		.click(function(){

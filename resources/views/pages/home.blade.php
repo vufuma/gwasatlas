@@ -30,7 +30,7 @@
 @section('content')
 <div class="container" style="padding-top:50px;">
 	<div style="text-align: center;">
-		<h2>Welcome to an ATLAS of GWAS Summary Statistics</h2>
+		<h2>Welcome to the Atlas of GWAS Summary Statistics</h2>
 	</div>
 	<br/>
 	<p>
