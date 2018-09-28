@@ -11,3 +11,4 @@
 		</div>
 	</div>
 </footer>
+<script src="{!! URL::asset('js/google_analytics.js') !!}"></script>
