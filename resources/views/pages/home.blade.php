@@ -34,13 +34,13 @@
 	</div>
 	<br/>
 	<p>
-		This atlas is a databased of publicly available GWAS summary statistics.
-		Each GWAS can be browsed their manhattan plot, risk loci, MAGMA results, SNP heritability and genetic correlations with other GWAS in the database.
+		This atlas is a database of publicly available GWAS summary statistics.
+		Each GWAS can be browsed with the manhattan plot, risk loci, MAGMA (i.e. gene-based) results, SNP heritability and genetic correlations with other GWAS in the database.
 		600 GWAS were performed in this project based on UK Biobank release 2 data under application ID 16406.
-		Each summary statistics can be downloaded from the original source following links (not directly from this website).
+		Full summary statistics can be downloaded from the original source following the provided links.
 	</p>
 	<p>
-		If you have/find GWAS summary statistics which is publicly available
+		If you have/find GWAS summary statistics that are publicly available
 		and not included in this database, please let us know by contacting Kyoko Watanabe (k.watanabe@vu.nl).
 	</p>
 	<p>
@@ -60,7 +60,7 @@
 			<div class="panel panel-success">
 				<div class="panel-heading" style="padding-top:5px; padding-bottom:5px;"><h4>Browse GWAS</h4></div>
 				<div class="panel-body" style="height:160px;">
-					Overview of each GWAS such as Manhattan plots and QQ plot at SNP and gene levels, genetic ocrrelations with other GWAS in the database.<br/>
+					Overview of each GWAS such as Manhattan plots and QQ plot at SNP and gene levels and genetic correlations with other GWAS in the database.<br/>
 					<br/><br/>
 					<button class="btn btn-success" style="opacity:0.8;"><a href="{{ Config::get('app.subdir') }}/traitDB" style="color:black;">Browse GWAS</a></button>
 				</div>
@@ -92,13 +92,17 @@
 		<div class="panel panel-default">
 			<div class="panel-heading"><h4>What's new</h4></div>
 			<div class="panel-body" style="max-height:200px; overflow-y:auto;">
-				<strong>2018-09-xx</strong><br/>
-				<span style="padding-left:20px">
+				<strong>2018-09-28</strong><br/>
+				<div style="padding-left:20px">
 					First release of atlas database with 3798 GWAS summary statistics.
 					The last database curation was done in Aug 2017.
-					We will update summary statistics published later that time point in near future.
+					We will update summary statistics published since then, in near future.
 					Publication is under preparation.
-				</span>
+				</div>
+				<strong>2017-12-18</strong><br/>
+				<div style="padding-left:20px">
+					First internal release of the website.
+				</div>
 			</div>
 		</div>
 	</div>
