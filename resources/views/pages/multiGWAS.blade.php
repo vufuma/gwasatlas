@@ -27,7 +27,7 @@
 	var subdir = "{{ Config::get('app.subdir') }}";
 </script>
 <script type="text/javascript" src="{!! URL::asset('js/global.js') !!}"></script>
-<script type="text/javascript" src="{!! URL::asset('js/multiGWAS.js') !!}"></script>
+<script type="text/javascript" src="{!! URL::asset('js/multiGWAS.js') !!}?0.0.1"></script>
 
 @stop
 
@@ -224,10 +224,10 @@
 						</span>
 						<br/>
 						Download the plot as
-						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("gcPlot","png");'>PNG</button>
-						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("gcPlot","jpeg");'>JPG</button>
-						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("gcPlot","svg");'>SVG</button>
-						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("gcPlot","pdf");'>PDF</button>
+						<button class="btn btn-default btn-xs ImgDown GCimg" onclick='ImgDown("gcPlot","png");'>PNG</button>
+						<button class="btn btn-default btn-xs ImgDown GCimg" onclick='ImgDown("gcPlot","jpeg");'>JPG</button>
+						<button class="btn btn-default btn-xs ImgDown GCimg" onclick='ImgDown("gcPlot","svg");'>SVG</button>
+						<button class="btn btn-default btn-xs ImgDown GCimg" onclick='ImgDown("gcPlot","pdf");'>PDF</button>
 						<br/>
 						Download data as
 						<button class="btn btn-default btn-xs" id="downGCjson">json</button>
@@ -260,10 +260,10 @@
 						</span>
 						<br/>
 						Download the plot as
-						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("magmaPlot","png");'>PNG</button>
-						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("magmaPlot","jpeg");'>JPG</button>
-						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("magmaPlot","svg");'>SVG</button>
-						<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("magmaPlot","pdf");'>PDF</button>
+						<button class="btn btn-default btn-xs ImgDown Mimg" onclick='ImgDown("magmaPlot","png");'>PNG</button>
+						<button class="btn btn-default btn-xs ImgDown Mimg" onclick='ImgDown("magmaPlot","jpeg");'>JPG</button>
+						<button class="btn btn-default btn-xs ImgDown Mimg" onclick='ImgDown("magmaPlot","svg");'>SVG</button>
+						<button class="btn btn-default btn-xs ImgDown Mimg" onclick='ImgDown("magmaPlot","pdf");'>PDF</button>
 						<br/>
 						Download data as
 						<button class="btn btn-default btn-xs" id="downMAGMAjson">json</button>

@@ -734,9 +734,12 @@ function gcPlot(data){
 	$('#gcPlot').html("");
 	if(data.data.id == undefined || data.data.id == null || data.data.id.length==0){
 		$('#gcPlot').html('<span style="color:red;padding-top:20px;">No genetic correlatioin is available for selected GWAS.<span>');
+		$('.GCimg').each(function(){$(this).prop('disabled', true)})
 	}else if(data.data.id.length > 100){
 		$('#gcPlot').html('<span style="color:red;padding-top:20px;">The heatmap is too large to display. Please download data in json format and create the plot on your local server.<span>');
+		$('.GCimg').each(function(){$(this).prop('disabled', true)})
 	}else{
+		$('.GCimg').each(function(){$(this).prop('disabled', false)})
 		var ids = data.data["id"];
 		var n = ids.length;
 		var cellsize = 12;
@@ -946,9 +949,12 @@ function magmaPlot(data){
 
 	if(data.data.id == undefined || data.data.id == null || data.data.id.length==0){
 		$('#magmaPlot').html('<span style="color:red;padding-top:20px;">No significant genes are overlapped between selected GWAS.<span>');
+		$('.Mimg').each(function(){$(this).prop('disabled', true)})
 	}else if(data.data.id.length > 100){
 		$('#magmaPlot').html('<span style="color:red;padding-top:20px;">The heatmap is too large to display. Please download data in json format and create the plot on your local server.<span>');
+		$('.Mimg').each(function(){$(this).prop('disabled', true)})
 	}else{
+		$('.Mimg').each(function(){$(this).prop('disabled', false)})
 		var ids = data.data["id"];
 		var n = ids.length;
 		var cellsize = 12;
