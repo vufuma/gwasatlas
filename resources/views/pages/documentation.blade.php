@@ -83,9 +83,33 @@
 			We selected traits with at least 50,000 individuals with non-missing phenotypes and
 			both cases and controls are at least 10,000 for binary traits.
 			Only phenotype of first visit and first run (f.xxx.0.0) was used with some exceptions
-			(please refer Supplementary Note 1-2 and Supplementary Table 1-2 of [4] for details).
+			(please refer Supplementary Text and Supplementary Table 1-2 of [4] for details).
 			GWAS was performed using PLINK v2.0 with either linear or logistic model by correcting for
 			age, sex, array, assessment center and Townsend deprivation index.
+			<br/><br/>
+			<strong>Columns of the summary statistics</strong><br/>
+			<div style="padding-left:20px">
+				SNP: unique ID of the SNP consists of chromosome, position and alphabetically ordered alleles<br/>
+				CHR: chromosome<br/>
+				BP: base pair position on GRCh37<br/>
+				A1: effect allele<br/>
+				TEST: Type of test (ADD for all files)<br/>
+				NMISS: Number of non-missing genotypes<br/>
+				BETA/OR: Regression coefficient or odds ratio<br/>
+				SE: Standard error<br/>
+				L95: Lower bound on confidence interval for CMH odds ratio<br/>
+				U95: Upper bound on confidence interval for CMH odds ratio<br/>
+				STAT: Coefficient t-statistics<br/>
+				P: P-value<br/>
+				A2: non effect allele<br/>
+				MAF: Minor allele frequency<br/>
+				NCHROBS: Number of allele observation<br/>
+				SNPID_UKB: rsID provided by UK Biobank<br/>
+				A1_UKB: A1 allele in UK Biobank<br/>
+				A2_UKB: A2 allele in UK Biobank<br/>
+				INFO_UKB: Info score provided by UK Biobank<br/>
+				MAF_UKB: MAF of entire UK Boiobank samples<br/>
+			</div>
 			<h4>2.3. Pre-process of GWAS summary statistics</h4>
 			Curated summary statistics on the database was pre-processed to standardise the format.
 			SNPs with P-value <=0 or >1, or non-numeric value such as “NA” were excluded.
@@ -417,7 +441,7 @@
 					<i>Nat. Commun.</i> <b>8</b>, 1826 (2017).
 					<a target="_blank" href="https://www.ncbi.nlm.nih.gov/pubmed/29184056">PMID: 29184056</a>
 				</li>
-				<li>Watanabe, K. <i>et al.</i> A global view of genetic architecture in human complex traits.
+				<li>Watanabe, K. <i>et al.</i> A global view of pleiotropy and genetic architecture1 in human complex traits.
 					[under preparation].
 				</li>
 				<li>Bycroft, C. <i>et al.</i> Genome-wide genetic data on ~500,000 UK Biobank particiants.

@@ -233,6 +233,7 @@
 						'Select GWAS with the maximum sample size per trail' and the manual selection if any of them is selected,
 						but before the filtering of P-value or Bonferroni corrected P-value.
 					</span>
+					<br/>
 					Download the plot as
 					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown2("GCplot","png");'>PNG</button>
 					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown2("GCplot","jpeg");'>JPG</button>

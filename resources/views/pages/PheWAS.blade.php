@@ -182,9 +182,6 @@
 			<h4 class="panel-title">PheWAS table</h4>
 		</div>
 		<div class="panel-body">
-			Download the table as
-			<button class="btn btn-xs" onclick='CSVdown("PheWAStable");'>csv</button>
-			<br/>
 			<div style="overflow-x:auto;">
 				<table id="PheWAStable" class="display compact dt-body-right dt-head-center" width="90%" cellspacing="0" style="font-size:12px;">
 					<thead>

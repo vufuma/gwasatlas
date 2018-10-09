@@ -419,8 +419,8 @@ function tablePheWAS(data){
 		+'</td><td>'+d[1]+'</td><td>'+d[6]+'</td></tr>');
 	});
 	$('#PheWAStable').DataTable({
-		// dom: 'Bfrtip',
-		// buttons: ['pageLength', 'csvHtml5'],
+		dom: 'Bfrtip',
+		buttons: ['pageLength', 'csvHtml5'],
 		"lengthMenue": [[10, 25, 50, -1], [10, 25, 50, "All"]],
 		"iDisplayLength": 10,
 		"stripeClasses": []
