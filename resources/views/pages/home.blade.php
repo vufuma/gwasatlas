@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="{!! URL::asset('css/odometer-theme-default.css') !!}">
 <script type="text/javascript">
 	$(document).ready(function(){
+		$('.releaseSubmit').hide()
 		$.ajax({
 			url: "/home/dbSum",
 			type: "POST",
@@ -23,6 +24,13 @@
 				$('#uniqDomain').html(data.domain);
 			}
 		});
+
+		$('.release').on('click', function(){
+			console.log($(this).text())
+
+			$('#release_file').val($(this).text());
+			$('#releaseSubmit').trigger('click');
+		})
 	});
 </script>
 @stop
@@ -102,6 +110,25 @@
 				<strong>2017-12-18</strong><br/>
 				<div style="padding-left:20px">
 					First internal release of the website.
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div style="padding-top:20ox; padding-bottom:20px;">
+		<div class="panel panel-default">
+			<div class="panel-heading"><h4>Database release</h4></div>
+			<div class="panel-body" style="max-height:200px; overflow-y:auto;">
+				<form method="post" target="_blank" action="{{ Config::get('app.subdir') }}/home/release">
+					<input type="hidden" name="_token" value="{{ csrf_token() }}">
+					<input type="hidden" name="file" id="release_file" val=""/>
+					<input type="submit" id="releaseSubmit" class="releaseSubmit"/>
+				</form>
+				<strong>v20180928</strong><br/>
+				<div style="padding-left:20px">
+					Plain text file: <a class="release">gwasATLAS_v20180928.txt.gz</a><br/>
+					Excel file: <a class="release">gwasATLAS_v20180928.xlsx.gz</a><br/>
+					README file: <a class="release">gwasATLAS_v20180928.readme</a><br/>
 				</div>
 			</div>
 		</div>

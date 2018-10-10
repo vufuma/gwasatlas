@@ -24,6 +24,7 @@ return [
 
   'datadir' => env('APP_DATADIR', ''),
   'sumstatsdir' => env('APP_SUMSTATS', ''),
+  'releasedir' => env('APP_RELEASE', ''),
 
   /*
   |--------------------------------------------------------------------------

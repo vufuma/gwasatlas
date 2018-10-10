@@ -111,4 +111,10 @@ class BaseController extends Controller
 			echo '{"data":[]}';
 		}
     }
+
+	public function release(Request $request){
+		$file = $request -> input('file');
+		$filedir = config('app.releasedir');
+		return response() -> download($filedir.'/'.$file);
+	}
 }

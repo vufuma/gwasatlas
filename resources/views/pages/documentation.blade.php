@@ -140,7 +140,7 @@
 				<tbody>
 					<tr>
 						<td>id</td>
-						<td>Unique ID in the database (arbitrary ordered).</td>
+						<td>Unique ID in the database (arbitrary order).</td>
 					</tr>
 					<tr>
 						<td>PMID</td>
