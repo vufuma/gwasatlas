@@ -53,7 +53,8 @@
 	</p>
 	<p>
 		<strong>Citation:</strong><br/>
-		Under preparation.
+		Watanabe, K. <i>et al.</i> A global view of pleiotropy and genetic architecture in complex traits. <i>bioRxiv</i>
+		<a target="_blank" href="https://www.biorxiv.org/content/early/2018/12/19/500090">doi: https://doi.org/10.1101/500090</a>
 	</p>
 	<br/>
 	<p style="font-size: 18px;">
@@ -100,6 +101,11 @@
 		<div class="panel panel-default">
 			<div class="panel-heading"><h4>What's new</h4></div>
 			<div class="panel-body" style="max-height:200px; overflow-y:auto;">
+				<strong>2018-12-20</strong><br/>
+				<div style="padding-left:20px">
+					Preprint is now available (<a target="_blank" href="https://www.biorxiv.org/content/early/2018/12/19/500090">doi: https://doi.org/10.1101/500090</a>).
+					The second release of the atlas database (total 4155 GWAS) will be available soon.
+				</div>
 				<strong>2018-09-28</strong><br/>
 				<div style="padding-left:20px">
 					First release of atlas database with 3798 GWAS summary statistics.
