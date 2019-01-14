@@ -21,6 +21,8 @@ $(document).ready(function(){
 	Selection("Domain");
 	// updatePlot();
 
+	$('PheWAStable_SNP').hide();
+
 	$('#plotPheWAS').on('click', function(){
 		updatePlot();
 	});
@@ -266,7 +268,7 @@ function updatePlot(){
 			if(data.length>0){
 				data = JSON.parse(data);
 				plotPheWAS(data);
-				tablePheWAS(data.data);
+				tablePheWAS(data.type, data.data);
 			}else{
 				$('#PheWASplot').html('<div style="height:200px;color:red;font-size:24px;text-align:center;padding-top:50px;">Sorry, we could not find any hit...<br/>'
 				+'Please try with different name or ID.</div>');
@@ -410,21 +412,43 @@ function plotPheWAS(data){
 	}
 }
 
-function tablePheWAS(data){
-	$('#PheWAStable').DataTable().destroy();
-	$('#PheWAStable_body').html("");
-	data.forEach(function(d){
-		$('#PheWAStable_body').append('<tr><td>'+d[0]+'</td><td>'+d[2]+'</td><td>'
-		+d[3]+'</td><td>'+d[4]+'</td><td>'+d[5]
-		+'</td><td>'+d[1]+'</td><td>'+d[6]+'</td></tr>');
-	});
-	$('#PheWAStable').DataTable({
-		dom: 'Bfrtip',
-		buttons: ['pageLength', 'csvHtml5'],
-		"lengthMenue": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-		"iDisplayLength": 10,
-		"stripeClasses": []
-	});
+function tablePheWAS(type, data){
+	$('#PheWAStable_SNP').DataTable().destroy();
+	$('#PheWAStable_gene').DataTable().destroy();
+	if(type=="SNP"){
+		$('#PheWAStable_gene').hide();
+		$('#PheWAStable_SNP').show();
+		$('#PheWAStable_SNP_body').html("");
+		data.forEach(function(d){
+			$('#PheWAStable_SNP_body').append('<tr><td>'+d[0]+'</td><td>'+d[2]+'</td><td>'
+			+d[3]+'</td><td>'+d[4]+'</td><td>'+d[5]
+			+'</td><td>'+d[1]+'</td><td>'+d[6]+'</td><td>'
+			+d[7]+'</td><td>'+d[8]+'</td></tr>');
+		});
+		$('#PheWAStable_SNP').DataTable({
+			dom: 'Bfrtip',
+			buttons: ['pageLength', 'csvHtml5'],
+			"lengthMenue": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+			"iDisplayLength": 10,
+			"stripeClasses": []
+		});
+	}else{
+		$('#PheWAStable_SNP').hide();
+		$('#PheWAStable_gene').show();
+		$('#PheWAStable_gene_body').html("");
+		data.forEach(function(d){
+			$('#PheWAStable_gene_body').append('<tr><td>'+d[0]+'</td><td>'+d[2]+'</td><td>'
+			+d[3]+'</td><td>'+d[4]+'</td><td>'+d[5]
+			+'</td><td>'+d[1]+'</td><td>'+d[6]+'</td></tr>');
+		});
+		$('#PheWAStable_gene').DataTable({
+			dom: 'Bfrtip',
+			buttons: ['pageLength', 'csvHtml5'],
+			"lengthMenue": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+			"iDisplayLength": 10,
+			"stripeClasses": []
+		});
+	}
 }
 
 function CSVdown(name){

@@ -183,7 +183,7 @@
 		</div>
 		<div class="panel-body">
 			<div style="overflow-x:auto;">
-				<table id="PheWAStable" class="display compact dt-body-right dt-head-center" width="90%" cellspacing="0" style="font-size:12px;">
+				<table id="PheWAStable_gene" class="display compact dt-body-right dt-head-center" width="90%" cellspacing="0" style="font-size:12px;">
 					<thead>
 						<th>atlas ID</th>
 						<th>PMID</th>
@@ -193,7 +193,21 @@
 						<th>P-value</th>
 						<th>N</th>
 					</thead>
-					<tbody id="PheWAStable_body"></tbody>
+					<tbody id="PheWAStable_gene_body"></tbody>
+				</table>
+				<table id="PheWAStable_SNP" class="display compact dt-body-right dt-head-center" width="90%" cellspacing="0" style="font-size:12px;">
+					<thead>
+						<th>atlas ID</th>
+						<th>PMID</th>
+						<th>Year</th>
+						<th>Domain</th>
+						<th>Trait</th>
+						<th>P-value</th>
+						<th>N</th>
+						<th>EA</th>
+						<th>NEA</th>
+					</thead>
+					<tbody id="PheWAStable_SNP_body"></tbody>
 				</table>
 			</div>
 		</div>

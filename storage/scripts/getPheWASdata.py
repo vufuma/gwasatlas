@@ -64,16 +64,20 @@ def getSNP(text, ids, host, user, passwd, db, datadir, maxP):
 
 	out = []
 	p = {}
+	ea = {}
+	nea = {}
 	tb = tabix.open(datadir+"/snps_P_lt_0_05_chr"+str(chrom)+".txt.gz")
 	snps = tb.querys(str(chrom)+":"+str(pos)+"-"+str(pos))
 	for l in snps:
-		if int(l[3]) in ids and float(l[2])<maxP:
-			p[int(l[3])] = float(l[2])
+		if int(l[5]) in ids and float(l[4])<maxP:
+			p[int(l[5])] = float(l[4])
+			ea[int(l[5])] = l[2]
+			nea[int(l[5])] = l[3]
 	c.execute("SELECT id,PMID,Year,Domain,Trait,N FROM gwasDB")
 	rows = c.fetchall()
 	for r in rows:
 		if r[0] in p:
-			out.append([r[0], p[r[0]]]+list(r)[1:])
+			out.append([r[0], p[r[0]]]+list(r)[1:]+[ea[r[0]], nea[r[0]]])
 
 	return out
 
@@ -181,6 +185,6 @@ def main():
 		order.append(list(t[np.lexsort((t[:,5], t[:,4])),0])) ## domain_alph
 		order.append(list(t[np.lexsort((t[:,1].astype(float), t[:,4])),0])) ## domain_p
 
-	print json.dumps({"data":out, "order":order, "error":error})
+	print json.dumps({"type":input_type, "data":out, "order":order, "error":error})
 
 if __name__=="__main__": main()
