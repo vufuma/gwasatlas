@@ -21,7 +21,8 @@ $(document).ready(function(){
 	Selection("Domain");
 	// updatePlot();
 
-	$('PheWAStable_SNP').hide();
+	$('#PheWAStable_SNP').hide();
+	$('#PheWAStable_SNP_info').hide();
 
 	$('#plotPheWAS').on('click', function(){
 		updatePlot();
@@ -418,6 +419,7 @@ function tablePheWAS(type, data){
 	if(type=="SNP"){
 		$('#PheWAStable_gene').hide();
 		$('#PheWAStable_SNP').show();
+		$('#PheWAStable_SNP_info').show();
 		$('#PheWAStable_SNP_body').html("");
 		data.forEach(function(d){
 			$('#PheWAStable_SNP_body').append('<tr><td>'+d[0]+'</td><td>'+d[2]+'</td><td>'
@@ -434,6 +436,7 @@ function tablePheWAS(type, data){
 		});
 	}else{
 		$('#PheWAStable_SNP').hide();
+		$('#PheWAStable_SNP_info').hide();
 		$('#PheWAStable_gene').show();
 		$('#PheWAStable_gene_body').html("");
 		data.forEach(function(d){

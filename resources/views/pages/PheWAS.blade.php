@@ -209,6 +209,12 @@
 					</thead>
 					<tbody id="PheWAStable_SNP_body"></tbody>
 				</table>
+				<span id="PheWAStable_SNP_info" class="info"><i class="fa fa-info"></i> Alleles for SNPs table <br/>
+					EA (effect allele): allele increases the risk of the phenotype (for binary phenotype) or the phenotype value (for quantitative phenotype).<br/>
+					NEA (non-effect allele): other alleles.<br/>
+					EA and NEA are only provided for GWAS when both effect and non-effect alleles and signed effect (beta or OR) are provided in the original summary statistics.
+					Otherwise NA.
+				</span>
 			</div>
 		</div>
 	</div>
