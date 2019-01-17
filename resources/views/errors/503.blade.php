@@ -13,6 +13,7 @@
 <script type="text/javascript">
 	$(document).ready(function(){
 		$('.releaseSubmit').hide()
+		$('.btn').prop("disabled", true);
 		$.ajax({
 			url: "/home/dbSum",
 			type: "POST",
@@ -39,7 +40,7 @@
 <div class="container" style="padding-top:50px;">
 	<div id="message" style="text-align: center;">
 		<div class="alert alert-danger" style="font-size:24px;">
-			GWAS atlas is currently closed for a server maintenance.
+			GWAS atlas is currently closed for an update.
 			Will be back online as soon as possible!!
 		</div>
 	</div>
@@ -59,7 +60,8 @@
 	</p>
 	<p>
 		<strong>Citation:</strong><br/>
-		Under preparation.
+		Watanabe, K. <i>et al.</i> A global view of pleiotropy and genetic architecture in complex traits. <i>bioRxiv</i>
+		<a target="_blank" href="https://www.biorxiv.org/content/early/2018/12/19/500090">doi: https://doi.org/10.1101/500090</a>
 	</p>
 	<br/>
 	<p style="font-size: 18px;">
@@ -106,6 +108,12 @@
 		<div class="panel panel-default">
 			<div class="panel-heading"><h4>What's new</h4></div>
 			<div class="panel-body" style="max-height:200px; overflow-y:auto;">
+				<strong>2019-01-17</strong><br/>
+				<div style="padding-left:20px">
+					Second release of atlas database with in total of 4155 GWAS summary statistics (ID 3799-4155 are new GWASs).
+					The last database curation was done in Oct 2018.
+					Several updates have done for ID 1-3798 (see "DateLastModfied" column in the database).
+				</div>
 				<strong>2018-09-28</strong><br/>
 				<div style="padding-left:20px">
 					First release of atlas database with 3798 GWAS summary statistics.

@@ -101,6 +101,12 @@
 		<div class="panel panel-default">
 			<div class="panel-heading"><h4>What's new</h4></div>
 			<div class="panel-body" style="max-height:200px; overflow-y:auto;">
+				<strong>2019-01-17</strong><br/>
+				<div style="padding-left:20px">
+					Second release of atlas database with in total of 4155 GWAS summary statistics (ID 3799-4155 are new GWASs).
+					The last database curation was done in Oct 2018.
+					Several updates have done for ID 1-3798 (see "DateLastModfied" column in the database).
+				</div>
 				<strong>2018-12-20</strong><br/>
 				<div style="padding-left:20px">
 					Preprint is now available (<a target="_blank" href="https://www.biorxiv.org/content/early/2018/12/19/500090">doi: https://doi.org/10.1101/500090</a>).
@@ -130,7 +136,13 @@
 					<input type="hidden" name="file" id="release_file" val=""/>
 					<input type="submit" id="releaseSubmit" class="releaseSubmit"/>
 				</form>
-				<strong>v20180928</strong><br/>
+				<strong>Release 2: v20190117</strong><br/>
+				<div style="padding-left:20px">
+					Plain text file: <a class="release">gwasATLAS_v20190117.txt.gz</a><br/>
+					Excel file: <a class="release">gwasATLAS_v20190117.xlsx.gz</a><br/>
+					README file: <a class="release">gwasATLAS_v20190117.readme</a><br/>
+				</div>
+				<strong>Release 1: v20180928</strong><br/>
 				<div style="padding-left:20px">
 					Plain text file: <a class="release">gwasATLAS_v20180928.txt.gz</a><br/>
 					Excel file: <a class="release">gwasATLAS_v20180928.xlsx.gz</a><br/>
