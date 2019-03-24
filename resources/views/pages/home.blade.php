@@ -105,7 +105,7 @@
 				<div style="padding-left:20px">
 					Second release of atlas database with in total of 4155 GWAS summary statistics (ID 3799-4155 are new GWASs).
 					The last database curation was done in Oct 2018.
-					Several updates have done for ID 1-3798 (see "DateLastModfied" column in the database).
+					Several updates have done for ID 1-3798 (see "DateLastModified" column in the database).
 				</div>
 				<strong>2018-12-20</strong><br/>
 				<div style="padding-left:20px">
