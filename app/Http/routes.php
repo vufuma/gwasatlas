@@ -81,6 +81,15 @@ Route::get('/faq', function(){
   return view('pages.faq');
 });
 
+// ************** Report GWAS Page ***************
+Route::get('/report', function(){
+  return view('pages.report');
+});
+
+Route::post('/report/submit', 'ReportController@submit');
+
+Route::get('/report/getTable', 'ReportController@getTable');
+
 // ************** Stats Page ***************
 Route::get('/stats', function(){
   return view('pages.stats');

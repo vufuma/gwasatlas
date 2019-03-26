@@ -18,6 +18,7 @@
         <li class="{{ Request::is('multiGWAS*') ? 'active' : ''}}"><a href="{{ Config::get('app.subdir') }}/multiGWAS">Multiple GWAS comparison</a></li>
 		<li class="{{ Request::is('PheWAS*') ? 'active' : ''}}"><a href="{{ Config::get('app.subdir') }}/PheWAS">PheWAS</a></li>
 		<li class="{{ Request::is('stats*') ? 'active' : ''}}"><a href="{{ Config::get('app.subdir') }}/stats">Stats</a></li>
+		<li class="{{ Request::is('report*') ? 'active' : ''}}"><a href="{{ Config::get('app.subdir') }}/report">Report GWAS</a></li>
         <li class="{{ Request::is('documentation*') ? 'active' : ''}}"><a href="{{ Config::get('app.subdir') }}/documentation">Documentation</a></li>
 		<li class="{{ Request::is('howto') ? 'active' : ''}}"><a href="{{ Config::get('app.subdir') }}/faq">FAQ</a></li>
       </ul>
