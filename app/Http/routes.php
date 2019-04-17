@@ -8,6 +8,8 @@ Route::post('/home/dbSum', 'StatsController@dbSum');
 
 Route::post('/home/release', 'BaseController@release');
 
+Route::get('/home/getAckn', 'BaseController@getAckn');
+
 Route::get('/howto', function(){
   return view('pages.howto');
 });

@@ -31,6 +31,15 @@
 			$('#release_file').val($(this).text());
 			$('#releaseSubmit').trigger('click');
 		})
+
+		$.ajax({
+			url: "/home/getAckn",
+			type: "GET",
+			success: function(data){
+				console.log(data)
+				$('#ackn').append(data);
+			}
+		});
 	});
 </script>
 @stop
@@ -49,7 +58,9 @@
 	</p>
 	<p>
 		If you have/find GWAS summary statistics that are publicly available
-		and not included in this database, please let us know by contacting Kyoko Watanabe (k.watanabe@vu.nl).
+		and not included in this database, please let us know from <a href="{{ Config::get('app.subdir') }}/report">Report GWAS</a> page.
+		We appreciate any contribution to make the GWAS atlas as comprehensive as possible!!
+		Contributions are acknowledged at the bottom of this page (except anonymous submissions).
 	</p>
 	<p>
 		<strong>Citation:</strong><br/>
@@ -147,6 +158,21 @@
 					Plain text file: <a class="release">gwasATLAS_v20180928.txt.gz</a><br/>
 					Excel file: <a class="release">gwasATLAS_v20180928.xlsx.gz</a><br/>
 					README file: <a class="release">gwasATLAS_v20180928.readme</a><br/>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div style="padding-top:20ox; padding-bottom:20px;">
+		<div class="panel panel-default">
+			<div class="panel-heading"><h4>Acknowledgements for contributions</h4></div>
+			<div class="panel-body" style="max-height:200px; overflow-y:auto;">
+				<div id="ackn">
+					<strong>
+						Thank you for your contributions!!<br/>
+						Names are ordered by the number of submissions (within square brackets), otherwise arbitral.
+					</strong>
+					<br/>
 				</div>
 			</div>
 		</div>

@@ -117,4 +117,28 @@ class BaseController extends Controller
 		$filedir = config('app.releasedir');
 		return response() -> download($filedir.'/'.$file);
 	}
+
+	public function getAckn(){
+		$out = [];
+		$rows = DB::select('SELECT name, affiliation, count(*) as count FROM reportedGWAS WHERE anonymous=0 GROUP BY name, affiliation ORDER BY count DESC');
+		foreach($rows as $r){
+			$n = $r->name;
+			$a = $r->affiliation;
+			$c = $r->count;
+			if($a=="NA"){
+				$out[] = $n." [".$c."]";
+			}else{
+				$out[] = $n." (".$a.") [".$c."]";
+			}
+		}
+		$anony = collect(DB::select('SELECT name FROM reportedGWAS WHERE anonymous=1'))->count();
+		if($anony>0){
+			$out[] = "Anonymous [".$anony."]";
+		}
+		if(count($out)>0){
+			return implode(", ", $out);
+		}else{
+			return "No contribution has been made.";
+		}
+	}
 }

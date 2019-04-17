@@ -36,13 +36,12 @@ $(document).ready(function(){
 			<h4>I can't find GWAS summary statistics I'm looking for. <a href="#faq2" data-toggle="collapse" style="float: right; padding-right:20px;"><i class="fa fa-chevron-down"></i></a></h4>
 		</div>
 		<div class="panel-body collapse" id="faq2">
-			The atlas of GWAS summary statistics only contains GWAS summary statistics when results of full SNPs are publicly available without applying to access.
-			Non-GWAS results such as WES or customised chip studies are not included.
+			The atlas of GWAS summary statistics only contains GWAS summary statistics when results of full SNPs are publicly available without any application to access.
+			Non-GWAS results such as WES or customised chip studies are not included (for the current version).
 			Please also check the latest release of the database from the home page.
-			If the GWAS you are looking for is published after the last release, it might be included for the next release.
 			If the GWAS is already published and full results are publicly available, but you can't still find them in the database,
-			please contact Kyoko Watanabe (k.watanabe@vu.nl).
-			We appreciate your contribution to make the database comprehensive.
+			please report the GWAS from <a href="{{ Config::get('app.subdir') }}/report">Report GWAS page</a>.
+			We appreciate your contribution to make the database comprehensive!!
 		</div>
 	</div>
 	<div class="panel panel-default">
