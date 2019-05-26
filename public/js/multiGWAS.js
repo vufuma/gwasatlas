@@ -1309,7 +1309,10 @@ function LociOverPlot(data){
 			y.domain([1, max_nTrait+1]);
 			svg.selectAll(".y.axis").call(yAxis);
 			svg.selectAll(".locidot").transition().duration(1000)
-				.attr("r", function(d){return d[5]/max_nDomain*7+3;})
+				.attr("r", function(d){
+					if(max_nDomain==1){return 4}
+					else{return d[5]/max_nDomain*7+3}
+				})
 				.attr("cy", function(d){return y(d[4])});
 			svg.selectAll(".ytitle").text("Number of GWAS");
 		}else{
@@ -1580,7 +1583,10 @@ function GenesPleiotropyPlot(data){
 			y.domain([1, max_nTrait+1]);
 			svg.selectAll(".y.axis").call(yAxis);
 			svg.selectAll(".genedot").transition().duration(1000)
-				.attr("r", function(d){return d[6]/max_nDomain*7+3;})
+				.attr("r", function(d){
+					if(max_nDomain==1){return 4}
+					else{return d[5]/max_nDomain*7+3}
+				})
 				.attr("cy", function(d){return y(d[5])});
 			svg.selectAll(".ytitle").text("Number of GWAS");
 		}else{
