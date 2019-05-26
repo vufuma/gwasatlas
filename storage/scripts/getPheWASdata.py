@@ -111,11 +111,11 @@ def getGene(text, ids, host, user, passwd, db, datadir, genesdir, maxP):
 
 	out = []
 	p = {}
-	genes = pd.read_table(datadir+"/magma.P.txt", header=0, dtype=str, usecols=["GENE"])
+	genes = pd.read_csv(datadir+"/magma.P.txt", delim_whitespace=True, header=0, dtype=str, usecols=["GENE"])
 	genes = np.array(genes)[:,0]
 	if text in genes:
 		idx = list(genes).index(text)
-		tmp = pd.read_table(datadir+"/magma.P.txt", header=None, dtype=str, skiprows=idx+1, nrows=1)
+		tmp = pd.read_csv(datadir+"/magma.P.txt", delim_whitespace=True, header=None, dtype=str, skiprows=idx+1, nrows=1)
 		tmp = np.array(tmp)[0,:]
 		for i in range(1, len(tmp)):
 			if i in ids and tmp[i]!="NA" and float(tmp[i])<maxP:

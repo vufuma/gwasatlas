@@ -44,7 +44,7 @@ conn = MySQLdb.connect(host=host, user=user, passwd=passwd, db=db)
 c = conn.cursor()
 
 ## get risk loci
-loci = pd.read_table(datadir+"/RiskLoci.txt", header=0)
+loci = pd.read_csv(datadir+"/RiskLoci.txt", header=0, sep="\t")
 loci = np.array(loci)
 loci = loci[ArrayIn(loci[:,0], ids)]
 if len(loci)==0:

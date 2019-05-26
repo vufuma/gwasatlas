@@ -45,7 +45,7 @@ conn = MySQLdb.connect(host=host, user=user, passwd=passwd, db=db)
 c = conn.cursor()
 
 ## magma genes
-magma = pd.read_table(datadir+"/magma.P.txt", header=0, index_col=0, usecols=["GENE"]+[str(x) for x in ids])
+magma = pd.read_csv(datadir+"/magma.P.txt", delim_whitespace=True, header=0, index_col=0, usecols=["GENE"]+[str(x) for x in ids])
 magma = magma.dropna()
 genes = np.array(list(magma.index.values))
 magma = np.array(magma)
@@ -65,7 +65,7 @@ magma = magma[genes.argsort()]
 genes = genes[genes.argsort()]
 
 ## ENSG
-ENSG = pd.read_table(genedir, header=0, usecols=["ensembl_gene_id", "external_gene_name", "chromosome_name", "start_position", "end_position"])
+ENSG = pd.read_csv(genedir, sep="\t", header=0, usecols=["ensembl_gene_id", "external_gene_name", "chromosome_name", "start_position", "end_position"])
 ENSG = np.array(ENSG)
 ENSG = ENSG[ENSG[:,0].argsort()]
 ENSG = ENSG[ArrayIn(ENSG[:,0], genes)]

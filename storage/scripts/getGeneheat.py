@@ -47,7 +47,7 @@ conn = MySQLdb.connect(host=host, user=user, passwd=passwd, db=db)
 c = conn.cursor()
 
 ## get sig genes
-magma = pd.read_table(datadir+"/magma.P.txt", header=0, index_col=0, usecols=["GENE"]+[str(x) for x in ids])
+magma = pd.read_csv(datadir+"/magma.P.txt", delim_whitespace=True, header=0, index_col=0, usecols=["GENE"]+[str(x) for x in ids])
 magma = magma.dropna()
 genes = np.array(list(magma.index.values))
 magma = np.array(magma)
