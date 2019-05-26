@@ -85,7 +85,8 @@
 			Only phenotype of first visit and first run (f.xxx.0.0) was used with some exceptions
 			(please refer Supplementary Text and Supplementary Table 1-2 of [4] for details).
 			GWAS was performed using PLINK v2.0 with either linear or logistic model by correcting for
-			age, sex, array, assessment center and Townsend deprivation index.
+			age, sex, 20 PCs (re-computed for EUR subjects only, not the PCs provided by UKB),
+			array, assessment center and Townsend deprivation index.
 			<br/><br/>
 			<strong>Columns of the summary statistics</strong><br/>
 			<div style="padding-left:20px">
@@ -96,7 +97,7 @@
 				TEST: Type of test (ADD for all files)<br/>
 				NMISS: Number of non-missing genotypes<br/>
 				BETA/OR: Regression coefficient or odds ratio<br/>
-				SE: Standard error<br/>
+				SE: Standard error (for OR, in logOR scale) <br/>
 				L95: Lower bound on confidence interval for CMH odds ratio<br/>
 				U95: Upper bound on confidence interval for CMH odds ratio<br/>
 				STAT: Coefficient t-statistics<br/>

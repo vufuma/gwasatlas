@@ -108,7 +108,7 @@
 		</div>
 	</div>
 
-	<div style="padding-top:20ox; padding-bottom:20px;">
+	<div style="padding-top:20px; padding-bottom:20px;">
 		<div class="panel panel-default">
 			<div class="panel-heading"><h4>What's new</h4></div>
 			<div class="panel-body" style="max-height:200px; overflow-y:auto;">
