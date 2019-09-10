@@ -28,7 +28,7 @@
 </script>
 <script type="text/javascript" src="{!! URL::asset('js/global.js') !!}"></script>
 <script type="text/javascript" src="{!! URL::asset('js/jquery.tabletoCSV.js') !!}"></script>
-<script type="text/javascript" src="{!! URL::asset('js/PheWAS.js') !!}"></script>
+<script type="text/javascript" src="{!! URL::asset('js/PheWAS.js') !!}?100"></script>
 @stop
 
 @section('content')
@@ -170,6 +170,7 @@
 			<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("PheWASplot","svg");'>SVG</button>
 			<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("PheWASplot","pdf");'>PDF</button>
 			<br/>
+			<div id="nDataPheWAS"></div>
 			<div style="overflow-y:auto;text-align:center;">
 				<div id="PheWASplot">
 					<h4>Please search either SNP or gene from the search box</h4>

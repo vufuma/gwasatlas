@@ -104,7 +104,7 @@
 				<strong>2019-09-10</strong><br/>
 				<div style="padding-left:20px">
 					Allele misspecification for atlas ID 4096, 4098-4155 are fixed.
-					This update only affects EA and NEA columns for the PheWAS table of SNPs.
+					This update only affects EA and NEA columns for the PheWAS table of SNPs.<br/>
 				</div>
 				<strong>2019-01-17</strong><br/>
 				<div style="padding-left:20px">

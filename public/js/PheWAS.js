@@ -268,7 +268,7 @@ function updatePlot(){
 		success: function(data){
 			if(data.length>0){
 				data = JSON.parse(data);
-				plotPheWAS(data);
+				plotPheWAS(data, ids.length);
 				tablePheWAS(data.type, data.data);
 			}else{
 				$('#PheWASplot').html('<div style="height:200px;color:red;font-size:24px;text-align:center;padding-top:50px;">Sorry, we could not find any hit...<br/>'
@@ -278,9 +278,10 @@ function updatePlot(){
 	})
 }
 
-function plotPheWAS(data){
+function plotPheWAS(data, nIDs){
 	$('#PheWASplot').html("");
 	if(data.error.length>0){
+		$('#nDataPheWAS').html("")
 		$('#PheWASplot').append('<div id="errorms" style="height:200px;color:red;font-size:24px;text-align:center;padding-top:50px;"></div>')
 		if(data.error=="SNP_input_error"){
 			$('#errorms').append("Input format of the SNP is not valid.")
@@ -315,6 +316,10 @@ function plotPheWAS(data){
 		if(nData>100){labelFont=5;}
 		else if(nData>50){labelFont=6;}
 		else if(nData>10){labelFont=8;}
+
+		if(nIDs==0){nIDs = selectTable.columns(0).nodes()[0].length;}
+		$('#nDataPheWAS').html('Number of GWASs considered: '+nIDs+' (including GWASs in which the serached SNP or gene was not tested, Bonferroni corrected P-value: '+(0.05/nIDs).toExponential(2)+').<br/>'
+			+'Number of data points in the plot: '+nData+' (Bonferroni corrected P-value: '+(0.05/nData).toExponential(2)+').<br/>')
 
 		var order={"alph":0, "p":1, "n":2, "domain_alph":3, "domain_p":4};
 		var order_idx = order[$('#traitOrder').val()];
