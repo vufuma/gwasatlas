@@ -112,6 +112,11 @@
 		<div class="panel panel-default">
 			<div class="panel-heading"><h4>What's new</h4></div>
 			<div class="panel-body" style="max-height:200px; overflow-y:auto;">
+				<strong>2019-09-10</strong><br/>
+				<div style="padding-left:20px">
+					Allele misspecification for atlas ID 4096, 4098-4155 are fixed.
+					This update only affects EA and NEA columns for the PheWAS table of SNPs.<br/>
+				</div>
 				<strong>2019-04-17</strong><br/>
 				<div style="padding-left:20px">
 					We have added a page to report missing GWAS from the ATLAS database.
