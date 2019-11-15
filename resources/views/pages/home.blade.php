@@ -64,8 +64,8 @@
 	</p>
 	<p>
 		<strong>Citation:</strong><br/>
-		Watanabe, K. <i>et al.</i> A global view of pleiotropy and genetic architecture in complex traits. <i>bioRxiv</i>
-		<a target="_blank" href="https://www.biorxiv.org/content/early/2018/12/19/500090">doi: https://doi.org/10.1101/500090</a>
+		Watanabe, K. <i>et al.</i> A global overview of pleiotropy and genetic architecture in complex traits. <i>Nat. Genet.</i> <b>51</b>, 1339-1348 (2019).
+		<a target="_blank" href="https://www.ncbi.nlm.nih.gov/pubmed/31427789">PMID: 31427789</a>
 	</p>
 	<br/>
 	<p style="font-size: 18px;">
@@ -112,10 +112,21 @@
 		<div class="panel panel-default">
 			<div class="panel-heading"><h4>What's new</h4></div>
 			<div class="panel-body" style="max-height:200px; overflow-y:auto;">
+				<strong>2019-11-15</strong><br/>
+				<div style="padding-left:20px">
+					Third release of atlas database with in total of 4756 GWAS summary statistics.
+					The last database curation was done in Aug 2019.
+					SNP heritability in observed scale was added to the database.
+					Several updates were made for previous entries (see "DateLastModified" column in the database).
+				</div>
 				<strong>2019-09-10</strong><br/>
 				<div style="padding-left:20px">
 					Allele misspecification for atlas ID 4096, 4098-4155 are fixed.
 					This update only affects EA and NEA columns for the PheWAS table of SNPs.<br/>
+				</div>
+				<strong>2019-08-19</strong><br/>
+				<div style="padding-left:20px">
+					The study was published in <i>Nature Genetics</i>.
 				</div>
 				<strong>2019-04-17</strong><br/>
 				<div style="padding-left:20px">
@@ -126,7 +137,7 @@
 				<div style="padding-left:20px">
 					Second release of atlas database with in total of 4155 GWAS summary statistics (ID 3799-4155 are new GWASs).
 					The last database curation was done in Oct 2018.
-					Several updates have done for ID 1-3798 (see "DateLastModified" column in the database).
+					Several updates were made for ID 1-3798 (see "DateLastModified" column in the database).
 				</div>
 				<strong>2018-12-20</strong><br/>
 				<div style="padding-left:20px">
@@ -148,26 +159,38 @@
 		</div>
 	</div>
 
-	<div style="padding-top:20ox; padding-bottom:20px;">
+	<div style="padding-top:20px; padding-bottom:20px;">
 		<div class="panel panel-default">
 			<div class="panel-heading"><h4>Database release</h4></div>
-			<div class="panel-body" style="max-height:200px; overflow-y:auto;">
+			<div class="panel-body" style="overflow-y:auto;">
 				<form method="post" target="_blank" action="{{ Config::get('app.subdir') }}/home/release">
 					<input type="hidden" name="_token" value="{{ csrf_token() }}">
 					<input type="hidden" name="file" id="release_file" val=""/>
 					<input type="submit" id="releaseSubmit" class="releaseSubmit"/>
 				</form>
+				<strong>Release 3: v20191115</strong><br/>
+				<div style="padding-left:20px">
+					README file: <a class="release">gwasATLAS_v20191115.readme</a><br/>
+					Plain text file: <a class="release">gwasATLAS_v20191115.txt.gz</a><br/>
+					Excel file: <a class="release">gwasATLAS_v20191115.xlsx.gz</a><br/>
+					Used column names: <a class="release">gwasATLAS_v20191115_columns.txt.gz</a><br/>
+					Full pair-wise genetic correlation: <a class="release">gwasATLAS_v20191115_GC.txt.gz</a><br/>
+					Full MAGMA gene P-values: <a class="release">gwasATLAS_v20191115_magma_P.txt.gz</a><br/>
+					Full risk loci: <a class="release">gwasATLAS_v20191115_riskloci.txt.gz</a><br/>
+				</div>
+				<br/>
 				<strong>Release 2: v20190117</strong><br/>
 				<div style="padding-left:20px">
+					README file: <a class="release">gwasATLAS_v20190117.readme</a><br/>
 					Plain text file: <a class="release">gwasATLAS_v20190117.txt.gz</a><br/>
 					Excel file: <a class="release">gwasATLAS_v20190117.xlsx.gz</a><br/>
-					README file: <a class="release">gwasATLAS_v20190117.readme</a><br/>
 				</div>
+				<br/>
 				<strong>Release 1: v20180928</strong><br/>
 				<div style="padding-left:20px">
+					README file: <a class="release">gwasATLAS_v20180928.readme</a><br/>
 					Plain text file: <a class="release">gwasATLAS_v20180928.txt.gz</a><br/>
 					Excel file: <a class="release">gwasATLAS_v20180928.xlsx.gz</a><br/>
-					README file: <a class="release">gwasATLAS_v20180928.readme</a><br/>
 				</div>
 			</div>
 		</div>

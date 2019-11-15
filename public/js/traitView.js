@@ -3,7 +3,8 @@ var table_desriptions = {
 	"Population": "Population assigned to one of the 5 populations from 1000 genomes, i.e. AFR, AMR, EAS, EUR and SAS. For multi-ethnic GWAS, all populations included in the GWAS are listed here. For UK Biobank chohort, UKB1 or UKB2 for each release.",
 	"Nsnps": "The number of SNPs in the original summary statistics file.",
 	"Nhits": "The number of independent genomic risk loci. See documentation for details of definitioin of risk loci.",
-	"SNPh2": "SNPs based heritability computed by LD score regression. This value is only available for GWAS which meet certain criteria. See documentaion for details."
+	"SNPh2": "SNPs based heritability in observed scale computed by LD score regression. This value is only available for GWAS which meet certain criteria. See documentaion for details.",
+	"SNPh2_l2": "SNPs based heritability in liability scale computed by LD score regression. This value is only available for GWAS which meet certain criteria. See documentaion for details.",
 }
 
 $(document).ready(function(){
@@ -22,7 +23,7 @@ $(document).ready(function(){
 			$('#title').html("<h3>atlas ID: "+id+" <strong>"+temp[0]["Trait"]+"</strong></h3>");
 			var header = ["id", "PMID", "Year", "File", "Website", "Consortium", "Domain", "ChapterLevel", "SubchapterLevel",
 				"Trait", "uniqTrait", "Population", "Ncase", "Ncontrol", "N", "Genome", "Nsnps", "Nhits", "SNPh2",
-				"SNPh2_se", "SNPh2_z", "LambdaGC", "Chi2", "Intercept", "Note"];
+				"SNPh2_se", "SNPh2_z", "SNPh2_l", "SNPh2_l_se", "LambdaGC", "Chi2", "Intercept", "Note"];
 			var table = '';
 			for(var i=0; i<header.length; i++){
 				if(header[i]=="Genome"){continue;}

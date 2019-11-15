@@ -396,41 +396,7 @@ class DBController extends Controller
 	}
 
 	public function manhattan($id, $file){
-		// $host = config('app.ssh_host');
-		// $user = config('app.ssh_user');
-		// $passwd = config('app.ssh_passwd');
-		// $datadir = config('app.ssh_datadir');
-		// $datadir .= '/'.$id.'/';
 		$filedir = config('app.datadir').'/'.$id.'/';
-		// $conn = ssh2_connect($host);
-		// if(ssh2_auth_password($conn, $user, $passwd)){
-		// 	$sftp = ssh2_sftp($conn);
-		// 	if($file == "manhattan.txt"){
-		// 		$stream = fopen("ssh2.sftp://$sftp".$datadir.$file, "r");
-		// 		$header = fgetcsv($stream, 0, "\t");
-		// 		$all_rows = [];
-		// 		while($row = fgetcsv($stream, 0, "\t")){
-		// 			$row[0] = (int)$row[0];
-		// 			$row[1] = (int)$row[1];
-		// 			$row[2] = (float)$row[2];
-		// 			$all_rows[] = $row;
-		// 		}
-		// 		echo json_encode($all_rows);
-		// 	}else if($file == "magma.genes.out"){
-		// 		$stream = fopen("ssh2.sftp://$sftp".$datadir.$file, "r");
-		// 		$header = fgetcsv($stream, 0, "\t");
-		// 		$all_rows = [];
-		// 		while($row = fgetcsv($stream, 0, "\t")){
-		// 			if($row[1]=="X"){$row[1] = "23";}
-		// 			$row[1] = (int)$row[1];
-		// 			$row[2] = (int)$row[2];
-		// 			$row[3] = (int)$row[3];
-		// 			$row[8] = (float)$row[8];
-		// 			$all_rows[] = array($row[1], $row[2], $row[3], $row[8], $row[9]);
-		// 		}
-		// 		echo json_encode($all_rows);
-		// 	}
-		// }
 		if($file == "manhattan.txt"){
 			if(file_exists($filedir.$file)){
 				$f = fopen($filedir.$file, "r");

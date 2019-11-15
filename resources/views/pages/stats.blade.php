@@ -116,6 +116,11 @@
 		<div class="panel-body">
 			<div id="domainSumPlot" style="text-align: center;">
 			</div>
+			<br/>
+			<span class="info"><i class="fa fa-info"></i>
+				SNP heritability is in liability scale (winsorized at 1).
+			</span>
+			<br/>
 		</div>
 	</div>
 </div>

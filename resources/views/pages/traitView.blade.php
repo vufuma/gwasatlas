@@ -21,7 +21,7 @@
 	var id = "{{ $id }}";
 </script>
 <script type="text/javascript" src="{!! URL::asset('js/global.js') !!}"></script>
-<script type="text/javascript" src="{!! URL::asset('js/traitView.js') !!}"></script>
+<script type="text/javascript" src="{!! URL::asset('js/traitView.js') !!}?0.0.3"></script>
 <script type="text/javascript" src="{!! URL::asset('js/jquery.tabletoCSV.js') !!}"></script>
 
 @stop

@@ -14,7 +14,7 @@ class MultiController extends Controller
 		$ids = $request->input('ids');
 		$ids = explode(":", $ids);
 
-		$tmp = DB::select('SELECT id, PMID, Year, Domain, Trait, N, Nhits, SNPh2, SNPh2_z FROM gwasDB');
+		$tmp = DB::select('SELECT id, PMID, Year, Domain, Trait, N, Nhits, IFNULL(SNPh2_l, SNPh2) as SNPh2, SNPh2_z FROM gwasDB');
 		$tmp = json_decode(json_encode($tmp), true);
 		$dbData = [];
 		foreach($tmp as $r){

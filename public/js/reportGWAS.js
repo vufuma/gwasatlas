@@ -95,7 +95,7 @@ function getTable(){
 			{"data": "date_submit", name: "Date submitted"},
 			{"data": "date_last_update", name: "Date last updated"}
 		],
-		"order": [[1, "desc"]],
+		"order": [[0, "desc"]],
 		"lengthMenue": [[10, 25, 50, -1], [10, 25, 50, "All"]],
 		"iDisplayLength": 10,
 		"stripeClasses": []

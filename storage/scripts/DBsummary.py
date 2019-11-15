@@ -34,7 +34,7 @@ conn = MySQLdb.connect(host=host, user=user, passwd=passwd, db=db)
 c = conn.cursor()
 
 ### get values
-c.execute('SELECT '+col+',PMID, uniqTrait, N, SNPh2 from gwasDB')
+c.execute('SELECT '+col+',PMID, uniqTrait, N, IFNULL(SNPh2_l, SNPh2) as SNPh2 from gwasDB')
 rows = c.fetchall()
 data = []
 for r in rows:
@@ -68,7 +68,9 @@ for g in groups:
 ### box plot for SNP h2
 Hbox = []
 Hboxout = []
-data = data[data[:,4].astype(float)>0]
+data[data[:,4].astype(float)>1,4] = "1"
+data[data[:,4].astype(float)<0,4] = "0"
+data = data[data[:,4].astype(float)>=0]
 for g in groups:
 	if g in data[:,0]:
 		med = round(np.median(data[data[:,0]==g,4].astype(float)), 2)

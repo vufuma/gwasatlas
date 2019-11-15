@@ -19,7 +19,7 @@
 <link rel="stylesheet" href="{!! URL::asset('css/sweetalert.css') !!}"> -->
 <script type="text/javascript" src="{!! URL::asset('js/global.js') !!}"></script>
 <script type="text/javascript" src="{!! URL::asset('js/HoldOn.min.js') !!}?0.0.1"></script>
-<script type="text/javascript" src="{!! URL::asset('js/reportGWAS.js') !!}?0.0.1"></script>
+<script type="text/javascript" src="{!! URL::asset('js/reportGWAS.js') !!}?0.0.3"></script>
 @stop
 
 @section('content')

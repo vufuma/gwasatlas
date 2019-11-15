@@ -60,8 +60,8 @@
 	</p>
 	<p>
 		<strong>Citation:</strong><br/>
-		Watanabe, K. <i>et al.</i> A global view of pleiotropy and genetic architecture in complex traits. <i>bioRxiv</i>
-		<a target="_blank" href="https://www.biorxiv.org/content/early/2018/12/19/500090">doi: https://doi.org/10.1101/500090</a>
+		Watanabe, K. <i>et al.</i> A global overview of pleiotropy and genetic architecture in complex traits. <i>Nat. Genet.</i> <b>51</b>, 1339-1348 (2019).
+		<a target="_blank" href="https://www.ncbi.nlm.nih.gov/pubmed/31427789">PMID: 31427789</a>
 	</p>
 	<br/>
 	<p style="font-size: 18px;">

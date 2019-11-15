@@ -315,12 +315,15 @@
 			SNPs are filtered on HapMap3 SNPs and the MHC region was excluded from any of LDSC analyses.
 			<h4>5.2. SNP heritability estimation</h4>
 			SNP heritability was estimated for GWAS with either EUR or EAS population
-			(or, EUR or EAS has the most proportion of the total sample size), and the number of SNPs
-			available in the summary statistics file is > 450,000.
+			(or, EUR or EAS has the most proportion of the total sample size), total sample size > 5,000
+			and the number of SNPs available in the summary statistics file is > 450,000.
 			When signed effect size or odds ratio is not available in the summary statistics file,
 			"--a1-inc” flag was used.
-			For binary traits, population prevalence was curated from literatures
-			(only for diseases whose prevalence was available, Supplementary Table 25 [4])
+			For all GWASs fulfil above criteria, SNP heritability was computed in observed scale.
+			<br/>
+			For binary traits, SNPs heritability was also computed in liability scale.
+			The population prevalence was curated from literatures
+			(only for diseases whose prevalence was available, Supplementary Table 25 [4] or in "Note" column of this databset)
 			to compute SNP heritability at liability scale with “--samp-prep” and ”--pop-prep”
 			flags and specified in the "Note" feature of the database.
 			For most of personality/activity (binary) traits from UKB2 cohort,
@@ -442,8 +445,8 @@
 					<i>Nat. Commun.</i> <b>8</b>, 1826 (2017).
 					<a target="_blank" href="https://www.ncbi.nlm.nih.gov/pubmed/29184056">PMID: 29184056</a>
 				</li>
-				<li>Watanabe, K. <i>et al.</i> A global view of pleiotropy and genetic architecture1 in human complex traits.
-					[under preparation].
+				<li>Watanabe, K. <i>et al.</i> A global overview of pleiotropy and genetic architecture in complex traits.
+					<i>Nat. Genet.</i> <b>51</b>, 1339-1348 (2019).
 				</li>
 				<li>Bycroft, C. <i>et al.</i> Genome-wide genetic data on ~500,000 UK Biobank particiants.
 					<i>bioRxiv</i> <a target="_blank" href="https://www.biorxiv.org/content/early/2017/07/20/166298">doi:https://doi.org/10.1101/166298</a> (2017).

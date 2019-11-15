@@ -177,6 +177,7 @@
 					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("nVSh2Plot","svg");'>SVG</button>
 					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("nVSh2Plot","pdf");'>PDF</button>
 					<br/>
+					<span class="info"><i class="fa fa-info"></i>SNP heritability is in liability scale.<br/></span>
 					<div id="nVSh2Body"></div>
 				</div>
 			</div>
@@ -193,6 +194,7 @@
 					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("lociVSh2Plot","svg");'>SVG</button>
 					<button class="btn btn-default btn-xs ImgDown" onclick='ImgDown("lociVSh2Plot","pdf");'>PDF</button>
 					<br/>
+					<span class="info"><i class="fa fa-info"></i>SNP heritability is in liability scale.<br/></span>
 					<div id="lociVSh2Body"></div>
 				</div>
 			</div>
