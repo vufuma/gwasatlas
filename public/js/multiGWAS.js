@@ -1220,7 +1220,9 @@ function LociOverPlot(data){
 	max_chr = Math.max(...chr);
 
 	var max_nTrait = d3.max(data.loci_group, function(d){return d[4]});
+	var nTrait_size = d3.scale.linear().range([1.5,5]).domain([0,max_nTrait*1.01])
 	var max_nDomain = d3.max(data.loci_group, function(d){return d[5]});
+	var nDomain_size = d3.scale.linear().range([1.5,5]).domain([0,max_nDomain*1.01])
 	var x = d3.scale.linear().range([0, width]);
 	x.domain([0, (chromStart[max_chr-1]+chromSize[max_chr-1])]);
 	var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(0);
@@ -1246,7 +1248,7 @@ function LociOverPlot(data){
 	svg.selectAll(".dot").data(data.loci_group).enter()
 		.append("circle")
 		.attr('class', 'locidot')
-		.attr("r", function(d){return d[4]/max_nTrait*7+3;})
+		.attr("r", function(d){return nTrait_size(d[4]);})
 		.attr("cx", function(d){return x((d[2]+d[3])/2+chromStart[d[1]-1])})
 		.attr("cy", function(d){return y(d[5])})
 		.attr("fill", function(d){
@@ -1309,17 +1311,14 @@ function LociOverPlot(data){
 			y.domain([1, max_nTrait+1]);
 			svg.selectAll(".y.axis").call(yAxis);
 			svg.selectAll(".locidot").transition().duration(1000)
-				.attr("r", function(d){
-					if(max_nDomain==1){return 4}
-					else{return d[5]/max_nDomain*7+3}
-				})
+				.attr("r", function(d){return nDomain_size(d[5])})
 				.attr("cy", function(d){return y(d[4])});
 			svg.selectAll(".ytitle").text("Number of GWAS");
 		}else{
 			y.domain([1, max_nDomain+1]);
 			svg.selectAll(".y.axis").call(yAxis);
 			svg.selectAll(".locidot").transition().duration(1000)
-				.attr("r", function(d){return d[4]/max_nTrait*7+3;})
+				.attr("r", function(d){return nTrait_size(d[4]);})
 				.attr("cy", function(d){return y(d[5])});
 			svg.selectAll(".ytitle").text("Number of Domains");
 		}
@@ -1495,8 +1494,9 @@ function GenesPleiotropyPlot(data){
 	max_chr = Math.max(...chr);
 
 	var max_nTrait = d3.max(data.genes, function(d){return d[5]});
+	var nTrait_size = d3.scale.linear().range([1.5,8]).domain([0,max_nTrait*1.001])
 	var max_nDomain = d3.max(data.genes, function(d){return d[6]});
-
+	var nDomain_size = d3.scale.linear().range([1.5,8]).domain([0,max_nDomain*1.001])
 	var x = d3.scale.linear().range([0, width]);
 	x.domain([0, (chromStart[max_chr-1]+chromSize[max_chr-1])]);
 	var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(0);
@@ -1522,7 +1522,7 @@ function GenesPleiotropyPlot(data){
 	svg.selectAll(".dot").data(data.genes).enter()
 		.append("circle")
 		.attr('class', 'genedot')
-		.attr("r", function(d){return d[5]/max_nTrait*7+3;})
+		.attr("r", function(d){return nTrait_size(d[5]);})
 		.attr("cx", function(d){return x((d[3]+d[4])/2+chromStart[d[2]-1])})
 		.attr("cy", function(d){return y(d[6])})
 		.attr("fill", function(d){
@@ -1583,17 +1583,14 @@ function GenesPleiotropyPlot(data){
 			y.domain([1, max_nTrait+1]);
 			svg.selectAll(".y.axis").call(yAxis);
 			svg.selectAll(".genedot").transition().duration(1000)
-				.attr("r", function(d){
-					if(max_nDomain==1){return 4}
-					else{return d[5]/max_nDomain*7+3}
-				})
+				.attr("r", function(d){return nDomain_size(d[6])})
 				.attr("cy", function(d){return y(d[5])});
 			svg.selectAll(".ytitle").text("Number of GWAS");
 		}else{
 			y.domain([1, max_nDomain+1]);
 			svg.selectAll(".y.axis").call(yAxis);
 			svg.selectAll(".genedot").transition().duration(1000)
-				.attr("r", function(d){return d[5]/max_nTrait*7+3;})
+				.attr("r", function(d){return nTrait_size(d[5]);})
 				.attr("cy", function(d){return y(d[6])});
 			svg.selectAll(".ytitle").text("Number of Domains");
 		}

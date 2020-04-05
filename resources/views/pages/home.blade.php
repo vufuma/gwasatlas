@@ -176,6 +176,7 @@
 					Used column names: <a class="release">gwasATLAS_v20191115_columns.txt.gz</a><br/>
 					Full pair-wise genetic correlation: <a class="release">gwasATLAS_v20191115_GC.txt.gz</a><br/>
 					Full MAGMA gene P-values: <a class="release">gwasATLAS_v20191115_magma_P.txt.gz</a><br/>
+					Full MAGMA gene-set P-values (MsigDB v7.0): <a class="release">gwasATLAS_v20191115_magma_sets_P.txt.gz</a><br/>
 					Full risk loci: <a class="release">gwasATLAS_v20191115_riskloci.txt.gz</a><br/>
 				</div>
 				<br/>

@@ -361,6 +361,9 @@
 			MAGMA gene-set analysis was performed for 4,737 curated gene set
 			and 5,917 GO terms (4,436 biological processes, 580 cellular components
 			and 901 molecular functions) from MsigDB v6.1 [9].
+			<br>
+			For the release of v20191115, gene-set analyses for all traits in the database are updated to MsigDB v7.0
+			(5,500 curated gene sets, 7,350 GO biological process, 1,001 GO cellular components, 1,645 GO molecular function).
 			<br/><br/>[<a href="#top">Go to top</a>]<br/>
 		</div>
 	</p>

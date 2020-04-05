@@ -27,7 +27,7 @@
 	var subdir = "{{ Config::get('app.subdir') }}";
 </script>
 <script type="text/javascript" src="{!! URL::asset('js/global.js') !!}"></script>
-<script type="text/javascript" src="{!! URL::asset('js/multiGWAS.js') !!}?0.0.1"></script>
+<script type="text/javascript" src="{!! URL::asset('js/multiGWAS.js') !!}?0.0.2"></script>
 
 @stop
 
