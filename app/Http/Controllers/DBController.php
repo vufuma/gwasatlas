@@ -391,7 +391,7 @@ class DBController extends Controller
 
 	public function getData(Request $request){
 		$id = $request->input("id");
-		$result = DB::table('gwasDB')->where('id', $id)->get();
+		$result = DB::table('gwasDB')->where('id', $id)->get()->all();
 		return json_encode($result);
 	}
 
